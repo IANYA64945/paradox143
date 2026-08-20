@@ -1,0 +1,20 @@
+#gameOverlay{position:fixed;inset:0;z-index:60;display:none;background:rgba(2,4,10,.78);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);touch-action:none}
+#gameOverlay.show{display:block}
+#gameCanvas{position:absolute;inset:0;width:100%;height:100%;display:none;touch-action:none}
+#gameCanvas.show{display:block}
+.gamePanel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(90vw,520px);padding:28px 24px;border:1px solid rgba(244,175,199,.34);border-radius:18px;background:linear-gradient(180deg,rgba(15,17,31,.97),rgba(7,8,17,.98));box-shadow:0 24px 80px rgba(0,0,0,.55),0 0 35px rgba(205,91,137,.11);color:#fff;text-align:center}
+.gamePanel.hidden{display:none}
+.gamePanel h2{font-family:Georgia,serif;font-size:clamp(23px,5vw,32px);font-weight:500;margin-bottom:14px}
+.gamePanel p{font-size:14px;line-height:1.6;color:rgba(255,255,255,.78);margin-bottom:18px}
+.gameBtn{border:1px solid rgba(255,219,232,.45);border-radius:999px;padding:11px 20px;background:rgba(164,73,106,.58);color:#fff;font-weight:600;letter-spacing:.06em;cursor:pointer;margin:5px;-webkit-tap-highlight-color:transparent}
+.gameBtn:active{transform:scale(.97)}
+#gameHud{position:absolute;left:50%;top:max(12px,env(safe-area-inset-top));transform:translateX(-50%);z-index:64;display:none;align-items:center;gap:16px;padding:8px 14px;border-radius:999px;background:rgba(0,0,0,.48);border:1px solid rgba(255,255,255,.12);color:#fff;font-size:12px;letter-spacing:.05em;white-space:nowrap}
+#gameHud.show{display:flex}
+#hpText{color:#ff6f93;font-size:17px;letter-spacing:.12em}
+#finalLetter{display:none}
+#finalLetter.show{display:block}
+.finalPaper{margin:0 auto 18px;width:min(100%,430px);padding:28px 25px;background:linear-gradient(180deg,#fffaf5,#f7e9eb);border-radius:10px;color:#5f3341;box-shadow:0 15px 45px rgba(0,0,0,.34)}
+.finalPaper .seal{font-size:25px;color:#bd5a7d;margin-bottom:10px}
+.finalPaper h2{color:#7e3d55;margin-bottom:16px}
+.finalPaper p{color:#694452;font-family:Georgia,serif;font-size:18px;line-height:1.55;margin:0}
+
