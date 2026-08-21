@@ -1,0 +1,1306 @@
+/* =========================================================
+   PARCHE MÁGICO DEL CAMPO
+   - Canasta flotante
+   - Badge mejorado
+   - Estrellas titilantes
+   - Halo/partículas de la luna
+   - Eventos ambientales por exploración
+========================================================= */
+
+
+/* =====================================================
+   1. CANASTA: SEPARADA DEL BORDE + PANEL SUAVE
+===================================================== */
+
+#letterBasketBtn{
+  left:max(20px,env(safe-area-inset-left)) !important;
+  bottom:max(20px,env(safe-area-inset-bottom)) !important;
+
+  width:106px !important;
+  height:138px !important;
+
+  padding:6px !important;
+
+  border:
+    1px solid
+    rgba(255,206,229,.20) !important;
+
+  border-radius:12px !important;
+
+  background:
+    rgba(0,0,0,.20) !important;
+
+  box-shadow:
+    0 8px 28px rgba(0,0,0,.25),
+    inset 0 0 18px rgba(255,199,226,.035) !important;
+
+  backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
+
+  overflow:visible !important;
+}
+
+
+/* La canasta sigue completa y apoyada dentro de su panel. */
+
+.basketPixelImage{
+  left:50% !important;
+  top:auto !important;
+  bottom:6px !important;
+
+  width:94px !important;
+  height:auto !important;
+
+  transform:translateX(-50%) !important;
+
+  image-rendering:pixelated !important;
+  image-rendering:crisp-edges !important;
+}
+
+
+/* =====================================================
+   2. BADGE DE CARTAS
+===================================================== */
+
+#basketCount{
+  right:-7px !important;
+  top:-8px !important;
+
+  min-width:28px !important;
+  height:28px !important;
+
+  padding:0 6px !important;
+
+  border:
+    3px solid
+    #66354f !important;
+
+  border-radius:7px !important;
+
+  background:
+    #f3a5c9 !important;
+
+  color:
+    #381829 !important;
+
+  font:
+    800 13px/1
+    monospace !important;
+
+  box-shadow:
+    0 0 0 2px rgba(255,229,241,.86),
+    0 0 12px rgba(248,167,207,.38) !important;
+
+  image-rendering:pixelated;
+}
+
+#basketCount.badgePop{
+  animation:
+    basketBadgePop
+    .56s
+    steps(5,end);
+}
+
+@keyframes basketBadgePop{
+  0%,100%{transform:scale(1)}
+  38%{transform:scale(1.42) rotate(-5deg)}
+  68%{transform:scale(.92) rotate(3deg)}
+}
+
+
+/* =====================================================
+   3. CARTITA VOLANDO HACIA LA CANASTA
+===================================================== */
+
+.magicCollectionFly{
+  position:fixed;
+  z-index:95;
+
+  width:34px;
+  height:26px;
+
+  pointer-events:none;
+
+  border:
+    2px solid
+    #6e395c;
+
+  background:
+    #e39bbd;
+
+  box-shadow:
+    0 0 0 2px #f4c0d7,
+    0 0 13px rgba(255,184,219,.55);
+
+  image-rendering:pixelated;
+}
+
+.magicCollectionFly::before,
+.magicCollectionFly::after{
+  content:"";
+  position:absolute;
+  inset:0;
+}
+
+.magicCollectionFly::before{
+  background:
+    linear-gradient(
+      145deg,
+      transparent 0 47%,
+      #bb678e 48% 52%,
+      transparent 53%
+    );
+}
+
+.magicCollectionFly::after{
+  content:"♡";
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff3f8;
+  font-size:12px;
+}
+
+
+/* =====================================================
+   4. CAPA MÁGICA
+===================================================== */
+
+#magicAmbientLayer{
+  position:fixed;
+  inset:0;
+
+  z-index:17;
+
+  overflow:hidden;
+
+  pointer-events:none;
+
+  touch-action:none;
+}
+
+
+/* =====================================================
+   ESTRELLAS TITILANTES
+===================================================== */
+
+#magicTwinkles{
+  position:absolute;
+  inset:0 0 58% 0;
+  overflow:hidden;
+}
+
+.magicTwinkleStar{
+  position:absolute;
+
+  width:2px;
+  height:2px;
+
+  border-radius:50%;
+
+  background:#f7fbff;
+
+  box-shadow:
+    0 0 4px rgba(239,247,255,.68);
+
+  opacity:.15;
+
+  animation:
+    magicTwinkle
+    var(--twinkle-time,4.8s)
+    ease-in-out
+    var(--twinkle-delay,0s)
+    infinite;
+}
+
+.magicTwinkleStar.big{
+  width:3px;
+  height:3px;
+
+  box-shadow:
+    0 0 5px rgba(255,255,255,.95),
+    0 0 11px rgba(204,221,255,.45);
+}
+
+@keyframes magicTwinkle{
+  0%,100%{
+    opacity:.12;
+    transform:scale(.70);
+  }
+
+  42%{
+    opacity:.92;
+    transform:scale(1.34);
+  }
+
+  68%{
+    opacity:.34;
+    transform:scale(.92);
+  }
+}
+
+
+/* =====================================================
+   5. LUNA: HALO MÁS MÁGICO
+===================================================== */
+
+#moonHotspot.awakened::before{
+  opacity:1 !important;
+
+  transform:
+    translate(-50%,-50%)
+    scale(1.68) !important;
+
+  filter:
+    brightness(1.42)
+    blur(.15px);
+
+  box-shadow:
+    0 0 14px rgba(255,255,248,.98),
+    0 0 34px rgba(231,240,255,.84),
+    0 0 68px rgba(193,211,255,.58),
+    0 0 105px rgba(255,169,216,.26) !important;
+}
+
+.magicMoonParticle{
+  position:fixed;
+
+  z-index:29;
+
+  width:5px;
+  height:5px;
+
+  pointer-events:none;
+
+  background:#fff5c8;
+
+  box-shadow:
+    0 0 7px #fff,
+    0 0 15px rgba(255,203,229,.68);
+
+  transform:
+    translate(-50%,-50%);
+
+  animation:
+    moonParticleBurst
+    var(--particle-life,1.25s)
+    cubic-bezier(.15,.70,.25,1)
+    var(--particle-delay,0s)
+    forwards;
+}
+
+.magicMoonParticle.diamond{
+  width:7px;
+  height:7px;
+
+  transform:
+    translate(-50%,-50%)
+    rotate(45deg);
+}
+
+@keyframes moonParticleBurst{
+  0%{
+    opacity:0;
+    transform:
+      translate(-50%,-50%)
+      scale(.35);
+  }
+
+  15%{
+    opacity:1;
+  }
+
+  100%{
+    opacity:0;
+
+    transform:
+      translate(
+        calc(-50% + var(--particle-x)),
+        calc(-50% + var(--particle-y))
+      )
+      rotate(115deg)
+      scale(.90);
+  }
+}
+
+
+/* =====================================================
+   6. LLUVIA DE ESTRELLAS
+===================================================== */
+
+.magicShootingStar{
+  position:absolute;
+
+  width:4px;
+  height:4px;
+
+  border-radius:50%;
+
+  background:#fff;
+
+  box-shadow:
+    0 0 7px rgba(255,255,255,.95),
+    0 0 15px rgba(202,222,255,.72);
+
+  opacity:0;
+
+  transform:
+    rotate(-28deg);
+
+  animation:
+    shootingStarFlight
+    var(--shoot-time,1.3s)
+    linear
+    var(--shoot-delay,0s)
+    forwards;
+}
+
+.magicShootingStar::after{
+  content:"";
+
+  position:absolute;
+
+  right:1px;
+  top:50%;
+
+  width:
+    var(--tail,90px);
+
+  height:2px;
+
+  transform:
+    translateY(-50%);
+
+  transform-origin:right center;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(190,214,255,.18),
+      rgba(255,255,255,.90)
+    );
+}
+
+@keyframes shootingStarFlight{
+  0%{
+    opacity:0;
+    transform:
+      translate(0,0)
+      rotate(-28deg)
+      scale(.65);
+  }
+
+  12%{
+    opacity:1;
+  }
+
+  80%{
+    opacity:.92;
+  }
+
+  100%{
+    opacity:0;
+    transform:
+      translate(
+        var(--shoot-x,360px),
+        var(--shoot-y,210px)
+      )
+      rotate(-28deg)
+      scale(1);
+  }
+}
+
+
+/* =====================================================
+   7. NEBLINA
+===================================================== */
+
+#magicFog{
+  position:absolute;
+  inset:30% -30% 0 -30%;
+
+  opacity:0;
+
+  visibility:hidden;
+
+  transition:
+    opacity 1.6s ease,
+    visibility 1.6s ease;
+
+  filter:
+    blur(12px);
+}
+
+#magicFog.show{
+  opacity:.72;
+  visibility:visible;
+}
+
+.magicFogBank{
+  position:absolute;
+
+  left:0;
+
+  width:140%;
+  height:42%;
+
+  border-radius:50%;
+
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(176,205,211,.26) 0,
+      rgba(144,185,191,.17) 38%,
+      rgba(99,146,150,.07) 62%,
+      transparent 75%
+    );
+
+  animation:
+    fogDrift
+    11s
+    ease-in-out
+    infinite
+    alternate;
+}
+
+.magicFogBank:nth-child(1){
+  top:2%;
+}
+
+.magicFogBank:nth-child(2){
+  top:30%;
+  left:-25%;
+  opacity:.74;
+
+  animation-duration:14s;
+  animation-direction:alternate-reverse;
+}
+
+.magicFogBank:nth-child(3){
+  top:56%;
+  left:10%;
+  opacity:.55;
+
+  animation-duration:16s;
+}
+
+@keyframes fogDrift{
+  from{transform:translateX(-6%) scale(1)}
+  to{transform:translateX(11%) scale(1.08)}
+}
+
+
+/* =====================================================
+   8. LLUVIA / TORMENTA CANVAS
+===================================================== */
+
+#magicWeatherCanvas{
+  position:absolute;
+  inset:0;
+
+  width:100%;
+  height:100%;
+
+  opacity:0;
+
+  transition:
+    opacity .65s ease;
+}
+
+#magicWeatherCanvas.show{
+  opacity:1;
+}
+
+#magicStormShade{
+  position:absolute;
+  inset:0;
+
+  opacity:0;
+
+  visibility:hidden;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(7,10,19,.38),
+      rgba(6,13,15,.23)
+    );
+
+  transition:
+    opacity 1s ease,
+    visibility 1s ease;
+}
+
+#magicStormShade.show{
+  opacity:1;
+  visibility:visible;
+}
+
+
+/* =====================================================
+   RELÁMPAGO
+===================================================== */
+
+#magicLightning{
+  position:absolute;
+  inset:0;
+
+  opacity:0;
+
+  background:
+    rgba(225,234,255,.72);
+
+  mix-blend-mode:screen;
+
+  pointer-events:none;
+}
+
+#magicLightning.flash{
+  animation:
+    lightningFlash
+    .56s
+    steps(5,end);
+}
+
+@keyframes lightningFlash{
+  0%{opacity:0}
+  10%{opacity:.72}
+  18%{opacity:.12}
+  29%{opacity:.93}
+  42%{opacity:.05}
+  100%{opacity:0}
+}
+
+
+/* =====================================================
+   CURSOR TEMÁTICO — SOLO PC
+===================================================== */
+
+@media(pointer:fine){
+
+  html,
+  body,
+  #app{
+    cursor:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' shape-rendering='crispEdges'%3E%3Cpath fill='%23f2a2c7' d='M10 2h4v4h4v4h4v4h-4v4h-4v4h-4v-4H6v-4H2v-4h4V6h4z'/%3E%3Cpath fill='%23fff1f7' d='M10 6h4v4h4v4h-4v4h-4v-4H6v-4h4z'/%3E%3C/svg%3E")
+      12 12,
+      auto;
+  }
+
+  button,
+  [role="button"]{
+    cursor:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' shape-rendering='crispEdges'%3E%3Cpath fill='%23ffd3e7' d='M10 2h4v4h4v4h4v4h-4v4h-4v4h-4v-4H6v-4H2v-4h4V6h4z'/%3E%3C/svg%3E")
+      12 12,
+      pointer;
+  }
+
+}
+
+
+/* =====================================================
+   CELULAR
+===================================================== */
+
+@media(max-width:600px){
+
+  #letterBasketBtn{
+    left:max(16px,env(safe-area-inset-left)) !important;
+    bottom:max(16px,env(safe-area-inset-bottom)) !important;
+
+    width:88px !important;
+    height:116px !important;
+  }
+
+  .basketPixelImage{
+    width:78px !important;
+    bottom:5px !important;
+  }
+
+  #basketCount{
+    min-width:25px !important;
+    height:25px !important;
+    right:-6px !important;
+    top:-7px !important;
+    font-size:12px !important;
+  }
+
+}
+
+
+
+/* =========================================================
+   CARTAS SECRETAS DE CADA EVENTO
+========================================================= */
+
+#magicSpecialLayer{
+  position:absolute;
+  inset:0;
+
+  z-index:9;
+
+  pointer-events:none;
+}
+
+
+.weatherSpecial{
+  position:absolute;
+
+  z-index:10;
+
+  border:0;
+  padding:0;
+
+  background:transparent;
+
+  pointer-events:auto;
+  cursor:pointer;
+
+  transform:
+    translate(-50%,-50%);
+
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+
+
+.weatherSpecial.found{
+  pointer-events:none;
+
+  animation:
+    weatherSpecialFound
+    .46s
+    steps(5,end)
+    forwards;
+}
+
+
+@keyframes weatherSpecialFound{
+
+  0%{
+    opacity:1;
+    transform:
+      translate(-50%,-50%)
+      scale(1);
+  }
+
+  45%{
+    opacity:1;
+    transform:
+      translate(-50%,-50%)
+      scale(1.55)
+      rotate(9deg);
+  }
+
+  100%{
+    opacity:0;
+    transform:
+      translate(-50%,-50%)
+      scale(.25)
+      rotate(-18deg);
+  }
+}
+
+
+/* LLUVIA DE ESTRELLAS */
+
+.weatherSpecial-stars{
+  width:58px;
+  height:58px;
+
+  animation:
+    specialStarFloat
+    1.45s
+    ease-in-out
+    infinite;
+}
+
+
+.specialStarCore{
+  position:absolute;
+  inset:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:#fff7c7;
+
+  font-size:32px;
+
+  text-shadow:
+    0 0 6px #fff,
+    0 0 14px #fff1ae,
+    0 0 28px rgba(167,204,255,.95),
+    0 0 50px rgba(255,177,224,.38);
+}
+
+
+.weatherSpecial-stars::before{
+  content:"";
+
+  position:absolute;
+  inset:8px;
+
+  border-radius:50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(255,255,220,.92),
+      rgba(198,219,255,.24) 40%,
+      transparent 72%
+    );
+
+  filter:blur(4px);
+}
+
+
+@keyframes specialStarFloat{
+  0%,100%{
+    transform:
+      translate(-50%,-50%)
+      scale(.90)
+      rotate(-5deg);
+  }
+
+  50%{
+    transform:
+      translate(-50%,-64%)
+      scale(1.12)
+      rotate(6deg);
+  }
+}
+
+
+/* NEBLINA */
+
+.weatherSpecial-fog{
+  width:66px;
+  height:66px;
+
+  border-radius:50%;
+
+  animation:
+    specialFogFloat
+    2.2s
+    ease-in-out
+    infinite;
+}
+
+
+.specialFogCore{
+  position:absolute;
+  inset:0;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:50%;
+
+  color:#ffe8c5;
+  font-size:25px;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(255,226,177,.70) 0,
+      rgba(255,184,204,.24) 30%,
+      rgba(199,226,224,.13) 53%,
+      transparent 72%
+    );
+
+  box-shadow:
+    0 0 18px rgba(255,223,177,.56),
+    0 0 38px rgba(238,172,205,.25);
+
+  text-shadow:
+    0 0 8px #fff;
+}
+
+
+@keyframes specialFogFloat{
+  0%,100%{
+    transform:
+      translate(-50%,-50%)
+      translateX(-8px);
+  }
+
+  50%{
+    transform:
+      translate(-50%,-62%)
+      translateX(9px);
+  }
+}
+
+
+/* LLUVIA */
+
+.weatherSpecial-rain{
+  width:62px;
+  height:72px;
+
+  animation:
+    specialRainFloat
+    1.45s
+    ease-in-out
+    infinite;
+}
+
+
+.specialRainCore{
+  position:absolute;
+
+  left:50%;
+  top:50%;
+
+  width:29px;
+  height:29px;
+
+  transform:
+    translate(-50%,-58%)
+    rotate(45deg);
+
+  border-radius:
+    65% 15% 65% 65%;
+
+  background:
+    linear-gradient(
+      145deg,
+      #f5fbff,
+      #b7d8ef 45%,
+      #eda5ca 100%
+    );
+
+  box-shadow:
+    0 0 9px #fff,
+    0 0 20px rgba(174,216,242,.76),
+    0 0 31px rgba(238,159,205,.34);
+}
+
+
+.specialRainCore::after{
+  content:"";
+
+  position:absolute;
+
+  width:7px;
+  height:7px;
+
+  left:6px;
+  top:5px;
+
+  border-radius:2px;
+
+  background:
+    rgba(255,255,255,.95);
+}
+
+
+@keyframes specialRainFloat{
+  0%,100%{
+    transform:
+      translate(-50%,-50%);
+  }
+
+  50%{
+    transform:
+      translate(-50%,-70%);
+  }
+}
+
+
+/* TORMENTA:
+   un tulipán real del atlas sigue de pie */
+
+.weatherSpecial-storm{
+  width:68px;
+  height:126px;
+
+  animation:
+    specialStormShake
+    .75s
+    steps(6,end)
+    infinite;
+}
+
+
+.specialStormTulip{
+  position:absolute;
+
+  left:50%;
+  bottom:0;
+
+  width:62px;
+  height:119px;
+
+  transform:
+    translateX(-50%);
+
+  background-image:
+    url('tulip_atlas.webp');
+
+  background-repeat:no-repeat;
+
+  background-size:
+    300% 100%;
+
+  background-position:
+    100% 0;
+
+  filter:
+    brightness(1.30)
+    drop-shadow(0 0 7px rgba(255,210,113,.74))
+    drop-shadow(0 0 15px rgba(255,134,198,.62));
+
+  image-rendering:pixelated;
+}
+
+
+.specialStormBolt{
+  position:absolute;
+
+  right:-8px;
+  top:-8px;
+
+  color:#fff3a9;
+
+  font-size:28px;
+
+  text-shadow:
+    0 0 8px #fff,
+    0 0 18px #f6e994;
+}
+
+
+@keyframes specialStormShake{
+  0%,100%{
+    transform:
+      translate(-50%,-50%)
+      rotate(-1deg);
+  }
+
+  24%{
+    transform:
+      translate(-54%,-50%)
+      rotate(-5deg);
+  }
+
+  48%{
+    transform:
+      translate(-46%,-50%)
+      rotate(4deg);
+  }
+
+  72%{
+    transform:
+      translate(-52%,-50%)
+      rotate(-3deg);
+  }
+}
+
+
+/* =====================================================
+   PISTA DEL ELEMENTO SECRETO
+===================================================== */
+
+#magicSpecialHint{
+  position:fixed;
+
+  z-index:34;
+
+  left:50%;
+  bottom:
+    max(
+      25px,
+      env(safe-area-inset-bottom)
+    );
+
+  transform:
+    translate(-50%,12px);
+
+  max-width:
+    min(
+      88vw,
+      480px
+    );
+
+  padding:
+    9px 13px;
+
+  border:
+    3px solid
+    #e8a4ca;
+
+  background:
+    rgba(6,10,19,.93);
+
+  box-shadow:
+    0 0 0 3px #673754,
+    0 0 18px rgba(239,155,206,.18);
+
+  color:#fff;
+
+  font:
+    700 11px/1.45
+    monospace;
+
+  text-align:center;
+
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+
+  transition:
+    opacity .20s,
+    transform .20s,
+    visibility .20s;
+}
+
+
+#magicSpecialHint.show{
+  opacity:1;
+  visibility:visible;
+
+  transform:
+    translate(-50%,0);
+}
+
+
+/* =====================================================
+   CARTITA QUE CAE DEL OBJETO ESPECIAL
+===================================================== */
+
+.weatherEventLetter{
+  position:fixed;
+
+  z-index:14;
+
+  width:62px;
+  height:48px;
+
+  border:0;
+  padding:0;
+
+  background:transparent;
+
+  transform:
+    translate(-50%,-50%)
+    scale(.32)
+    rotate(-8deg);
+
+  opacity:0;
+
+  pointer-events:none;
+  cursor:pointer;
+
+  -webkit-tap-highlight-color:transparent;
+}
+
+
+.weatherEventLetter.drop{
+  opacity:1;
+
+  animation:
+    weatherLetterDrop
+    1s
+    cubic-bezier(.17,.72,.25,1)
+    forwards;
+}
+
+
+.weatherEventLetter.ready{
+  pointer-events:auto;
+
+  animation:
+    weatherLetterHover
+    1.75s
+    ease-in-out
+    infinite;
+}
+
+
+.weatherEnvelope{
+  position:absolute;
+  inset:0;
+
+  border:
+    3px solid
+    #6d3b5b;
+
+  background:
+    #dfa0bd;
+
+  box-shadow:
+    0 0 0 3px #f1bad3,
+    0 0 16px rgba(255,180,218,.48);
+}
+
+
+.weatherEnvelope::before{
+  content:"";
+
+  position:absolute;
+  inset:0;
+
+  background:
+    linear-gradient(
+      145deg,
+      transparent 0 47%,
+      #bd6a90 48% 52%,
+      transparent 53%
+    ),
+    linear-gradient(
+      215deg,
+      transparent 0 47%,
+      #cd789d 48% 52%,
+      transparent 53%
+    );
+}
+
+
+.weatherEnvelopeSeal{
+  position:absolute;
+
+  z-index:2;
+
+  left:50%;
+  top:50%;
+
+  transform:
+    translate(-50%,-46%);
+
+  color:#fff5f8;
+
+  font-size:19px;
+}
+
+
+.weatherEnvelopeSpark{
+  position:absolute;
+
+  right:-11px;
+  top:-13px;
+
+  color:#fff0a9;
+
+  font-size:16px;
+
+  text-shadow:
+    0 0 8px #fff;
+}
+
+
+@keyframes weatherLetterDrop{
+
+  0%{
+    opacity:0;
+
+    transform:
+      translate(-50%,-50%)
+      scale(.28)
+      rotate(-12deg);
+  }
+
+  18%{
+    opacity:1;
+  }
+
+  100%{
+    opacity:1;
+
+    transform:
+      translate(
+        calc(-50% + var(--eventLetterX)),
+        calc(-50% + var(--eventLetterY))
+      )
+      scale(1)
+      rotate(-3deg);
+  }
+}
+
+
+@keyframes weatherLetterHover{
+
+  0%,100%{
+    transform:
+      translate(
+        calc(-50% + var(--eventLetterX)),
+        calc(-50% + var(--eventLetterY))
+      )
+      rotate(-3deg);
+  }
+
+  50%{
+    transform:
+      translate(
+        calc(-50% + var(--eventLetterX)),
+        calc(-50% + var(--eventLetterY) - 7px)
+      )
+      rotate(2deg);
+  }
+}
+
+
+/* =====================================================
+   TORMENTA MÁS FUERTE
+===================================================== */
+
+#magicStormShade.show{
+  opacity:.52 !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(4,6,13,.60),
+      rgba(5,12,14,.39)
+    ) !important;
+}
+
+
+#magicLightning.flash{
+  animation:
+    lightningFlashStrong
+    .66s
+    steps(7,end) !important;
+}
+
+
+@keyframes lightningFlashStrong{
+
+  0%{opacity:0}
+   7%{opacity:.94}
+  13%{opacity:.10}
+  20%{opacity:.64}
+  29%{opacity:.03}
+  37%{opacity:1}
+  45%{opacity:.08}
+  100%{opacity:0}
+}
+
+
+@media(max-width:600px){
+
+  .weatherSpecial-storm{
+    width:56px;
+    height:106px;
+  }
+
+  .specialStormTulip{
+    width:52px;
+    height:100px;
+  }
+
+  #magicSpecialHint{
+    bottom:
+      max(
+        18px,
+        env(safe-area-inset-bottom)
+      );
+
+    font-size:10px;
+  }
+
+}
