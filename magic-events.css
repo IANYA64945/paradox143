@@ -1304,3 +1304,1401 @@
   }
 
 }
+
+
+/* =========================================================
+   ACTIVIDADES DURANTE LA ESPERA
+========================================================= */
+
+#idleActivitiesLayer{
+  position:fixed;
+  inset:0;
+
+  z-index:18;
+
+  overflow:hidden;
+
+  pointer-events:none;
+}
+
+
+#idleActivityMessage{
+  position:fixed;
+
+  z-index:36;
+
+  left:50%;
+  bottom:
+    max(
+      24px,
+      env(safe-area-inset-bottom)
+    );
+
+  transform:
+    translate(-50%,12px);
+
+  max-width:
+    min(
+      88vw,
+      490px
+    );
+
+  padding:
+    9px 13px;
+
+  border:
+    3px solid
+    #e9a6c9;
+
+  border-radius:4px;
+
+  background:
+    rgba(6,10,18,.94);
+
+  box-shadow:
+    0 0 0 3px #653650,
+    0 0 17px rgba(239,159,202,.16);
+
+  color:#fff;
+
+  font:
+    700 11px/1.45
+    monospace;
+
+  text-align:center;
+
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+
+  transition:
+    opacity .18s,
+    transform .18s,
+    visibility .18s;
+}
+
+
+#idleActivityMessage.show{
+  opacity:1;
+  visibility:visible;
+
+  transform:
+    translate(-50%,0);
+}
+
+
+/* =====================================================
+   TULIPÁN AL TOCAR EL CAMPO
+===================================================== */
+
+.tapTulipReaction{
+  position:absolute;
+
+  width:42px;
+  height:80px;
+
+  transform:
+    translate(-50%,-82%);
+
+  background-image:
+    url('tulip_atlas.webp');
+
+  background-repeat:no-repeat;
+
+  background-size:
+    300% 100%;
+
+  background-position:
+    0 0;
+
+  filter:
+    brightness(1.38)
+    drop-shadow(
+      0 0 7px
+      rgba(255,218,118,.78)
+    )
+    drop-shadow(
+      0 0 13px
+      rgba(255,130,192,.60)
+    );
+
+  image-rendering:pixelated;
+
+  pointer-events:none;
+
+  animation:
+    tapTulipSway
+    .95s
+    ease-out
+    forwards;
+}
+
+
+@keyframes tapTulipSway{
+
+  0%{
+    opacity:0;
+    transform:
+      translate(-50%,-82%)
+      rotate(0deg)
+      scale(.92);
+  }
+
+  20%{
+    opacity:1;
+  }
+
+  48%{
+    transform:
+      translate(-50%,-82%)
+      rotate(8deg)
+      scale(1.08);
+  }
+
+  72%{
+    transform:
+      translate(-50%,-82%)
+      rotate(-5deg)
+      scale(1.02);
+  }
+
+  100%{
+    opacity:0;
+    transform:
+      translate(-50%,-82%)
+      rotate(0deg)
+      scale(1);
+  }
+}
+
+
+.tapTulipPetal{
+  position:absolute;
+
+  width:7px;
+  height:10px;
+
+  border-radius:
+    70% 30% 70% 30%;
+
+  background:
+    #e993b7;
+
+  box-shadow:
+    0 0 6px
+    rgba(255,165,205,.70);
+
+  pointer-events:none;
+
+  animation:
+    tapTulipPetalFly
+    1.25s
+    ease-out
+    forwards;
+}
+
+
+@keyframes tapTulipPetalFly{
+
+  from{
+    opacity:1;
+
+    transform:
+      translate(-50%,-50%)
+      rotate(0deg)
+      scale(.8);
+  }
+
+  to{
+    opacity:0;
+
+    transform:
+      translate(
+        calc(-50% + var(--petal-x)),
+        calc(-50% + var(--petal-y))
+      )
+      rotate(190deg)
+      scale(.45);
+  }
+}
+
+
+/* =====================================================
+   LUCIÉRNAGAS
+===================================================== */
+
+.idleFirefly{
+  position:absolute;
+
+  width:34px;
+  height:34px;
+
+  transform:
+    translate(-50%,-50%);
+
+  border:0;
+
+  border-radius:50%;
+
+  background:
+    transparent;
+
+  pointer-events:auto;
+  cursor:pointer;
+
+  -webkit-tap-highlight-color:transparent;
+
+  animation:
+    idleFireflyMove
+    2.4s
+    ease-in-out
+    var(--fly-delay,0s)
+    infinite
+    alternate;
+}
+
+
+.idleFirefly::before{
+  content:"";
+
+  position:absolute;
+
+  left:50%;
+  top:50%;
+
+  width:5px;
+  height:5px;
+
+  transform:
+    translate(-50%,-50%);
+
+  border-radius:50%;
+
+  background:
+    #fff6a7;
+
+  box-shadow:
+    0 0 6px #fff7bc,
+    0 0 14px #f8eb7b,
+    0 0 24px rgba(196,255,151,.45);
+}
+
+
+.idleFirefly.caught{
+  animation:
+    fireflyCaught
+    .45s
+    ease-out
+    forwards;
+}
+
+
+@keyframes idleFireflyMove{
+
+  from{
+    transform:
+      translate(-50%,-50%)
+      translate(-9px,5px);
+  }
+
+  to{
+    transform:
+      translate(-50%,-50%)
+      translate(10px,-9px);
+  }
+}
+
+
+@keyframes fireflyCaught{
+
+  to{
+    opacity:0;
+
+    transform:
+      translate(-50%,-50%)
+      scale(2.2);
+  }
+}
+
+
+#fireflyBadge{
+  position:absolute;
+
+  left:50%;
+  top:13px;
+
+  transform:
+    translateX(-50%)
+    translateY(-8px);
+
+  padding:
+    6px 10px;
+
+  border:
+    2px solid
+    rgba(255,232,178,.75);
+
+  border-radius:6px;
+
+  background:
+    rgba(5,11,18,.80);
+
+  color:#fff1a7;
+
+  font:
+    800 11px/1
+    monospace;
+
+  opacity:0;
+
+  transition:
+    opacity .18s,
+    transform .18s;
+
+  pointer-events:none;
+}
+
+
+#fireflyBadge.show{
+  opacity:1;
+
+  transform:
+    translateX(-50%)
+    translateY(0);
+}
+
+
+.fireflyHeart{
+  position:absolute;
+
+  left:50%;
+  top:24%;
+
+  width:1px;
+  height:1px;
+
+  pointer-events:none;
+
+  animation:
+    fireflyHeartGlow
+    5s
+    ease-in-out
+    forwards;
+}
+
+
+.fireflyHeart i{
+  position:absolute;
+
+  left:0;
+  top:0;
+
+  width:5px;
+  height:5px;
+
+  border-radius:50%;
+
+  transform:
+    translate(
+      var(--hx),
+      var(--hy)
+    );
+
+  background:#fff4a2;
+
+  box-shadow:
+    0 0 7px #fff5ba,
+    0 0 16px rgba(249,226,109,.82);
+}
+
+
+@keyframes fireflyHeartGlow{
+
+  0%{
+    opacity:0;
+    transform:scale(.65);
+  }
+
+  18%{
+    opacity:1;
+    transform:scale(1);
+  }
+
+  75%{
+    opacity:1;
+  }
+
+  100%{
+    opacity:0;
+    transform:scale(1.12);
+  }
+}
+
+
+/* =====================================================
+   PLANTAR
+===================================================== */
+
+.idlePlantPlot{
+  position:absolute;
+
+  width:76px;
+  height:94px;
+
+  transform:
+    translate(-50%,-78%);
+
+  border:0;
+
+  background:transparent;
+
+  pointer-events:auto;
+  cursor:pointer;
+
+  -webkit-tap-highlight-color:transparent;
+}
+
+
+.plantSoil{
+  position:absolute;
+
+  left:50%;
+  bottom:0;
+
+  width:58px;
+  height:15px;
+
+  transform:
+    translateX(-50%);
+
+  border-radius:50%;
+
+  background:
+    radial-gradient(
+      ellipse,
+      #293a20,
+      #172618 70%,
+      transparent 72%
+    );
+
+  filter:
+    drop-shadow(
+      0 0 5px
+      rgba(106,149,81,.30)
+    );
+}
+
+
+.plantSeed,
+.plantSprout,
+.plantFlower{
+  position:absolute;
+
+  opacity:0;
+
+  pointer-events:none;
+
+  transition:
+    opacity .35s,
+    transform .45s;
+}
+
+
+.plantSeed{
+  left:50%;
+  bottom:7px;
+
+  transform:
+    translateX(-50%);
+
+  color:#e9bd88;
+
+  font-size:19px;
+}
+
+
+.plantSprout{
+  left:50%;
+  bottom:14px;
+
+  transform:
+    translateX(-50%)
+    rotate(-14deg);
+
+  color:#7fb76a;
+
+  font:
+    900 28px/1
+    monospace;
+}
+
+
+.plantFlower{
+  left:50%;
+  bottom:5px;
+
+  width:47px;
+  height:90px;
+
+  transform:
+    translateX(-50%)
+    scale(.3);
+
+  background-image:
+    url('tulip_atlas.webp');
+
+  background-repeat:no-repeat;
+
+  background-size:
+    300% 100%;
+
+  background-position:
+    50% 0;
+
+  filter:
+    brightness(1.25)
+    drop-shadow(
+      0 0 8px
+      rgba(255,218,116,.60)
+    )
+    drop-shadow(
+      0 0 15px
+      rgba(249,134,194,.42)
+    );
+
+  image-rendering:pixelated;
+}
+
+
+.idlePlantPlot.stage-1
+.plantSeed{
+  opacity:1;
+}
+
+
+.idlePlantPlot.stage-2
+.plantSprout{
+  opacity:1;
+}
+
+
+.idlePlantPlot.stage-3
+.plantFlower{
+  opacity:1;
+
+  transform:
+    translateX(-50%)
+    scale(1);
+}
+
+
+.idlePlantPlot.grown
+.plantFlower{
+  animation:
+    plantedTulipGlow
+    2s
+    ease-in-out
+    infinite
+    alternate;
+}
+
+
+@keyframes plantedTulipGlow{
+
+  from{
+    filter:
+      brightness(1.12)
+      drop-shadow(
+        0 0 5px
+        rgba(255,218,116,.46)
+      )
+      drop-shadow(
+        0 0 11px
+        rgba(249,134,194,.32)
+      );
+  }
+
+  to{
+    filter:
+      brightness(1.42)
+      drop-shadow(
+        0 0 10px
+        rgba(255,226,132,.78)
+      )
+      drop-shadow(
+        0 0 21px
+        rgba(249,134,194,.52)
+      );
+  }
+}
+
+
+.idlePlantPlot.plantFade{
+  opacity:0;
+
+  transition:
+    opacity
+    1.6s;
+}
+
+
+/* =====================================================
+   CONSTELACIÓN
+===================================================== */
+
+.idleConstellation{
+  position:absolute;
+
+  left:50%;
+  top:21%;
+
+  width:
+    min(
+      480px,
+      78vw
+    );
+
+  aspect-ratio:
+    2.3 / 1;
+
+  transform:
+    translate(-50%,-50%);
+
+  pointer-events:none;
+}
+
+
+.constellationLines{
+  position:absolute;
+
+  inset:0;
+
+  width:100%;
+  height:100%;
+
+  overflow:visible;
+
+  pointer-events:none;
+}
+
+
+.constellationLines line{
+  stroke:
+    rgba(211,228,255,.78);
+
+  stroke-width:.7;
+
+  filter:
+    drop-shadow(
+      0 0 2px
+      rgba(255,255,255,.8)
+    );
+
+  animation:
+    constellationLineIn
+    .45s
+    ease-out;
+}
+
+
+@keyframes constellationLineIn{
+  from{opacity:0}
+  to{opacity:1}
+}
+
+
+.constellationStar{
+  position:absolute;
+
+  width:36px;
+  height:36px;
+
+  transform:
+    translate(-50%,-50%);
+
+  border:0;
+
+  background:transparent;
+
+  color:#cad5e9;
+
+  font-size:20px;
+
+  text-shadow:
+    0 0 6px
+    rgba(220,230,255,.55);
+
+  opacity:.46;
+
+  pointer-events:auto;
+  cursor:pointer;
+
+  -webkit-tap-highlight-color:transparent;
+}
+
+
+.constellationStar.next{
+  color:#fff3ad;
+
+  opacity:1;
+
+  text-shadow:
+    0 0 7px #fff,
+    0 0 16px rgba(255,238,154,.80);
+
+  animation:
+    constellationNext
+    .85s
+    ease-in-out
+    infinite;
+}
+
+
+.constellationStar.done{
+  color:#f8e6ff;
+  opacity:1;
+}
+
+
+@keyframes constellationNext{
+
+  0%,100%{
+    transform:
+      translate(-50%,-50%)
+      scale(.84);
+  }
+
+  50%{
+    transform:
+      translate(-50%,-50%)
+      scale(1.28);
+  }
+}
+
+
+.constellationSymbol{
+  position:absolute;
+
+  left:50%;
+  top:49%;
+
+  transform:
+    translate(-50%,-50%);
+
+  color:
+    rgba(255,215,237,.95);
+
+  font:
+    700 68px/1
+    monospace;
+
+  text-shadow:
+    0 0 9px #fff,
+    0 0 26px
+    rgba(255,174,216,.65);
+
+  pointer-events:none;
+
+  animation:
+    constellationSymbolIn
+    5s
+    ease-in-out
+    forwards;
+}
+
+
+@keyframes constellationSymbolIn{
+
+  0%{
+    opacity:0;
+    transform:
+      translate(-50%,-50%)
+      scale(.5);
+  }
+
+  20%{
+    opacity:1;
+    transform:
+      translate(-50%,-50%)
+      scale(1);
+  }
+
+  75%{
+    opacity:1;
+  }
+
+  100%{
+    opacity:0;
+    transform:
+      translate(-50%,-50%)
+      scale(1.12);
+  }
+}
+
+
+/* =====================================================
+   HUELLAS DE MEWO
+===================================================== */
+
+.idleFootprint{
+  position:absolute;
+
+  width:46px;
+  height:46px;
+
+  border:0;
+
+  background:transparent;
+
+  color:
+    rgba(240,182,211,.70);
+
+  pointer-events:auto;
+  cursor:pointer;
+
+  filter:
+    drop-shadow(
+      0 0 6px
+      rgba(245,167,207,.28)
+    );
+
+  animation:
+    footprintPulse
+    1.3s
+    ease-in-out
+    infinite;
+
+  -webkit-tap-highlight-color:transparent;
+}
+
+
+.idleFootprint span,
+.idleFootprint i,
+.idleFootprint b,
+.idleFootprint em{
+  position:absolute;
+
+  display:block;
+
+  width:8px;
+  height:8px;
+
+  border-radius:50%;
+
+  background:
+    currentColor;
+
+  font-size:0;
+}
+
+
+.idleFootprint span{
+  left:18px;
+  top:21px;
+
+  width:16px;
+  height:17px;
+}
+
+
+.idleFootprint i{
+  left:7px;
+  top:10px;
+}
+
+
+.idleFootprint b{
+  left:19px;
+  top:5px;
+}
+
+
+.idleFootprint em{
+  left:31px;
+  top:11px;
+}
+
+
+.idleFootprint.footFound{
+  animation:
+    footprintFound
+    .28s
+    ease-out
+    forwards;
+}
+
+
+@keyframes footprintPulse{
+
+  0%,100%{
+    opacity:.42;
+  }
+
+  50%{
+    opacity:1;
+  }
+}
+
+
+@keyframes footprintFound{
+
+  to{
+    opacity:0;
+
+    transform:
+      translate(-50%,-50%)
+      scale(1.6);
+  }
+}
+
+
+/* =====================================================
+   PÉTALO AL VIENTO
+===================================================== */
+
+.idleWindPetal{
+  position:absolute;
+
+  z-index:3;
+
+  left:-10%;
+
+  width:28px;
+  height:38px;
+
+  border:0;
+
+  border-radius:
+    70% 30% 70% 30%;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffd2e3,
+      #e58bb4
+    );
+
+  box-shadow:
+    0 0 10px
+    rgba(248,149,197,.65);
+
+  pointer-events:auto;
+  cursor:pointer;
+
+  animation:
+    windPetalCross
+    10s
+    linear
+    forwards;
+
+  -webkit-tap-highlight-color:transparent;
+}
+
+
+@keyframes windPetalCross{
+
+  from{
+    transform:
+      translate(0,0)
+      rotate(0deg);
+  }
+
+  30%{
+    transform:
+      translate(
+        34vw,
+        var(--petal-drift)
+      )
+      rotate(160deg);
+  }
+
+  65%{
+    transform:
+      translate(
+        72vw,
+        calc(
+          var(--petal-drift)*-.35
+        )
+      )
+      rotate(330deg);
+  }
+
+  to{
+    transform:
+      translate(
+        120vw,
+        calc(
+          var(--petal-drift)*.45
+        )
+      )
+      rotate(540deg);
+  }
+}
+
+
+.idlePetalBurst{
+  position:absolute;
+
+  width:6px;
+  height:9px;
+
+  border-radius:
+    70% 30% 70% 30%;
+
+  background:#f3a1c7;
+
+  box-shadow:
+    0 0 5px
+    rgba(247,162,203,.55);
+
+  pointer-events:none;
+
+  animation:
+    petalBurstOut
+    1.15s
+    ease-out
+    forwards;
+}
+
+
+@keyframes petalBurstOut{
+
+  to{
+    opacity:0;
+
+    transform:
+      translate(
+        var(--burst-x),
+        var(--burst-y)
+      )
+      rotate(220deg)
+      scale(.45);
+  }
+}
+
+
+/* =====================================================
+   ESTRELLA VIAJERA
+===================================================== */
+
+.idleTravelingStar{
+  position:absolute;
+
+  width:56px;
+  height:56px;
+
+  transform:
+    translate(-50%,-50%);
+
+  border:0;
+
+  background:transparent;
+
+  color:#fff3b6;
+
+  font-size:34px;
+
+  text-shadow:
+    0 0 6px #fff,
+    0 0 17px
+    rgba(255,235,147,.82),
+    0 0 28px
+    rgba(185,209,255,.50);
+
+  pointer-events:auto;
+  cursor:grab;
+
+  touch-action:none;
+
+  animation:
+    travelingStarFloat
+    2s
+    ease-in-out
+    infinite;
+
+  -webkit-tap-highlight-color:transparent;
+}
+
+
+.idleTravelingStar.dragging{
+  cursor:grabbing;
+
+  animation:none;
+
+  transform:
+    translate(-50%,-50%)
+    scale(1.18);
+}
+
+
+.idleTravelingStar.starDelivered{
+  animation:
+    starDelivered
+    .9s
+    ease-out
+    forwards;
+}
+
+
+.idleTravelingStar.starMissed{
+  animation:
+    starMissed
+    1s
+    ease-out
+    forwards;
+}
+
+
+@keyframes travelingStarFloat{
+
+  0%,100%{
+    transform:
+      translate(-50%,-50%)
+      translateY(0);
+  }
+
+  50%{
+    transform:
+      translate(-50%,-50%)
+      translateY(-8px);
+  }
+}
+
+
+@keyframes starDelivered{
+
+  to{
+    opacity:0;
+
+    transform:
+      translate(-50%,-50%)
+      scale(2.4);
+  }
+}
+
+
+@keyframes starMissed{
+
+  to{
+    opacity:0;
+
+    transform:
+      translate(-50%,-90%)
+      scale(.65);
+  }
+}
+
+
+#moonHotspot.idleMoonKiss::before{
+  opacity:1 !important;
+
+  transform:
+    translate(-50%,-50%)
+    scale(1.35) !important;
+
+  box-shadow:
+    0 0 14px
+    rgba(255,255,245,.96),
+    0 0 35px
+    rgba(215,228,255,.70),
+    0 0 62px
+    rgba(255,176,219,.34) !important;
+
+  transition:
+    transform .25s,
+    opacity .25s,
+    box-shadow .25s;
+}
+
+
+.idleMoonSpark{
+  position:fixed;
+
+  z-index:31;
+
+  width:5px;
+  height:5px;
+
+  border-radius:50%;
+
+  transform:
+    translate(-50%,-50%);
+
+  background:#fff5b8;
+
+  box-shadow:
+    0 0 7px #fff,
+    0 0 15px
+    rgba(255,206,227,.62);
+
+  pointer-events:none;
+
+  animation:
+    idleMoonSparkOut
+    1.3s
+    ease-out
+    forwards;
+}
+
+
+@keyframes idleMoonSparkOut{
+
+  to{
+    opacity:0;
+
+    transform:
+      translate(
+        calc(-50% + var(--moon-x)),
+        calc(-50% + var(--moon-y))
+      )
+      scale(.45);
+  }
+}
+
+
+/* =====================================================
+   PIEDRITA / MENSAJE
+===================================================== */
+
+.idlePebble{
+  position:absolute;
+
+  width:50px;
+  height:38px;
+
+  transform:
+    translate(-50%,-50%);
+
+  border:
+    2px solid
+    rgba(71,72,81,.82);
+
+  border-radius:
+    50% 45% 52% 40%;
+
+  background:
+    linear-gradient(
+      160deg,
+      #6d7077,
+      #3d4248 65%,
+      #272e31
+    );
+
+  box-shadow:
+    0 5px 7px
+    rgba(0,0,0,.24);
+
+  pointer-events:auto;
+  cursor:pointer;
+
+  -webkit-tap-highlight-color:transparent;
+
+  animation:
+    pebbleHint
+    2.1s
+    ease-in-out
+    infinite;
+}
+
+
+.idlePebble span{
+  position:absolute;
+
+  right:5px;
+  top:-8px;
+
+  color:
+    rgba(255,214,233,.68);
+
+  font-size:12px;
+
+  text-shadow:
+    0 0 6px
+    rgba(246,174,210,.45);
+}
+
+
+.idlePebble.pebbleOpen{
+  animation:
+    pebbleOpen
+    .85s
+    ease-out
+    forwards;
+}
+
+
+@keyframes pebbleHint{
+
+  0%,100%{
+    filter:
+      brightness(.88);
+  }
+
+  50%{
+    filter:
+      brightness(1.13);
+  }
+}
+
+
+@keyframes pebbleOpen{
+
+  to{
+    opacity:0;
+
+    transform:
+      translate(-50%,-70%)
+      scale(1.4);
+  }
+}
+
+
+/* =====================================================
+   CELULAR
+===================================================== */
+
+@media(max-width:600px){
+
+  #idleActivityMessage{
+    bottom:
+      max(
+        18px,
+        env(safe-area-inset-bottom)
+      );
+
+    font-size:10px;
+  }
+
+
+  .tapTulipReaction{
+    width:35px;
+    height:68px;
+  }
+
+
+  .idleConstellation{
+    width:88vw;
+
+    top:23%;
+  }
+
+
+  .constellationSymbol{
+    font-size:52px;
+  }
+
+
+  .idleTravelingStar{
+    width:50px;
+    height:50px;
+
+    font-size:30px;
+  }
+
+
+  #fireflyBadge{
+    top:9px;
+
+    font-size:10px;
+  }
+}

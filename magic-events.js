@@ -2771,3 +2771,2089 @@
   );
 
 })();
+
+
+/* =========================================================
+   ACTIVIDADES PEQUEÑAS PARA EXPLORAR EL CAMPO
+
+   Siempre disponible:
+   - tocar tulipanes
+
+   Actividades que aparecen durante las esperas:
+   - luciérnagas
+   - plantar un tulipán
+   - constelación
+   - huellas de Mewo
+   - pétalo al viento
+   - estrella viajera
+   - piedra/mensaje escondido
+
+   Los eventos grandes (clima, Mewo, juego, cartas)
+   tienen prioridad y pausan estas actividades.
+========================================================= */
+
+(() => {
+
+  const app =
+    document.getElementById('app');
+
+  if(!app){
+    return;
+  }
+
+
+  /* =====================================================
+     CAPA
+  ===================================================== */
+
+  const idleLayer =
+    document.createElement('div');
+
+  idleLayer.id =
+    'idleActivitiesLayer';
+
+
+  const idleMessage =
+    document.createElement('div');
+
+  idleMessage.id =
+    'idleActivityMessage';
+
+
+  const fireflyBadge =
+    document.createElement('div');
+
+  fireflyBadge.id =
+    'fireflyBadge';
+
+  fireflyBadge.innerHTML =
+    '✨ <span id="fireflyCount">0</span>/10';
+
+
+  idleLayer.appendChild(
+    fireflyBadge
+  );
+
+  document.body.appendChild(
+    idleLayer
+  );
+
+  document.body.appendChild(
+    idleMessage
+  );
+
+
+  /* =====================================================
+     ESTADO
+  ===================================================== */
+
+  let idleTimer=0;
+  let activeIdle=null;
+  let activityToken=0;
+
+  let fireflyCount=0;
+
+  let tulipPointer=null;
+
+
+  const cooldowns = {
+    fireflies:0,
+    plant:0,
+    constellation:0,
+    footprints:0,
+    petal:0,
+    traveler:0,
+    pebble:0
+  };
+
+
+  const cooldownTime = {
+    fireflies:55000,
+    plant:125000,
+    constellation:150000,
+    footprints:105000,
+    petal:45000,
+    traveler:135000,
+    pebble:95000
+  };
+
+
+  /* =====================================================
+     UTILIDADES
+  ===================================================== */
+
+  function now(){
+    return Date.now();
+  }
+
+
+  function sceneBusy(){
+
+    if(
+      document.body.classList.contains(
+        'intro-active'
+      )
+    ){
+      return true;
+    }
+
+
+    const game =
+      document.getElementById(
+        'gameOverlay'
+      );
+
+    if(
+      game &&
+      game.classList.contains(
+        'show'
+      )
+    ){
+      return true;
+    }
+
+
+    if(
+      window.MAGIC_AMBIENT_ACTIVE ||
+      window.MAGIC_SPECIAL_PENDING
+    ){
+      return true;
+    }
+
+
+    const mewo =
+      document.getElementById(
+        'mewoCat'
+      );
+
+    if(
+      mewo &&
+      mewo.classList.contains(
+        'show'
+      ) &&
+      !mewo.classList.contains(
+        'leaving'
+      )
+    ){
+      return true;
+    }
+
+
+    const reader =
+      document.getElementById(
+        'letterReader'
+      );
+
+    if(
+      reader &&
+      reader.classList.contains(
+        'show'
+      )
+    ){
+      return true;
+    }
+
+
+    return false;
+  }
+
+
+  function showIdleMessage(
+    text,
+    duration=2600
+  ){
+
+    idleMessage.textContent =
+      text;
+
+    idleMessage.classList.remove(
+      'show'
+    );
+
+    void idleMessage.offsetWidth;
+
+    idleMessage.classList.add(
+      'show'
+    );
+
+
+    clearTimeout(
+      showIdleMessage.timer
+    );
+
+
+    showIdleMessage.timer =
+      setTimeout(
+        ()=>{
+          idleMessage.classList.remove(
+            'show'
+          );
+        },
+        duration
+      );
+  }
+
+
+  function randomGrassPoint(
+    low=.58,
+    high=.82
+  ){
+
+    return {
+      x:
+        10+
+        Math.random()*80,
+
+      y:
+        (
+          low+
+          Math.random()*
+          (
+            high-low
+          )
+        )*100
+    };
+  }
+
+
+  function randomSkyPoint(){
+
+    return {
+      x:
+        10+
+        Math.random()*80,
+
+      y:
+        8+
+        Math.random()*29
+    };
+  }
+
+
+  function clearActivityNodes(){
+
+    idleLayer
+      .querySelectorAll(
+        '.idleTemporary'
+      )
+      .forEach(
+        node=>node.remove()
+      );
+  }
+
+
+  function finishIdle(
+    type,
+    delay=25000
+  ){
+
+    if(type){
+      cooldowns[type]=
+        now();
+    }
+
+    activeIdle=null;
+
+    scheduleNext(
+      delay
+    );
+  }
+
+
+  function scheduleNext(
+    customDelay=null
+  ){
+
+    clearTimeout(
+      idleTimer
+    );
+
+
+    const delay =
+      customDelay ??
+      (
+        24000+
+        Math.random()*24000
+      );
+
+
+    idleTimer =
+      setTimeout(
+        tryRandomActivity,
+        delay
+      );
+  }
+
+
+  function availableActivities(){
+
+    const t=now();
+
+    return Object
+      .keys(cooldowns)
+      .filter(
+        type=>
+          t-
+          cooldowns[type]
+          >=
+          cooldownTime[type]
+      );
+  }
+
+
+  function weightedPick(
+    list
+  ){
+
+    /*
+      Fireflies/petals are the lightest and can
+      happen more often. Constellations/traveler
+      are rarer.
+    */
+
+    const weighted=[];
+
+    for(const item of list){
+
+      let weight=1;
+
+      if(item==='fireflies'){
+        weight=3;
+      }
+
+      if(item==='petal'){
+        weight=3;
+      }
+
+      if(item==='pebble'){
+        weight=2;
+      }
+
+      if(item==='footprints'){
+        weight=2;
+      }
+
+      for(let i=0;i<weight;i++){
+        weighted.push(item);
+      }
+    }
+
+
+    return weighted[
+      Math.floor(
+        Math.random()*
+        weighted.length
+      )
+    ];
+  }
+
+
+  function tryRandomActivity(){
+
+    if(
+      activeIdle ||
+      sceneBusy() ||
+      document.hidden
+    ){
+
+      scheduleNext(
+        12000
+      );
+
+      return;
+    }
+
+
+    const list =
+      availableActivities();
+
+
+    if(!list.length){
+
+      scheduleNext(
+        18000
+      );
+
+      return;
+    }
+
+
+    const type =
+      weightedPick(
+        list
+      );
+
+
+    activeIdle=type;
+    activityToken++;
+
+    const token=
+      activityToken;
+
+
+    if(type==='fireflies'){
+      startFireflies(token);
+    }
+
+    else if(type==='plant'){
+      startPlanting(token);
+    }
+
+    else if(type==='constellation'){
+      startConstellation(token);
+    }
+
+    else if(type==='footprints'){
+      startFootprints(token);
+    }
+
+    else if(type==='petal'){
+      startWindPetal(token);
+    }
+
+    else if(type==='traveler'){
+      startTravelingStar(token);
+    }
+
+    else if(type==='pebble'){
+      startPebble(token);
+    }
+  }
+
+
+  /* =====================================================
+     1. TOCAR TULIPANES — SIEMPRE DISPONIBLE
+  ===================================================== */
+
+  function reactTulip(
+    x,
+    y
+  ){
+
+    if(
+      sceneBusy() ||
+      y<
+      window.innerHeight*.49
+    ){
+      return;
+    }
+
+
+    const flower =
+      document.createElement('span');
+
+    flower.className =
+      'tapTulipReaction';
+
+    flower.style.left =
+      `${x}px`;
+
+    flower.style.top =
+      `${y}px`;
+
+
+    idleLayer.appendChild(
+      flower
+    );
+
+
+    for(let i=0;i<5;i++){
+
+      const petal =
+        document.createElement('span');
+
+      petal.className =
+        'tapTulipPetal';
+
+      petal.style.left =
+        `${x}px`;
+
+      petal.style.top =
+        `${y-18}px`;
+
+      petal.style.setProperty(
+        '--petal-x',
+        `${-30+Math.random()*60}px`
+      );
+
+      petal.style.setProperty(
+        '--petal-y',
+        `${-20-Math.random()*46}px`
+      );
+
+      petal.style.animationDelay =
+        `${Math.random()*.14}s`;
+
+
+      idleLayer.appendChild(
+        petal
+      );
+
+
+      setTimeout(
+        ()=>petal.remove(),
+        1450
+      );
+    }
+
+
+    setTimeout(
+      ()=>flower.remove(),
+      1050
+    );
+  }
+
+
+  app.addEventListener(
+    'pointerdown',
+    e=>{
+
+      tulipPointer={
+        id:e.pointerId,
+        x:e.clientX,
+        y:e.clientY,
+        time:performance.now()
+      };
+    },
+    {
+      passive:true
+    }
+  );
+
+
+  app.addEventListener(
+    'pointerup',
+    e=>{
+
+      if(
+        !tulipPointer ||
+        tulipPointer.id!==e.pointerId
+      ){
+        return;
+      }
+
+
+      const distance=
+        Math.hypot(
+          e.clientX-
+          tulipPointer.x,
+          e.clientY-
+          tulipPointer.y
+        );
+
+
+      const time=
+        performance.now()-
+        tulipPointer.time;
+
+
+      if(
+        distance<11 &&
+        time<420
+      ){
+
+        reactTulip(
+          e.clientX,
+          e.clientY
+        );
+      }
+
+
+      tulipPointer=null;
+    },
+    {
+      passive:true
+    }
+  );
+
+
+  app.addEventListener(
+    'pointercancel',
+    ()=>{
+      tulipPointer=null;
+    },
+    {
+      passive:true
+    }
+  );
+
+
+  /* =====================================================
+     2. LUCIÉRNAGAS
+  ===================================================== */
+
+  function updateFireflyBadge(){
+
+    const value =
+      document.getElementById(
+        'fireflyCount'
+      );
+
+    if(value){
+      value.textContent=
+        String(
+          fireflyCount%10
+        );
+    }
+
+
+    fireflyBadge.classList.add(
+      'show'
+    );
+
+
+    clearTimeout(
+      updateFireflyBadge.timer
+    );
+
+
+    updateFireflyBadge.timer=
+      setTimeout(
+        ()=>{
+          fireflyBadge.classList.remove(
+            'show'
+          );
+        },
+        3300
+      );
+  }
+
+
+  function fireflyHeart(){
+
+    const heart =
+      document.createElement('div');
+
+    heart.className =
+      'fireflyHeart idleTemporary';
+
+
+    const points=[
+      [0,-18],
+      [-17,-32],
+      [-37,-28],
+      [-50,-10],
+      [-43,10],
+      [-25,28],
+      [0,48],
+      [25,28],
+      [43,10],
+      [50,-10],
+      [37,-28],
+      [17,-32]
+    ];
+
+
+    for(
+      const [x,y]
+      of points
+    ){
+
+      const dot=
+        document.createElement('i');
+
+      dot.style.setProperty(
+        '--hx',
+        `${x}px`
+      );
+
+      dot.style.setProperty(
+        '--hy',
+        `${y}px`
+      );
+
+      heart.appendChild(
+        dot
+      );
+    }
+
+
+    idleLayer.appendChild(
+      heart
+    );
+
+
+    showIdleMessage(
+      '✨ 10 luciérnagas formaron un corazón en el cielo ♡',
+      4200
+    );
+
+
+    setTimeout(
+      ()=>heart.remove(),
+      5200
+    );
+  }
+
+
+  function startFireflies(
+    token
+  ){
+
+    showIdleMessage(
+      '✨ Hay luciérnagas entre los tulipanes... puedes atraparlas.',
+      3300
+    );
+
+
+    let remaining=5;
+
+
+    for(let i=0;i<5;i++){
+
+      const p=
+        randomGrassPoint(
+          .54,
+          .80
+        );
+
+
+      const f=
+        document.createElement(
+          'button'
+        );
+
+      f.type='button';
+
+      f.className=
+        'idleFirefly idleTemporary';
+
+      f.setAttribute(
+        'aria-label',
+        'Atrapar luciérnaga'
+      );
+
+      f.style.left=
+        `${p.x}%`;
+
+      f.style.top=
+        `${p.y}%`;
+
+      f.style.setProperty(
+        '--fly-delay',
+        `${Math.random()*1.8}s`
+      );
+
+
+      f.addEventListener(
+        'click',
+        e=>{
+
+          e.stopPropagation();
+
+          if(
+            f.classList.contains(
+              'caught'
+            )
+          ){
+            return;
+          }
+
+
+          f.classList.add(
+            'caught'
+          );
+
+          fireflyCount++;
+
+          updateFireflyBadge();
+
+
+          if(
+            fireflyCount>0 &&
+            fireflyCount%10===0
+          ){
+
+            fireflyHeart();
+          }
+
+
+          remaining--;
+
+
+          setTimeout(
+            ()=>f.remove(),
+            480
+          );
+
+
+          if(remaining<=0){
+
+            finishIdle(
+              'fireflies',
+              18000
+            );
+          }
+        }
+      );
+
+
+      idleLayer.appendChild(
+        f
+      );
+    }
+
+
+    setTimeout(
+      ()=>{
+
+        if(
+          token!==activityToken ||
+          activeIdle!=='fireflies'
+        ){
+          return;
+        }
+
+
+        idleLayer
+          .querySelectorAll(
+            '.idleFirefly'
+          )
+          .forEach(
+            node=>node.remove()
+          );
+
+
+        finishIdle(
+          'fireflies',
+          16000
+        );
+
+      },
+      18000
+    );
+  }
+
+
+  /* =====================================================
+     3. PLANTAR UN TULIPÁN
+  ===================================================== */
+
+  function startPlanting(
+    token
+  ){
+
+    const p=
+      randomGrassPoint(
+        .64,
+        .80
+      );
+
+
+    const plot=
+      document.createElement(
+        'button'
+      );
+
+    plot.type='button';
+
+    plot.className=
+      'idlePlantPlot idleTemporary stage-0';
+
+    plot.style.left=
+      `${p.x}%`;
+
+    plot.style.top=
+      `${p.y}%`;
+
+    plot.innerHTML=
+      `
+        <span class="plantSoil"></span>
+        <span class="plantSeed">•</span>
+        <span class="plantSprout">⌁</span>
+        <span class="plantFlower"></span>
+      `;
+
+
+    let stage=0;
+
+
+    showIdleMessage(
+      '🌱 Encontraste un pequeño espacio de tierra. Tócalo para plantar algo.',
+      3900
+    );
+
+
+    plot.addEventListener(
+      'click',
+      e=>{
+
+        e.stopPropagation();
+
+        stage=
+          Math.min(
+            3,
+            stage+1
+          );
+
+
+        plot.className=
+          `idlePlantPlot idleTemporary stage-${stage}`;
+
+
+        if(stage===1){
+
+          showIdleMessage(
+            'Una semillita quedó bajo la tierra...'
+          );
+        }
+
+
+        else if(stage===2){
+
+          showIdleMessage(
+            '🌱 Está creciendo...'
+          );
+        }
+
+
+        else if(stage===3){
+
+          plot.classList.add(
+            'grown'
+          );
+
+          showIdleMessage(
+            '🌷 Plantaste un tulipán para este campo ♡',
+            3600
+          );
+
+
+          activeIdle=null;
+          cooldowns.plant=now();
+
+          scheduleNext(
+            19000
+          );
+
+
+          /*
+            Ya crecido, deja de ser temporal:
+            permanece durante esta visita.
+          */
+
+          plot.classList.remove(
+            'idleTemporary'
+          );
+
+          setTimeout(
+            ()=>{
+              plot.classList.add(
+                'plantFade'
+              );
+
+              setTimeout(
+                ()=>plot.remove(),
+                1800
+              );
+            },
+            120000
+          );
+        }
+      }
+    );
+
+
+    idleLayer.appendChild(
+      plot
+    );
+
+
+    setTimeout(
+      ()=>{
+
+        if(
+          token!==activityToken ||
+          stage>=3
+        ){
+          return;
+        }
+
+        plot.remove();
+
+        finishIdle(
+          'plant',
+          19000
+        );
+
+      },
+      43000
+    );
+  }
+
+
+  /* =====================================================
+     4. CONSTELACIÓN
+  ===================================================== */
+
+  function startConstellation(
+    token
+  ){
+
+    const box=
+      document.createElement(
+        'div'
+      );
+
+    box.className=
+      'idleConstellation idleTemporary';
+
+
+    const svgNS=
+      'http://www.w3.org/2000/svg';
+
+
+    const lines=
+      document.createElementNS(
+        svgNS,
+        'svg'
+      );
+
+    lines.setAttribute(
+      'viewBox',
+      '0 0 100 100'
+    );
+
+    lines.classList.add(
+      'constellationLines'
+    );
+
+
+    box.appendChild(
+      lines
+    );
+
+
+    const points=[
+      [22,54],
+      [35,30],
+      [50,46],
+      [65,30],
+      [78,54]
+    ];
+
+
+    let current=0;
+
+
+    showIdleMessage(
+      '⭐ Una constelación quiere formarse. Toca la estrella que pulse primero.',
+      4300
+    );
+
+
+    function refresh(){
+
+      box
+        .querySelectorAll(
+          '.constellationStar'
+        )
+        .forEach(
+          (star,index)=>{
+            star.classList.toggle(
+              'next',
+              index===current
+            );
+
+            star.classList.toggle(
+              'done',
+              index<current
+            );
+          }
+        );
+    }
+
+
+    points.forEach(
+      ([x,y],index)=>{
+
+        const star=
+          document.createElement(
+            'button'
+          );
+
+        star.type='button';
+
+        star.className=
+          'constellationStar';
+
+        star.textContent='✦';
+
+        star.style.left=
+          `${x}%`;
+
+        star.style.top=
+          `${y}%`;
+
+
+        star.addEventListener(
+          'click',
+          e=>{
+
+            e.stopPropagation();
+
+
+            if(index!==current){
+
+              current=0;
+
+              lines.innerHTML='';
+
+              showIdleMessage(
+                'Las estrellas se desordenaron... empieza por la que pulse ✦',
+                2300
+              );
+
+              refresh();
+
+              return;
+            }
+
+
+            if(current>0){
+
+              const [
+                x1,
+                y1
+              ]=
+                points[
+                  current-1
+                ];
+
+              const [
+                x2,
+                y2
+              ]=
+                points[
+                  current
+                ];
+
+
+              const line=
+                document.createElementNS(
+                  svgNS,
+                  'line'
+                );
+
+              line.setAttribute(
+                'x1',
+                x1
+              );
+
+              line.setAttribute(
+                'y1',
+                y1
+              );
+
+              line.setAttribute(
+                'x2',
+                x2
+              );
+
+              line.setAttribute(
+                'y2',
+                y2
+              );
+
+
+              lines.appendChild(
+                line
+              );
+            }
+
+
+            current++;
+
+
+            if(
+              current>=
+              points.length
+            ){
+
+              refresh();
+
+              box.classList.add(
+                'complete'
+              );
+
+
+              const symbol=
+                document.createElement(
+                  'div'
+                );
+
+              symbol.className=
+                'constellationSymbol';
+
+              symbol.textContent=
+                Math.random()>.45
+                ? '♡'
+                : '✿';
+
+
+              box.appendChild(
+                symbol
+              );
+
+
+              showIdleMessage(
+                '✨ La constelación se completó.',
+                3600
+              );
+
+
+              setTimeout(
+                ()=>box.remove(),
+                5200
+              );
+
+
+              finishIdle(
+                'constellation',
+                23000
+              );
+
+              return;
+            }
+
+
+            refresh();
+          }
+        );
+
+
+        box.appendChild(
+          star
+        );
+      }
+    );
+
+
+    idleLayer.appendChild(
+      box
+    );
+
+    refresh();
+
+
+    setTimeout(
+      ()=>{
+
+        if(
+          token!==activityToken ||
+          activeIdle!=='constellation'
+        ){
+          return;
+        }
+
+        box.remove();
+
+        finishIdle(
+          'constellation',
+          20000
+        );
+
+      },
+      33000
+    );
+  }
+
+
+  /* =====================================================
+     5. HUELLAS DE MEWO
+  ===================================================== */
+
+  function startFootprints(
+    token
+  ){
+
+    const path=
+      [
+        {x:19,y:77,r:-18},
+        {x:34,y:70,r:12},
+        {x:53,y:75,r:-8},
+        {x:71,y:67,r:18},
+        {x:83,y:73,r:-10}
+      ];
+
+
+    let step=0;
+    let currentFoot=null;
+
+
+    showIdleMessage(
+      '🐾 Hay unas huellitas entre el pasto...',
+      3600
+    );
+
+
+    function spawnFoot(){
+
+      if(
+        token!==activityToken
+      ){
+        return;
+      }
+
+
+      if(currentFoot){
+        currentFoot.remove();
+      }
+
+
+      if(
+        step>=path.length
+      ){
+
+        showIdleMessage(
+          'miau... ♡ Mewo parece estar cerca.',
+          4200
+        );
+
+
+        window.dispatchEvent(
+          new CustomEvent(
+            'mewo-footprints-complete'
+          )
+        );
+
+
+        finishIdle(
+          'footprints',
+          22000
+        );
+
+        return;
+      }
+
+
+      const p=
+        path[step];
+
+
+      const foot=
+        document.createElement(
+          'button'
+        );
+
+      foot.type='button';
+
+      foot.className=
+        'idleFootprint idleTemporary';
+
+      foot.innerHTML=
+        '<span>●</span><i>●</i><b>●</b><em>●</em>';
+
+      foot.style.left=
+        `${p.x}%`;
+
+      foot.style.top=
+        `${p.y}%`;
+
+      foot.style.transform=
+        `translate(-50%,-50%) rotate(${p.r}deg)`;
+
+
+      foot.addEventListener(
+        'click',
+        e=>{
+
+          e.stopPropagation();
+
+          foot.classList.add(
+            'footFound'
+          );
+
+          step++;
+
+
+          setTimeout(
+            spawnFoot,
+            260
+          );
+        }
+      );
+
+
+      currentFoot=foot;
+
+      idleLayer.appendChild(
+        foot
+      );
+    }
+
+
+    spawnFoot();
+
+
+    setTimeout(
+      ()=>{
+
+        if(
+          token!==activityToken ||
+          activeIdle!=='footprints'
+        ){
+          return;
+        }
+
+        if(currentFoot){
+          currentFoot.remove();
+        }
+
+        finishIdle(
+          'footprints',
+          20000
+        );
+
+      },
+      39000
+    );
+  }
+
+
+  /* =====================================================
+     6. PÉTALO AL VIENTO
+  ===================================================== */
+
+  function startWindPetal(
+    token
+  ){
+
+    const petal=
+      document.createElement(
+        'button'
+      );
+
+    petal.type='button';
+
+    petal.className=
+      'idleWindPetal idleTemporary';
+
+    petal.setAttribute(
+      'aria-label',
+      'Atrapar pétalo'
+    );
+
+    petal.style.top=
+      `${30+Math.random()*42}%`;
+
+    petal.style.setProperty(
+      '--petal-drift',
+      `${-80+Math.random()*160}px`
+    );
+
+
+    idleLayer.appendChild(
+      petal
+    );
+
+
+    showIdleMessage(
+      '🌸 Un pétalo especial pasó con el viento...',
+      2700
+    );
+
+
+    let caught=false;
+
+
+    petal.addEventListener(
+      'click',
+      e=>{
+
+        e.stopPropagation();
+
+        caught=true;
+
+        const rect=
+          petal.getBoundingClientRect();
+
+        petal.remove();
+
+
+        for(let i=0;i<10;i++){
+
+          const spark=
+            document.createElement(
+              'span'
+            );
+
+          spark.className=
+            'idlePetalBurst';
+
+          spark.style.left=
+            `${rect.left+rect.width/2}px`;
+
+          spark.style.top=
+            `${rect.top+rect.height/2}px`;
+
+          spark.style.setProperty(
+            '--burst-x',
+            `${-48+Math.random()*96}px`
+          );
+
+          spark.style.setProperty(
+            '--burst-y',
+            `${-48+Math.random()*96}px`
+          );
+
+
+          idleLayer.appendChild(
+            spark
+          );
+
+
+          setTimeout(
+            ()=>spark.remove(),
+            1250
+          );
+        }
+
+
+        showIdleMessage(
+          '♡ Lo atrapaste.'
+        );
+
+
+        finishIdle(
+          'petal',
+          15000
+        );
+      }
+    );
+
+
+    setTimeout(
+      ()=>{
+
+        if(
+          token!==activityToken ||
+          caught ||
+          activeIdle!=='petal'
+        ){
+          return;
+        }
+
+        petal.remove();
+
+        finishIdle(
+          'petal',
+          13000
+        );
+
+      },
+      10500
+    );
+  }
+
+
+  /* =====================================================
+     7. ESTRELLA VIAJERA — ARRASTRAR A LA LUNA
+  ===================================================== */
+
+  function startTravelingStar(
+    token
+  ){
+
+    const moon=
+      document.getElementById(
+        'moonHotspot'
+      );
+
+
+    if(!moon){
+
+      finishIdle(
+        'traveler',
+        18000
+      );
+
+      return;
+    }
+
+
+    const star=
+      document.createElement(
+        'button'
+      );
+
+    star.type='button';
+
+    star.className=
+      'idleTravelingStar idleTemporary';
+
+    star.textContent='✦';
+
+    star.style.left=
+      `${12+Math.random()*22}%`;
+
+    star.style.top=
+      `${13+Math.random()*18}%`;
+
+
+    idleLayer.appendChild(
+      star
+    );
+
+
+    showIdleMessage(
+      '💫 Una estrellita viajera... ¿puedes llevarla hasta la luna?',
+      4300
+    );
+
+
+    let dragging=false;
+    let pointerId=null;
+
+
+    function moveStar(
+      x,
+      y
+    ){
+
+      star.style.left=
+        `${x}px`;
+
+      star.style.top=
+        `${y}px`;
+    }
+
+
+    star.addEventListener(
+      'pointerdown',
+      e=>{
+
+        dragging=true;
+        pointerId=e.pointerId;
+
+        star.classList.add(
+          'dragging'
+        );
+
+
+        try{
+          star.setPointerCapture(
+            e.pointerId
+          );
+        }
+        catch(_){}
+
+
+        moveStar(
+          e.clientX,
+          e.clientY
+        );
+
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    );
+
+
+    star.addEventListener(
+      'pointermove',
+      e=>{
+
+        if(
+          !dragging ||
+          e.pointerId!==pointerId
+        ){
+          return;
+        }
+
+
+        moveStar(
+          e.clientX,
+          e.clientY
+        );
+
+
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    );
+
+
+    function releaseStar(e){
+
+      if(!dragging){
+        return;
+      }
+
+
+      dragging=false;
+
+      star.classList.remove(
+        'dragging'
+      );
+
+
+      const mr=
+        moon.getBoundingClientRect();
+
+
+      const x=e.clientX;
+      const y=e.clientY;
+
+
+      const inside=
+        x>=mr.left-28 &&
+        x<=mr.right+28 &&
+        y>=mr.top-28 &&
+        y<=mr.bottom+28;
+
+
+      if(inside){
+
+        star.classList.add(
+          'starDelivered'
+        );
+
+
+        moon.classList.add(
+          'idleMoonKiss'
+        );
+
+
+        createMoonKiss(
+          mr.left+
+          mr.width/2,
+          mr.top+
+          mr.height/2
+        );
+
+
+        showIdleMessage(
+          '🌙✨ La luna recibió la estrellita.',
+          3500
+        );
+
+
+        setTimeout(
+          ()=>{
+            moon.classList.remove(
+              'idleMoonKiss'
+            );
+
+            star.remove();
+          },
+          1200
+        );
+
+
+        finishIdle(
+          'traveler',
+          22000
+        );
+      }
+
+      else{
+
+        star.classList.add(
+          'starMissed'
+        );
+
+
+        showIdleMessage(
+          'La estrellita siguió su viaje...'
+        );
+
+
+        setTimeout(
+          ()=>star.remove(),
+          1200
+        );
+
+
+        finishIdle(
+          'traveler',
+          18000
+        );
+      }
+    }
+
+
+    star.addEventListener(
+      'pointerup',
+      releaseStar
+    );
+
+    star.addEventListener(
+      'pointercancel',
+      releaseStar
+    );
+
+
+    setTimeout(
+      ()=>{
+
+        if(
+          token!==activityToken ||
+          activeIdle!=='traveler'
+        ){
+          return;
+        }
+
+        star.remove();
+
+        finishIdle(
+          'traveler',
+          18000
+        );
+
+      },
+      30000
+    );
+  }
+
+
+  function createMoonKiss(
+    x,
+    y
+  ){
+
+    for(let i=0;i<13;i++){
+
+      const spark=
+        document.createElement(
+          'span'
+        );
+
+      spark.className=
+        'idleMoonSpark';
+
+      spark.style.left=
+        `${x}px`;
+
+      spark.style.top=
+        `${y}px`;
+
+
+      const a=
+        Math.random()*
+        Math.PI*2;
+
+      const d=
+        26+
+        Math.random()*56;
+
+
+      spark.style.setProperty(
+        '--moon-x',
+        `${Math.cos(a)*d}px`
+      );
+
+      spark.style.setProperty(
+        '--moon-y',
+        `${Math.sin(a)*d}px`
+      );
+
+
+      document.body.appendChild(
+        spark
+      );
+
+
+      setTimeout(
+        ()=>spark.remove(),
+        1500
+      );
+    }
+  }
+
+
+  /* =====================================================
+     8. PIEDRITA / MENSAJE ESCONDIDO
+  ===================================================== */
+
+  const littleMessages=[
+    'te encontré ♡',
+    'sigue explorando...',
+    'miau...',
+    'aquí también pensé en ti',
+    '♡',
+    'un tulipán más para ti',
+    'todavía queda magia por encontrar...'
+  ];
+
+
+  function startPebble(
+    token
+  ){
+
+    const p=
+      randomGrassPoint(
+        .66,
+        .82
+      );
+
+
+    const pebble=
+      document.createElement(
+        'button'
+      );
+
+    pebble.type='button';
+
+    pebble.className=
+      'idlePebble idleTemporary';
+
+    pebble.style.left=
+      `${p.x}%`;
+
+    pebble.style.top=
+      `${p.y}%`;
+
+    pebble.innerHTML=
+      '<span>✦</span>';
+
+
+    idleLayer.appendChild(
+      pebble
+    );
+
+
+    showIdleMessage(
+      'Hay algo pequeño escondido entre el pasto...'
+    );
+
+
+    pebble.addEventListener(
+      'click',
+      e=>{
+
+        e.stopPropagation();
+
+        const text=
+          littleMessages[
+            Math.floor(
+              Math.random()*
+              littleMessages.length
+            )
+          ];
+
+
+        pebble.classList.add(
+          'pebbleOpen'
+        );
+
+
+        showIdleMessage(
+          text,
+          3600
+        );
+
+
+        setTimeout(
+          ()=>pebble.remove(),
+          900
+        );
+
+
+        finishIdle(
+          'pebble',
+          19000
+        );
+      }
+    );
+
+
+    setTimeout(
+      ()=>{
+
+        if(
+          token!==activityToken ||
+          activeIdle!=='pebble'
+        ){
+          return;
+        }
+
+        pebble.remove();
+
+        finishIdle(
+          'pebble',
+          17000
+        );
+
+      },
+      30000
+    );
+  }
+
+
+  /* =====================================================
+     INICIO
+  ===================================================== */
+
+  function beginWhenFieldReady(){
+
+    if(
+      !document.body.classList.contains(
+        'intro-active'
+      )
+    ){
+
+      scheduleNext(
+        18000
+      );
+
+      return;
+    }
+
+
+    const observer=
+      new MutationObserver(
+        ()=>{
+
+          if(
+            !document.body.classList.contains(
+              'intro-active'
+            )
+          ){
+
+            observer.disconnect();
+
+            scheduleNext(
+              17000
+            );
+          }
+        }
+      );
+
+
+    observer.observe(
+      document.body,
+      {
+        attributes:true,
+        attributeFilter:['class']
+      }
+    );
+  }
+
+
+  document.addEventListener(
+    'visibilitychange',
+    ()=>{
+
+      if(
+        document.hidden
+      ){
+        clearTimeout(
+          idleTimer
+        );
+      }
+
+      else if(
+        !activeIdle
+      ){
+        scheduleNext(
+          12000
+        );
+      }
+    }
+  );
+
+
+  beginWhenFieldReady();
+
+})();
