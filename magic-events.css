@@ -2702,3 +2702,805 @@
     font-size:10px;
   }
 }
+
+
+/* =========================================================
+   ATMÓSFERA CLIMÁTICA HD
+   Cambia el campo completo y no solo las partículas.
+========================================================= */
+
+#magicAtmosphere{
+  position:absolute;
+  inset:0;
+
+  z-index:0;
+
+  overflow:hidden;
+
+  pointer-events:none;
+}
+
+
+#magicSkyTint,
+#magicStarGlow,
+#magicRainHaze,
+#magicWetGround,
+#magicWindVeil{
+  position:absolute;
+  inset:0;
+
+  opacity:0;
+
+  pointer-events:none;
+
+  transition:
+    opacity 2.4s ease,
+    filter 2.4s ease;
+}
+
+
+/* =====================================================
+   NUBES EN CAPAS
+===================================================== */
+
+#magicCloudLayer{
+  position:absolute;
+  inset:-12% -18% 38% -18%;
+
+  opacity:0;
+
+  filter:
+    blur(22px);
+
+  transition:
+    opacity 2.5s ease,
+    filter 2.5s ease;
+}
+
+
+.magicCloud{
+  position:absolute;
+
+  width:62%;
+  height:45%;
+
+  border-radius:50%;
+
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(111,128,145,.76) 0,
+      rgba(75,93,112,.48) 44%,
+      rgba(36,50,68,.15) 66%,
+      transparent 75%
+    );
+
+  animation:
+    magicCloudDrift
+    18s
+    linear
+    infinite
+    alternate;
+}
+
+
+.magicCloud.cloud1{
+  left:-7%;
+  top:6%;
+}
+
+
+.magicCloud.cloud2{
+  left:35%;
+  top:-5%;
+
+  opacity:.75;
+
+  animation-duration:23s;
+  animation-direction:alternate-reverse;
+}
+
+
+.magicCloud.cloud3{
+  left:65%;
+  top:25%;
+
+  opacity:.64;
+
+  animation-duration:16s;
+}
+
+
+.magicCloud.cloud4{
+  left:6%;
+  top:43%;
+
+  opacity:.48;
+
+  animation-duration:27s;
+}
+
+
+.magicCloud.cloud5{
+  left:47%;
+  top:51%;
+
+  opacity:.58;
+
+  animation-duration:20s;
+  animation-direction:alternate-reverse;
+}
+
+
+@keyframes magicCloudDrift{
+
+  from{
+    transform:
+      translateX(-9%)
+      scale(1);
+  }
+
+  to{
+    transform:
+      translateX(12%)
+      scale(1.18);
+  }
+}
+
+
+/* =====================================================
+   LLUVIA DE ESTRELLAS — CAMBIO DEL CIELO
+===================================================== */
+
+body.weather-stars
+#magicSkyTint{
+  opacity:.30;
+
+  background:
+    radial-gradient(
+      ellipse at 50% 12%,
+      rgba(83,93,190,.23),
+      rgba(57,44,118,.16) 40%,
+      rgba(18,22,49,.13) 70%,
+      transparent
+    );
+}
+
+
+body.weather-stars
+#magicStarGlow{
+  opacity:1;
+
+  background:
+    radial-gradient(
+      ellipse at 35% 13%,
+      rgba(136,164,255,.18),
+      transparent 34%
+    ),
+    radial-gradient(
+      ellipse at 72% 18%,
+      rgba(255,153,219,.12),
+      transparent 31%
+    );
+
+  animation:
+    starAtmospherePulse
+    5.5s
+    ease-in-out
+    infinite
+    alternate;
+}
+
+
+body.weather-stars
+#magicTwinkles{
+  filter:
+    brightness(1.40);
+}
+
+
+body.weather-stars
+#scene{
+  filter:
+    brightness(1.04)
+    saturate(1.16)
+    contrast(1.04);
+
+  transition:
+    filter 2.2s ease;
+}
+
+
+@keyframes starAtmospherePulse{
+
+  from{
+    filter:
+      brightness(.84)
+      blur(2px);
+  }
+
+  to{
+    filter:
+      brightness(1.28)
+      blur(7px);
+  }
+}
+
+
+/* =====================================================
+   NEBLINA — DESATURACIÓN + CAPAS DENSAS
+===================================================== */
+
+body.weather-fog
+#magicSkyTint{
+  opacity:.34;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(117,144,151,.28),
+      rgba(83,112,113,.19) 52%,
+      rgba(72,101,91,.12)
+    );
+}
+
+
+body.weather-fog
+#magicCloudLayer{
+  opacity:.52;
+
+  filter:
+    blur(28px);
+}
+
+
+body.weather-fog
+#magicRainHaze{
+  opacity:.55;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0 8%,
+      rgba(189,212,208,.12) 23%,
+      transparent 38%,
+      rgba(191,216,213,.10) 58%,
+      transparent 76%
+    );
+
+  filter:
+    blur(18px);
+
+  animation:
+    fogVeilMove
+    9s
+    ease-in-out
+    infinite
+    alternate;
+}
+
+
+body.weather-fog
+#scene{
+  filter:
+    brightness(.72)
+    saturate(.61)
+    contrast(.94)
+    blur(.18px);
+
+  transition:
+    filter 2.5s ease;
+}
+
+
+body.weather-fog
+#magicFog.show{
+  opacity:.94;
+}
+
+
+body.weather-fog
+.magicFogBank{
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(204,222,221,.38) 0,
+      rgba(163,193,192,.28) 37%,
+      rgba(115,154,150,.13) 62%,
+      transparent 77%
+    );
+}
+
+
+@keyframes fogVeilMove{
+
+  from{
+    transform:
+      translateX(-7%);
+  }
+
+  to{
+    transform:
+      translateX(9%);
+  }
+}
+
+
+/* =====================================================
+   LLUVIA — CIELO CUBIERTO + REFLEJOS HÚMEDOS
+===================================================== */
+
+body.weather-rain
+#magicSkyTint{
+  opacity:.44;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(32,52,76,.56),
+      rgba(48,68,84,.32) 45%,
+      rgba(24,47,50,.22)
+    );
+}
+
+
+body.weather-rain
+#magicCloudLayer{
+  opacity:.76;
+
+  filter:
+    blur(24px)
+    brightness(.72);
+}
+
+
+body.weather-rain
+#magicRainHaze{
+  opacity:.58;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(177,205,220,.04),
+      rgba(166,199,211,.15) 49%,
+      rgba(129,168,174,.16)
+    );
+
+  animation:
+    rainHazeBreathe
+    3.8s
+    ease-in-out
+    infinite
+    alternate;
+}
+
+
+body.weather-rain
+#magicWetGround{
+  opacity:.72;
+
+  top:53%;
+
+  background:
+    radial-gradient(
+      ellipse at 30% 74%,
+      rgba(172,216,222,.15),
+      transparent 23%
+    ),
+    radial-gradient(
+      ellipse at 72% 82%,
+      rgba(149,201,210,.13),
+      transparent 26%
+    ),
+    linear-gradient(
+      180deg,
+      transparent,
+      rgba(97,149,144,.08)
+    );
+
+  mix-blend-mode:screen;
+}
+
+
+body.weather-rain
+#magicWindVeil{
+  opacity:.16;
+
+  background:
+    repeating-linear-gradient(
+      164deg,
+      transparent 0 19px,
+      rgba(185,214,228,.09) 20px 21px,
+      transparent 22px 48px
+    );
+
+  animation:
+    rainWindSweep
+    1.7s
+    linear
+    infinite;
+}
+
+
+body.weather-rain
+#scene{
+  filter:
+    brightness(.70)
+    saturate(.73)
+    contrast(1.02);
+
+  transition:
+    filter 2.3s ease;
+}
+
+
+@keyframes rainHazeBreathe{
+
+  from{
+    filter:
+      brightness(.85);
+  }
+
+  to{
+    filter:
+      brightness(1.12);
+  }
+}
+
+
+@keyframes rainWindSweep{
+
+  from{
+    transform:
+      translateX(-7%);
+  }
+
+  to{
+    transform:
+      translateX(7%);
+  }
+}
+
+
+/* =====================================================
+   TORMENTA — CAMBIO ATMOSFÉRICO FUERTE
+===================================================== */
+
+body.weather-storm
+#magicSkyTint{
+  opacity:.76;
+
+  background:
+    radial-gradient(
+      ellipse at 50% -10%,
+      rgba(66,79,112,.44),
+      rgba(13,20,36,.68) 55%,
+      rgba(4,10,13,.62)
+    );
+}
+
+
+body.weather-storm
+#magicCloudLayer{
+  opacity:1;
+
+  filter:
+    blur(18px)
+    brightness(.45)
+    contrast(1.28);
+
+  animation:
+    stormCloudLayer
+    4.8s
+    ease-in-out
+    infinite
+    alternate;
+}
+
+
+body.weather-storm
+.magicCloud{
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(71,81,101,.92),
+      rgba(31,42,61,.68) 45%,
+      rgba(8,17,30,.25) 67%,
+      transparent 76%
+    );
+
+  animation-duration:
+    7.5s;
+}
+
+
+body.weather-storm
+#magicRainHaze{
+  opacity:.78;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(168,190,214,.06),
+      rgba(100,133,151,.25) 47%,
+      rgba(62,101,106,.23)
+    );
+
+  filter:
+    blur(4px);
+}
+
+
+body.weather-storm
+#magicWetGround{
+  opacity:.94;
+
+  top:48%;
+
+  background:
+    radial-gradient(
+      ellipse at 25% 77%,
+      rgba(184,229,238,.21),
+      transparent 26%
+    ),
+    radial-gradient(
+      ellipse at 68% 84%,
+      rgba(166,216,228,.19),
+      transparent 28%
+    ),
+    radial-gradient(
+      ellipse at 47% 66%,
+      rgba(125,190,193,.13),
+      transparent 22%
+    );
+
+  mix-blend-mode:screen;
+}
+
+
+body.weather-storm
+#magicWindVeil{
+  opacity:.48;
+
+  background:
+    repeating-linear-gradient(
+      166deg,
+      transparent 0 16px,
+      rgba(206,229,240,.14) 17px 19px,
+      transparent 20px 38px
+    );
+
+  animation:
+    stormWindSweep
+    .72s
+    linear
+    infinite;
+}
+
+
+body.weather-storm
+#scene{
+  filter:
+    brightness(.48)
+    saturate(.52)
+    contrast(1.15);
+
+  transition:
+    filter 1.8s ease;
+}
+
+
+body.weather-storm
+#magicStormShade.show{
+  opacity:.76 !important;
+}
+
+
+@keyframes stormCloudLayer{
+
+  from{
+    transform:
+      translateX(-3%)
+      scale(1.04);
+  }
+
+  to{
+    transform:
+      translateX(4%)
+      scale(1.12);
+  }
+}
+
+
+@keyframes stormWindSweep{
+
+  from{
+    transform:
+      translateX(-10%);
+  }
+
+  to{
+    transform:
+      translateX(10%);
+  }
+}
+
+
+/* =====================================================
+   RAYO VISIBLE
+===================================================== */
+
+#magicLightningBolt{
+  position:absolute;
+  inset:0;
+
+  z-index:8;
+
+  opacity:0;
+
+  pointer-events:none;
+}
+
+
+#magicLightningBolt svg{
+  width:100%;
+  height:76%;
+
+  overflow:visible;
+}
+
+
+#magicLightningBolt polyline{
+  fill:none;
+
+  stroke-linecap:square;
+  stroke-linejoin:bevel;
+}
+
+
+#magicLightningBolt
+.lightningOuter{
+  stroke:
+    rgba(184,203,255,.62);
+
+  stroke-width:3.5;
+
+  filter:
+    blur(4px)
+    drop-shadow(
+      0 0 13px
+      rgba(179,199,255,.90)
+    );
+}
+
+
+#magicLightningBolt
+.lightningInner{
+  stroke:#fff;
+
+  stroke-width:.65;
+
+  filter:
+    drop-shadow(
+      0 0 4px #fff
+    );
+}
+
+
+#magicLightningBolt.flash{
+  animation:
+    lightningBoltFlash
+    .58s
+    steps(6,end)
+    forwards;
+}
+
+
+@keyframes lightningBoltFlash{
+
+  0%{opacity:0}
+  9%{opacity:1}
+  18%{opacity:.12}
+  28%{opacity:.90}
+  39%{opacity:.05}
+  100%{opacity:0}
+}
+
+
+/* =====================================================
+   PÉTALOS Y RESTOS ARRASTRADOS POR LA TORMENTA
+===================================================== */
+
+.magicStormPetal{
+  position:absolute;
+
+  z-index:6;
+
+  width:8px;
+  height:13px;
+
+  border-radius:
+    70% 30% 70% 30%;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ef9abf,
+      #ba668a
+    );
+
+  box-shadow:
+    0 0 5px
+    rgba(237,143,184,.35);
+
+  opacity:.80;
+
+  pointer-events:none;
+
+  animation:
+    stormPetalFly
+    var(--storm-petal-time,2.5s)
+    linear
+    forwards;
+}
+
+
+.magicStormPetal:nth-of-type(3n){
+  background:#577447;
+
+  width:6px;
+  height:15px;
+
+  border-radius:0 70% 0 70%;
+}
+
+
+@keyframes stormPetalFly{
+
+  from{
+    transform:
+      translate(0,0)
+      rotate(0deg);
+  }
+
+  to{
+    opacity:.16;
+
+    transform:
+      translate(
+        var(--storm-petal-x),
+        var(--storm-petal-y)
+      )
+      rotate(720deg);
+  }
+}
+
+
+/* =====================================================
+   TRANSICIÓN NORMAL DEL CAMPO
+===================================================== */
+
+body:not(.weather-stars):not(.weather-fog):not(.weather-rain):not(.weather-storm)
+#scene{
+  filter:none;
+
+  transition:
+    filter 2.5s ease;
+}
+
+
+/* En tormenta la lluvia ocupa visualmente más presencia. */
+
+body.weather-storm
+#magicWeatherCanvas{
+  filter:
+    brightness(1.16)
+    contrast(1.12);
+}
+
+
+body.weather-rain
+#magicWeatherCanvas{
+  filter:
+    brightness(1.06);
+}

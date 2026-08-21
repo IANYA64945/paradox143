@@ -396,13 +396,53 @@
   const lightning = document.createElement('div');
   lightning.id = 'magicLightning';
 
+
+  /*
+    Capas atmosféricas HD:
+    cambian la sensación completa del campo,
+    no solamente agregan partículas encima.
+  */
+
+  const atmosphere =
+    document.createElement('div');
+
+  atmosphere.id =
+    'magicAtmosphere';
+
+  atmosphere.innerHTML =
+    `
+      <div id="magicSkyTint"></div>
+
+      <div id="magicCloudLayer">
+        <span class="magicCloud cloud1"></span>
+        <span class="magicCloud cloud2"></span>
+        <span class="magicCloud cloud3"></span>
+        <span class="magicCloud cloud4"></span>
+        <span class="magicCloud cloud5"></span>
+      </div>
+
+      <div id="magicStarGlow"></div>
+      <div id="magicRainHaze"></div>
+      <div id="magicWetGround"></div>
+      <div id="magicWindVeil"></div>
+      <div id="magicLightningBolt"></div>
+    `;
+
+
   layer.appendChild(twinkles);
+  layer.appendChild(atmosphere);
   layer.appendChild(fog);
   layer.appendChild(stormShade);
   layer.appendChild(weatherCanvas);
   layer.appendChild(lightning);
 
   document.body.appendChild(layer);
+
+
+  const lightningBolt =
+    document.getElementById(
+      'magicLightningBolt'
+    );
 
 
   /* =====================================================
@@ -1622,6 +1662,234 @@
   }
 
 
+
+  /* =====================================================
+     CAMBIO GLOBAL DE ATMÓSFERA
+  ===================================================== */
+
+  function setWeatherAtmosphere(
+    type,
+    enabled=true
+  ){
+
+    document.body.classList.remove(
+      'weather-stars',
+      'weather-fog',
+      'weather-rain',
+      'weather-storm'
+    );
+
+
+    if(enabled && type){
+
+      document.body.classList.add(
+        `weather-${type}`
+      );
+    }
+
+
+    /*
+      El Canvas principal usa este valor para
+      mover los tulipanes con viento real.
+    */
+
+    if(!enabled){
+
+      window.MAGIC_WIND_INTENSITY=0;
+
+      return;
+    }
+
+
+    window.MAGIC_WIND_INTENSITY =
+
+      type==='storm'
+      ? 1.65
+
+      : type==='rain'
+      ? .72
+
+      : type==='fog'
+      ? .18
+
+      : .08;
+  }
+
+
+  function makeLightningBolt(){
+
+    if(!lightningBolt){
+      return;
+    }
+
+
+    const startX =
+      26 +
+      Math.random()*48;
+
+
+    let x=startX;
+    let y=0;
+
+    const points=[
+      `${x.toFixed(1)},${y}`
+    ];
+
+
+    for(
+      let i=1;
+      i<=8;
+      i++
+    ){
+
+      y=
+        i*12.5;
+
+      x +=
+        -8+
+        Math.random()*16;
+
+      points.push(
+        `${x.toFixed(1)},${y.toFixed(1)}`
+      );
+    }
+
+
+    lightningBolt.innerHTML =
+      `
+        <svg
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <polyline
+            class="lightningOuter"
+            points="${points.join(' ')}"
+          ></polyline>
+
+          <polyline
+            class="lightningInner"
+            points="${points.join(' ')}"
+          ></polyline>
+        </svg>
+      `;
+
+
+    lightningBolt.classList.remove(
+      'flash'
+    );
+
+    void lightningBolt.offsetWidth;
+
+    lightningBolt.classList.add(
+      'flash'
+    );
+  }
+
+
+  let stormPetalTimer=0;
+
+
+  function stormPetalBurst(){
+
+    if(
+      activeEvent!=='storm'
+    ){
+      return;
+    }
+
+
+    const amount=
+      window.innerWidth<600
+      ? 13
+      : 22;
+
+
+    for(
+      let i=0;
+      i<amount;
+      i++
+    ){
+
+      const petal=
+        document.createElement(
+          'span'
+        );
+
+      petal.className=
+        'magicStormPetal';
+
+      petal.style.left=
+        `${100+Math.random()*15}%`;
+
+      petal.style.top=
+        `${20+Math.random()*68}%`;
+
+      petal.style.setProperty(
+        '--storm-petal-x',
+        `${-(120+Math.random()*50)}vw`
+      );
+
+      petal.style.setProperty(
+        '--storm-petal-y',
+        `${-40+Math.random()*100}px`
+      );
+
+      petal.style.setProperty(
+        '--storm-petal-time',
+        `${1.8+Math.random()*1.9}s`
+      );
+
+      layer.appendChild(
+        petal
+      );
+
+
+      setTimeout(
+        ()=>petal.remove(),
+        4300
+      );
+    }
+  }
+
+
+  function startStormPetals(){
+
+    clearInterval(
+      stormPetalTimer
+    );
+
+
+    stormPetalBurst();
+
+
+    stormPetalTimer=
+      setInterval(
+        stormPetalBurst,
+        2700
+      );
+  }
+
+
+  function stopStormPetals(){
+
+    clearInterval(
+      stormPetalTimer
+    );
+
+    stormPetalTimer=0;
+
+
+    layer
+      .querySelectorAll(
+        '.magicStormPetal'
+      )
+      .forEach(
+        p=>p.remove()
+      );
+  }
+
+
   /* =====================================================
      WEATHER CANVAS
   ===================================================== */
@@ -1642,6 +1910,7 @@
 
   let weatherRAF=0;
   let drops=[];
+  let splashes=[];
 
   let activeEvent=null;
   let eventEndingTimer=0;
@@ -1664,10 +1933,16 @@
       );
 
 
+    /*
+      El campo está rindiendo bien, así que podemos
+      renderizar lluvia y destellos con mayor nitidez.
+    */
     weatherDpr =
       Math.min(
         window.devicePixelRatio || 1,
-        1.25
+        window.innerWidth < 600
+          ? 1.50
+          : 1.75
       );
 
 
@@ -1724,14 +1999,14 @@
 
       ? (
           mobile
-          ? 175
-          : 275
+          ? 320
+          : 520
         )
 
       : (
           mobile
-          ? 62
-          : 105
+          ? 145
+          : 245
         );
 
 
@@ -1770,8 +2045,16 @@
 
         alpha:
           heavy
-          ? .40 + Math.random()*.42
-          : .20 + Math.random()*.28
+          ? .34 + Math.random()*.55
+          : .17 + Math.random()*.36,
+
+        width:
+          heavy
+          ? .75 + Math.random()*1.35
+          : .45 + Math.random()*.90,
+
+        depth:
+          .45 + Math.random()*.80
 
       });
     }
@@ -1788,19 +2071,44 @@
     );
 
 
-    weatherCtx.lineWidth =
-      activeEvent === 'storm'
-      ? 1.25
-      : 1;
+    const storm =
+      activeEvent === 'storm';
 
+
+    /*
+      Lluvia en varias profundidades:
+      las gotas más cercanas son más grandes,
+      rápidas y luminosas.
+    */
 
     for (
       const d
       of drops
     ) {
 
+      weatherCtx.lineWidth =
+        d.width *
+        (
+          storm
+          ? 1.12
+          : 1
+        );
+
+
+      const brightness =
+        Math.min(
+          .95,
+          d.alpha *
+          d.depth
+        );
+
+
       weatherCtx.strokeStyle =
-        `rgba(186,214,232,${d.alpha})`;
+        storm
+
+        ? `rgba(197,222,241,${brightness})`
+
+        : `rgba(176,211,233,${brightness})`;
 
 
       weatherCtx.beginPath();
@@ -1811,44 +2119,178 @@
       );
 
       weatherCtx.lineTo(
-        d.x + d.drift,
-        d.y + d.len
+        d.x +
+        d.drift *
+        d.depth,
+        d.y +
+        d.len *
+        d.depth
       );
 
       weatherCtx.stroke();
 
 
       d.x +=
-        d.drift*.30;
+        d.drift *
+        .32 *
+        d.depth;
 
       d.y +=
-        d.speed;
+        d.speed *
+        d.depth;
 
 
       if (
         d.y >
-        weatherH + 30
+        weatherH + 32
       ) {
 
+        /*
+          Algunas gotas cercanas generan pequeñas
+          salpicaduras sobre la parte baja del campo.
+        */
+
+        if (
+          d.depth > .85 &&
+          Math.random() <
+          (
+            storm
+            ? .30
+            : .16
+          )
+        ) {
+
+          splashes.push({
+
+            x:
+              Math.max(
+                0,
+                Math.min(
+                  weatherW,
+                  d.x
+                )
+              ),
+
+            y:
+              weatherH *
+              (
+                .78 +
+                Math.random()*.18
+              ),
+
+            life:1,
+
+            size:
+              (
+                storm
+                ? 6
+                : 4
+              )
+              +
+              Math.random()*7
+
+          });
+
+
+          if (
+            splashes.length >
+            (
+              storm
+              ? 100
+              : 55
+            )
+          ) {
+
+            splashes.shift();
+          }
+        }
+
+
         d.y =
-          -30;
+          -40 -
+          Math.random()*80;
 
         d.x =
           Math.random() *
           (
-            weatherW + 100
+            weatherW + 160
           );
       }
 
 
       if (
-        d.x < -80
+        d.x < -120
       ) {
 
         d.x =
-          weatherW + 60;
+          weatherW + 80;
       }
 
+    }
+
+
+    /*
+      Reflejos/salpicaduras húmedas en el pasto.
+    */
+
+    for (
+      let i=
+        splashes.length-1;
+      i>=0;
+      i--
+    ) {
+
+      const s=
+        splashes[i];
+
+
+      weatherCtx.strokeStyle =
+        `rgba(205,231,241,${s.life*.34})`;
+
+      weatherCtx.lineWidth =
+        Math.max(
+          .6,
+          s.life*1.25
+        );
+
+
+      weatherCtx.beginPath();
+
+      weatherCtx.ellipse(
+        s.x,
+        s.y,
+        s.size*
+        (
+          1.4-
+          s.life*.35
+        ),
+        Math.max(
+          1,
+          s.size*.24
+        ),
+        0,
+        0,
+        Math.PI*2
+      );
+
+      weatherCtx.stroke();
+
+
+      s.life -=
+        storm
+        ? .038
+        : .046;
+
+
+      if (
+        s.life <= 0
+      ) {
+
+        splashes.splice(
+          i,
+          1
+        );
+      }
     }
 
 
@@ -1883,6 +2325,8 @@
 
 
   function stopRain() {
+
+    splashes=[];
 
     weatherCanvas.classList.remove(
       'show'
@@ -1921,8 +2365,8 @@
 
     const amount =
       window.innerWidth < 600
-      ? 7
-      : 11;
+      ? 14
+      : 24;
 
 
     for (
@@ -1969,7 +2413,7 @@
 
       s.style.setProperty(
         '--tail',
-        `${55 + Math.random()*95}px`
+        `${85 + Math.random()*150}px`
       );
 
 
@@ -2036,6 +2480,8 @@
       'flash'
     );
 
+    makeLightningBolt();
+
 
     /*
       Cada relámpago hace más fuerte
@@ -2048,13 +2494,13 @@
 
       window.MAGIC_STORM_DAMAGE =
         Math.min(
-          .34,
+          .48,
           (
             window.MAGIC_STORM_DAMAGE
             || .12
           )
           +
-          .045
+          .055
         );
 
 
@@ -2258,6 +2704,11 @@
     window.MAGIC_AMBIENT_ACTIVE=
       type;
 
+    setWeatherAtmosphere(
+      type,
+      true
+    );
+
     lastEventAt=
       Date.now();
 
@@ -2347,8 +2798,8 @@
       */
 
       window.MAGIC_STORM_ACTIVE=true;
-      window.MAGIC_STORM_INTENSITY=1.25;
-      window.MAGIC_STORM_DAMAGE=.11;
+      window.MAGIC_STORM_INTENSITY=1.70;
+      window.MAGIC_STORM_DAMAGE=.15;
 
 
       stormShade.classList.add(
@@ -2360,6 +2811,8 @@
       startRain(true);
 
       scheduleLightning();
+
+      startStormPetals();
 
       duration=40000;
     }
@@ -2428,6 +2881,8 @@
 
       stopRain();
 
+      stopStormPetals();
+
 
       /*
         El campo se recupera después
@@ -2448,6 +2903,11 @@
 
     activeEvent=null;
     window.MAGIC_AMBIENT_ACTIVE=null;
+
+    setWeatherAtmosphere(
+      null,
+      false
+    );
 
     paradoxAudio.restoreNormal();
 
