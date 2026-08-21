@@ -20,6 +20,355 @@
   if (!fieldApp) return;
 
 
+
+
+  /* =====================================================
+     MÚSICA COMPARTIDA PARA LOS EVENTOS
+
+     Archivos opcionales:
+     - musica_estrellas.mp3
+     - musica_neblina.mp3
+     - musica_lluvia.mp3
+     - musica_tormenta.mp3
+
+     Si alguno todavía no existe, el campo continúa
+     con musica.mp3 sin romper el evento.
+  ===================================================== */
+
+  const EVENT_MUSIC = {
+    stars:'musica_estrellas.mp3',
+    fog:'musica_neblina.mp3',
+    rain:'musica_lluvia.mp3',
+    storm:'musica_tormenta.mp3'
+  };
+
+
+  function createParadoxAudioManager(){
+
+    if(window.ParadoxAudio){
+      return window.ParadoxAudio;
+    }
+
+    const audio =
+      document.getElementById('bgMusic');
+
+    let normalState=null;
+    let fadeTimer=0;
+    let requestToken=0;
+
+
+    function fadeTo(
+      target,
+      duration=650
+    ){
+
+      return new Promise(resolve=>{
+
+        if(!audio){
+          resolve();
+          return;
+        }
+
+        clearInterval(fadeTimer);
+
+        const start =
+          Number.isFinite(audio.volume)
+          ? audio.volume
+          : .35;
+
+        const started =
+          performance.now();
+
+        fadeTimer =
+          setInterval(()=>{
+
+            const t =
+              Math.min(
+                1,
+                (
+                  performance.now()-
+                  started
+                )/
+                duration
+              );
+
+            audio.volume =
+              Math.max(
+                0,
+                Math.min(
+                  1,
+                  start+
+                  (
+                    target-start
+                  )*t
+                )
+              );
+
+            if(t>=1){
+              clearInterval(fadeTimer);
+              fadeTimer=0;
+              resolve();
+            }
+
+          },35);
+
+      });
+    }
+
+
+    async function exists(src){
+
+      try{
+
+        const response =
+          await fetch(
+            src,
+            {
+              method:'HEAD',
+              cache:'force-cache'
+            }
+          );
+
+        return response.ok;
+
+      }
+      catch(_){
+
+        return false;
+      }
+    }
+
+
+    async function playSpecial(
+      src,
+      volume=.38
+    ){
+
+      if(!audio || !src){
+        return false;
+      }
+
+      const token =
+        ++requestToken;
+
+      /*
+        No cambia la música si el archivo aún
+        no fue subido a GitHub.
+      */
+
+      if(
+        !(await exists(src)) ||
+        token!==requestToken
+      ){
+        return false;
+      }
+
+
+      if(!normalState){
+
+        normalState={
+          src:
+            audio.getAttribute('src')
+            || 'musica.mp3',
+
+          time:
+            Number.isFinite(audio.currentTime)
+            ? audio.currentTime
+            : 0,
+
+          volume:
+            Number.isFinite(audio.volume)
+            ? audio.volume
+            : .35,
+
+          wasPlaying:
+            !audio.paused
+        };
+      }
+
+
+      if(!audio.paused){
+        await fadeTo(0,520);
+      }
+
+
+      if(token!==requestToken){
+        return false;
+      }
+
+
+      try{
+
+        audio.pause();
+
+        audio.setAttribute(
+          'src',
+          src
+        );
+
+        audio.load();
+
+        audio.currentTime=0;
+        audio.volume=.02;
+        audio.loop=true;
+
+
+        const playPromise =
+          audio.play();
+
+
+        if(
+          playPromise &&
+          typeof playPromise.then==='function'
+        ){
+
+          await playPromise;
+        }
+
+
+        if(token!==requestToken){
+          return false;
+        }
+
+
+        await fadeTo(
+          volume,
+          760
+        );
+
+        return true;
+
+      }
+      catch(_){
+
+        /*
+          Si el navegador bloquea el cambio,
+          restauramos la canción normal.
+        */
+
+        await restoreNormal();
+
+        return false;
+      }
+    }
+
+
+    async function restoreNormal(){
+
+      if(!audio || !normalState){
+        return;
+      }
+
+
+      const token =
+        ++requestToken;
+
+      const state =
+        normalState;
+
+      normalState=null;
+
+
+      if(!audio.paused){
+        await fadeTo(0,550);
+      }
+
+
+      if(token!==requestToken){
+        return;
+      }
+
+
+      try{
+
+        audio.pause();
+
+        audio.setAttribute(
+          'src',
+          state.src
+        );
+
+        audio.load();
+
+        audio.volume=.02;
+        audio.loop=true;
+
+
+        const restoreTime=()=>{
+
+          try{
+            audio.currentTime=
+              state.time;
+          }
+          catch(_){}
+        };
+
+
+        if(audio.readyState>=1){
+          restoreTime();
+        }
+        else{
+          audio.addEventListener(
+            'loadedmetadata',
+            restoreTime,
+            {once:true}
+          );
+        }
+
+
+        if(state.wasPlaying){
+
+          try{
+
+            const p=
+              audio.play();
+
+            if(
+              p &&
+              typeof p.then==='function'
+            ){
+              await p;
+            }
+
+            await fadeTo(
+              state.volume,
+              720
+            );
+
+          }
+          catch(_){
+
+            audio.volume=
+              state.volume;
+          }
+        }
+        else{
+
+          audio.volume=
+            state.volume;
+        }
+
+      }
+      catch(_){}
+    }
+
+
+    const manager={
+      playSpecial,
+      restoreNormal
+    };
+
+    window.ParadoxAudio=
+      manager;
+
+    return manager;
+  }
+
+
+  const paradoxAudio =
+    createParadoxAudioManager();
+
+
   /* =====================================================
      CAPA VISUAL
   ===================================================== */
@@ -750,6 +1099,7 @@
 
     activeSpecialResolved=true;
     activeSpecialType=null;
+    window.MAGIC_SPECIAL_PENDING=false;
 
     injectWeatherLettersIntoBasket();
   }
@@ -1091,6 +1441,7 @@
 
     activeSpecialResolved=false;
     activeSpecialType=type;
+    window.MAGIC_SPECIAL_PENDING=true;
 
 
     const target =
@@ -1249,12 +1600,12 @@
     const delay =
 
       type === 'storm'
-      ? 3000
+      ? 6500
 
       : (
           type === 'stars'
-          ? 1300
-          : 1800
+          ? 3200
+          : 4800
         );
 
 
@@ -1740,11 +2091,14 @@
     const times =
       [
          900 + Math.random()*500,
-        2300 + Math.random()*500,
-        4200 + Math.random()*650,
-        6500 + Math.random()*650,
-        9000 + Math.random()*700,
-       11600 + Math.random()*650
+        3200 + Math.random()*650,
+        6800 + Math.random()*700,
+       10800 + Math.random()*750,
+       15400 + Math.random()*850,
+       20500 + Math.random()*900,
+       25700 + Math.random()*850,
+       31100 + Math.random()*900,
+       36000 + Math.random()*700
       ];
 
 
@@ -1770,49 +2124,52 @@
      CONTROL DE EVENTOS
   ===================================================== */
 
-  let eventSequence=
-    [
+  function buildEventSequence(){
+
+    const soft=[
       'stars',
       'fog',
       'rain'
     ];
 
 
-  /*
-    Orden aleatorio de los tres eventos suaves.
-    La tormenta SIEMPRE será el cuarto / último especial.
-  */
+    for(
+      let i=soft.length-1;
+      i>0;
+      i--
+    ){
 
-  for (
-    let i=
-      eventSequence.length-1;
+      const j=
+        Math.floor(
+          Math.random()*
+          (i+1)
+        );
 
-    i>0;
-
-    i--
-  ) {
-
-    const j =
-      Math.floor(
-        Math.random() *
-        (i+1)
-      );
+      [
+        soft[i],
+        soft[j]
+      ]=[
+        soft[j],
+        soft[i]
+      ];
+    }
 
 
-    [
-      eventSequence[i],
-      eventSequence[j]
-    ] =
-    [
-      eventSequence[j],
-      eventSequence[i]
+    /*
+      En cada ciclo los tres eventos suaves
+      salen en orden aleatorio y la tormenta
+      vuelve a ser el cierre especial.
+    */
+
+    return [
+      ...soft,
+      'storm'
     ];
   }
 
 
-  eventSequence.push(
-    'storm'
-  );
+  let eventSequence=
+    buildEventSequence();
 
 
   let eventIndex=0;
@@ -1820,8 +2177,8 @@
   let exploration=0;
 
   let nextExplorationGoal =
-    850 +
-    Math.random()*700;
+    3300 +
+    Math.random()*2200;
 
   let lastEventAt=0;
 
@@ -1898,8 +2255,25 @@
     activeEvent=
       type;
 
+    window.MAGIC_AMBIENT_ACTIVE=
+      type;
+
     lastEventAt=
       Date.now();
+
+
+    /*
+      Música propia del evento.
+      Si el MP3 todavía no está subido,
+      se mantiene la música normal.
+    */
+
+    paradoxAudio.playSpecial(
+      EVENT_MUSIC[type],
+      type==='storm'
+        ? .43
+        : .37
+    );
 
 
     clearTimeout(
@@ -1916,7 +2290,29 @@
 
       shootingStarEvent();
 
-      duration=5600;
+      /*
+        Varias oleadas para que la lluvia
+        de estrellas dure de verdad.
+      */
+      setTimeout(
+        ()=>{
+          if(activeEvent==='stars'){
+            shootingStarEvent();
+          }
+        },
+        6200
+      );
+
+      setTimeout(
+        ()=>{
+          if(activeEvent==='stars'){
+            shootingStarEvent();
+          }
+        },
+        12400
+      );
+
+      duration=19000;
     }
 
 
@@ -1926,7 +2322,7 @@
 
       startFog();
 
-      duration=8500;
+      duration=27000;
     }
 
 
@@ -1936,7 +2332,7 @@
 
       startRain(false);
 
-      duration=8500;
+      duration=29000;
     }
 
 
@@ -1965,7 +2361,7 @@
 
       scheduleLightning();
 
-      duration=14500;
+      duration=40000;
     }
 
 
@@ -2051,6 +2447,9 @@
 
 
     activeEvent=null;
+    window.MAGIC_AMBIENT_ACTIVE=null;
+
+    paradoxAudio.restoreNormal();
 
 
     /*
@@ -2061,8 +2460,8 @@
     exploration=0;
 
     nextExplorationGoal =
-      900 +
-      Math.random()*850;
+      3500 +
+      Math.random()*2400;
 
 
     if (
@@ -2104,32 +2503,15 @@
     ) {
 
       /*
-        Después de la tormenta,
-        pueden volver a aparecer
-        eventos suaves aleatorios,
-        pero NO otra tormenta.
+        Nuevo ciclo completo:
+        estrellas, neblina, lluvia y
+        nuevamente tormenta.
       */
 
-      const soft =
-        [
-          'stars',
-          'fog',
-          'rain'
-        ];
+      eventSequence=
+        buildEventSequence();
 
-
-      const type =
-        soft[
-          Math.floor(
-            Math.random() *
-            soft.length
-          )
-        ];
-
-
-      return startAmbientEvent(
-        type
-      );
+      eventIndex=0;
     }
 
 
@@ -2233,7 +2615,7 @@
         if (
           Date.now() -
           lastEventAt >
-          12000
+          65000
         ) {
 
           if (
@@ -2311,9 +2693,9 @@
 
         if (
           elapsed >
-          43000 &&
+          150000 &&
           Math.random() <
-          .34
+          .14
         ) {
 
           tryNextEvent();

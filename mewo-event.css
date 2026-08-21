@@ -332,3 +332,475 @@
   }
 
 }
+
+
+/* =========================================================
+   MEWO — CUIDADOS, JUEGO Y COMIDA
+========================================================= */
+
+#mewoCarePanel{
+  position:absolute;
+
+  left:50%;
+  bottom:10%;
+
+  width:min(430px,88vw);
+
+  padding:11px;
+
+  transform:
+    translateX(-50%)
+    translateY(12px);
+
+  border:
+    3px solid
+    #e7a1c5;
+
+  border-radius:5px;
+
+  background:
+    rgba(6,10,18,.94);
+
+  box-shadow:
+    0 0 0 3px #663653,
+    0 8px 28px rgba(0,0,0,.32),
+    0 0 20px rgba(238,158,204,.12);
+
+  color:#fff;
+
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+
+  transition:
+    opacity .20s,
+    transform .20s,
+    visibility .20s;
+
+  image-rendering:pixelated;
+}
+
+
+#mewoCarePanel.show{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+
+  transform:
+    translateX(-50%)
+    translateY(0);
+}
+
+
+.mewoCareTitle{
+  margin-bottom:9px;
+
+  color:#ffd6e8;
+
+  font:
+    800 11px/1.35
+    monospace;
+
+  text-align:center;
+
+  letter-spacing:.5px;
+}
+
+
+.mewoCareButtons{
+  display:grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap:7px;
+}
+
+
+.mewoCareBtn{
+  min-height:48px;
+
+  padding:7px 5px;
+
+  border:
+    2px solid
+    #8c4d70;
+
+  border-radius:4px;
+
+  background:
+    rgba(238,153,196,.09);
+
+  color:#ffe8f3;
+
+  font:
+    800 10px/1.25
+    monospace;
+
+  cursor:pointer;
+
+  pointer-events:auto;
+
+  box-shadow:
+    inset 0 0 10px rgba(255,190,220,.04);
+
+  -webkit-tap-highlight-color:transparent;
+}
+
+
+.mewoCareBtn span{
+  display:block;
+
+  margin-bottom:3px;
+
+  color:#f4a5ca;
+
+  font-size:17px;
+}
+
+
+.mewoCareBtn:active{
+  transform:scale(.96);
+}
+
+
+.mewoCareBtn.done{
+  border-color:
+    #efafd0;
+
+  background:
+    rgba(240,160,201,.18);
+
+  box-shadow:
+    inset 0 0 11px rgba(255,193,223,.12),
+    0 0 8px rgba(243,157,202,.12);
+}
+
+
+.mewoCareBtn.done::after{
+  content:"  ✓";
+
+  color:#ffe2ef;
+}
+
+
+.mewoRestBtn{
+  display:none;
+
+  grid-column:
+    1 / -1;
+
+  min-height:40px;
+
+  border-color:
+    #e8b2cb;
+
+  background:
+    rgba(232,157,195,.17);
+}
+
+
+.mewoRestBtn.unlocked{
+  display:block;
+
+  animation:
+    mewoRestGlow
+    1.6s
+    ease-in-out
+    infinite;
+}
+
+
+@keyframes mewoRestGlow{
+  0%,100%{
+    box-shadow:
+      0 0 0 rgba(245,168,207,0);
+  }
+
+  50%{
+    box-shadow:
+      0 0 14px rgba(245,168,207,.28);
+  }
+}
+
+
+/* =====================================================
+   JUGUETE
+===================================================== */
+
+#mewoToy{
+  position:absolute;
+
+  z-index:4;
+
+  width:52px;
+  height:52px;
+
+  padding:0;
+
+  border:0;
+
+  background:transparent;
+
+  opacity:0;
+  visibility:hidden;
+
+  pointer-events:none;
+  cursor:pointer;
+
+  transform:
+    translate(-50%,-50%)
+    scale(.65);
+
+  -webkit-tap-highlight-color:transparent;
+}
+
+
+#mewoToy.show{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+
+  animation:
+    mewoToyBounce
+    .72s
+    steps(6,end)
+    infinite
+    alternate;
+}
+
+
+#mewoToy span{
+  position:absolute;
+
+  left:50%;
+  top:50%;
+
+  width:28px;
+  height:28px;
+
+  border:
+    3px solid
+    #713951;
+
+  border-radius:50%;
+
+  transform:
+    translate(-50%,-50%);
+
+  background:
+    repeating-linear-gradient(
+      45deg,
+      #f2a3c8 0 4px,
+      #c76c98 4px 8px
+    );
+
+  box-shadow:
+    0 0 0 3px rgba(255,220,236,.62),
+    0 0 13px rgba(243,159,202,.44);
+}
+
+
+#mewoToy span::after{
+  content:"";
+
+  position:absolute;
+
+  left:22px;
+  top:19px;
+
+  width:25px;
+  height:3px;
+
+  transform:
+    rotate(27deg);
+
+  transform-origin:left center;
+
+  background:#e99abe;
+}
+
+
+@keyframes mewoToyBounce{
+  from{
+    transform:
+      translate(-50%,-50%)
+      translateY(1px)
+      rotate(-4deg);
+  }
+
+  to{
+    transform:
+      translate(-50%,-68%)
+      rotate(5deg);
+  }
+}
+
+
+/* =====================================================
+   COMIDA
+===================================================== */
+
+#mewoFood{
+  position:absolute;
+
+  z-index:4;
+
+  width:66px;
+  height:54px;
+
+  padding:0;
+
+  border:0;
+
+  background:transparent;
+
+  opacity:0;
+  visibility:hidden;
+
+  pointer-events:none;
+  cursor:pointer;
+
+  transform:
+    translate(-50%,-50%);
+
+  -webkit-tap-highlight-color:transparent;
+}
+
+
+#mewoFood.show{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+
+  animation:
+    mewoFoodPulse
+    1.1s
+    steps(6,end)
+    infinite;
+}
+
+
+.mewoFoodBowl{
+  position:absolute;
+
+  left:50%;
+  bottom:2px;
+
+  width:48px;
+  height:19px;
+
+  transform:
+    translateX(-50%);
+
+  border:
+    3px solid
+    #543850;
+
+  border-radius:
+    5px 5px 16px 16px;
+
+  background:
+    #d780a9;
+
+  box-shadow:
+    0 0 0 2px rgba(255,220,235,.44);
+}
+
+
+.mewoFoodBits{
+  position:absolute;
+
+  left:50%;
+  bottom:15px;
+
+  transform:
+    translateX(-50%);
+
+  color:#f2c68e;
+
+  font:
+    900 20px/1
+    monospace;
+
+  letter-spacing:-2px;
+
+  text-shadow:
+    0 0 5px rgba(255,222,175,.72);
+}
+
+
+@keyframes mewoFoodPulse{
+  0%,100%{
+    transform:
+      translate(-50%,-50%)
+      scale(.96);
+  }
+
+  50%{
+    transform:
+      translate(-50%,-55%)
+      scale(1.04);
+  }
+}
+
+
+/* =====================================================
+   AJUSTES PARA EVENTO MÁS LARGO
+===================================================== */
+
+#mewoCat.caught{
+  filter:
+    drop-shadow(0 0 10px rgba(244,161,204,.15));
+}
+
+
+#mewoStatus{
+  bottom:24%;
+}
+
+
+@media(max-width:600px){
+
+  #mewoCarePanel{
+    bottom:9%;
+
+    width:min(
+      92vw,
+      390px
+    );
+
+    padding:9px;
+  }
+
+
+  .mewoCareButtons{
+    gap:5px;
+  }
+
+
+  .mewoCareBtn{
+    min-height:44px;
+
+    padding:6px 3px;
+
+    font-size:9px;
+  }
+
+
+  #mewoStatus{
+    bottom:25%;
+  }
+
+
+  #mewoToy{
+    width:46px;
+    height:46px;
+  }
+
+
+  #mewoFood{
+    width:58px;
+    height:50px;
+  }
+}

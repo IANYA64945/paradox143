@@ -46,6 +46,49 @@
 
   const collected = safeLoad();
 
+
+  const MOON_MUSIC_SRC =
+    'musica_luna.mp3';
+
+  let moonMusicTimer=0;
+
+
+  function playMoonMusic(){
+
+    clearTimeout(
+      moonMusicTimer
+    );
+
+
+    if(
+      window.ParadoxAudio
+    ){
+
+      window.ParadoxAudio
+        .playSpecial(
+          MOON_MUSIC_SRC,
+          .36
+        );
+
+
+      /*
+        Tiempo suficiente para ver el brillo,
+        recoger la carta y leerla.
+      */
+
+      moonMusicTimer=
+        setTimeout(
+          ()=>{
+            if(window.ParadoxAudio){
+              window.ParadoxAudio
+                .restoreNormal();
+            }
+          },
+          26000
+        );
+    }
+  }
+
   /* =====================================================
      CREAR ELEMENTOS
   ===================================================== */
@@ -339,11 +382,11 @@
   ===================================================== */
 
   function releaseMoonLetter() {
-    if (collected.has('moon')) {
-      showMoonWhisper('Esta cartita ya está guardada en tu canasta ♡');
-      pulseBasket();
-      return;
-    }
+    /*
+      La carta de la luna puede volver a aparecer
+      todas las veces que se active el secreto.
+      La canasta NO duplica la carta.
+    */
 
     const { x, y } = moonGeometry();
 
@@ -406,10 +449,11 @@
     moonTriggered = true;
 
     moonHotspot.classList.add('awakened');
+
+    playMoonMusic();
+
     showMoonWhisper(
-      collected.has('moon')
-        ? 'La luna recuerda que ya encontraste su carta ♡'
-        : 'La luna también quería decirte algo...'
+      'La luna también quería decirte algo...'
     );
 
     setTimeout(releaseMoonLetter, 1200);
