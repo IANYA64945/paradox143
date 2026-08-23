@@ -5001,3 +5001,35 @@ body.weather-snow #magicWindVeil{opacity:.12;background:repeating-linear-gradien
 .darkMoonPulse{animation:darkMoonPulse .38s ease}
 @keyframes darkMoonPulse{0%{transform:scale(1)}50%{transform:scale(1.18)}100%{transform:scale(1)}}
 @media(max-width:600px){.darkMoonHalo{width:66px;height:66px}.darkMoonPanel{font-size:10px}}
+
+
+/* =========================================================
+   CANASTA 2.0
+========================================================= */
+#basketPanel[data-basket-v2="1"]{width:min(560px,92vw)!important;max-height:min(78vh,650px)!important;overflow:hidden!important;display:flex;flex-direction:column}
+#basketPanel[data-basket-v2="1"] .basketSubtitle{margin-bottom:7px}
+#basketTabs{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin:4px 0 8px;flex:0 0 auto}
+.basketTab{min-height:31px;padding:4px 3px;border:1px solid rgba(244,177,211,.20);border-radius:4px;background:rgba(255,255,255,.025);color:#d9c8d1;font:800 8px/1.1 monospace;cursor:pointer}
+.basketTab.active{color:#ffe1ef;border-color:rgba(245,176,211,.55);background:rgba(242,155,198,.12);box-shadow:inset 0 0 10px rgba(255,182,216,.05)}
+.basketPane{display:none;min-height:0;overflow-y:auto;padding-right:2px}.basketPane.active{display:block}
+.basketSectionHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:3px 0 8px;color:#f9d9e7;font:800 9px/1.2 monospace}.basketSectionHead span{color:#ffe6ad}
+.basketMemoryGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+.basketMemory{display:grid;grid-template-columns:26px 1fr;grid-template-rows:auto auto;gap:1px 6px;min-height:48px;padding:6px;border:1px solid rgba(245,183,213,.15);border-radius:5px;background:rgba(255,255,255,.025)}
+.basketMemory>span{grid-row:1/3;align-self:center;text-align:center;color:#ffd9ea;font-size:17px}.basketMemory strong{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#f7eaf0;font:800 9px/1.2 monospace}.basketMemory small{color:#9f8e97;font:700 7px/1.2 monospace}.basketMemory.locked{opacity:.38;filter:saturate(.45)}
+.basketProgressBox{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}.basketProgressBox>div{display:flex;align-items:center;justify-content:space-between;padding:7px 8px;border:1px solid rgba(229,173,203,.14);border-radius:5px;background:rgba(255,255,255,.02);color:#d7c3cd;font:700 8px/1 monospace}.basketProgressBox strong{color:#ffe3ae}
+.basketMewoCard{display:flex;align-items:center;gap:10px;padding:8px;border:1px solid rgba(245,181,211,.20);border-radius:6px;background:linear-gradient(90deg,rgba(238,154,194,.07),rgba(143,124,211,.04))}.basketMewoCard img{width:58px;height:58px;object-fit:contain;image-rendering:pixelated}.basketMewoCard strong{display:block;color:#ffdce9;font:900 11px/1.2 monospace}.basketMewoCard small{display:block;margin-top:4px;color:#bcaab3;font:700 8px/1.35 monospace}
+.mewoBondLabel{display:flex;justify-content:space-between;margin:10px 2px 4px;color:#ccb8c3;font:800 8px/1 monospace}.mewoBondLabel strong{color:#ffd9a8}.mewoBondBar{height:8px;overflow:hidden;border:1px solid rgba(242,176,207,.24);border-radius:3px;background:rgba(255,255,255,.035)}.mewoBondBar span{display:block;height:100%;background:linear-gradient(90deg,#bd7398,#f0a1c8,#ffe1a4);box-shadow:0 0 10px rgba(246,161,201,.28);transition:width .35s ease}
+.basketStatsGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin-top:9px}.basketStatsGrid>div{display:flex;justify-content:space-between;gap:6px;padding:7px 8px;border:1px solid rgba(238,178,207,.13);border-radius:5px;background:rgba(255,255,255,.022);color:#c8b7c0;font:700 8px/1.2 monospace}.basketStatsGrid strong{color:#ffe6b9}
+.mewoFutureHome{display:flex;align-items:center;gap:8px;margin-top:9px;padding:8px;border:1px dashed rgba(239,180,209,.23);border-radius:5px;color:#a997a0}.mewoFutureHome>span{font-size:19px;color:#d5bac7}.mewoFutureHome strong{display:block;color:#d9c5cf;font:800 8px/1.2 monospace}.mewoFutureHome small{display:block;margin-top:2px;font:700 7px/1.3 monospace}
+.weatherHistoryMini{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.weatherHistoryMini span{padding:5px 7px;border:1px solid rgba(234,177,206,.13);border-radius:4px;background:rgba(255,255,255,.02);color:#d9c4cf;font:800 8px/1 monospace}.basketStatsNote{margin:10px 2px 0;color:#8f7f88;font:700 7px/1.4 monospace;text-align:center}
+
+/* =========================================================
+   CLIMAS DESBLOQUEABLES
+========================================================= */
+#climateBtn{position:fixed;z-index:43;left:max(100px,calc(env(safe-area-inset-left) + 98px));top:max(12px,env(safe-area-inset-top));width:38px;height:38px;padding:0;border:1px solid rgba(201,218,244,.28);border-radius:8px;background:rgba(4,8,15,.76);box-shadow:0 5px 16px rgba(0,0,0,.24),inset 0 0 9px rgba(174,205,245,.04);color:#eaf4ff;font-size:17px;opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-5px);transition:opacity .2s,transform .2s,visibility .2s}
+#climateBtn.visible{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0)}
+#climatePanel{position:fixed;z-index:46;left:max(100px,calc(env(safe-area-inset-left) + 98px));top:max(56px,calc(env(safe-area-inset-top) + 46px));width:170px;padding:6px;border:2px solid rgba(180,207,238,.35);border-radius:7px;background:rgba(4,8,15,.95);box-shadow:0 0 0 2px rgba(43,64,88,.55),0 10px 25px rgba(0,0,0,.32);opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-5px) scale(.97);transform-origin:top left;transition:opacity .16s,transform .16s,visibility .16s}
+#climatePanel.show{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0) scale(1)}
+.climatePanelHeader{display:grid;grid-template-columns:1fr 25px;align-items:center;gap:4px;padding:0 2px 5px;color:#dceeff;font:800 9px/1 monospace}.climatePanelHeader button{width:25px;height:23px;padding:0;border:1px solid rgba(192,216,241,.22);border-radius:4px;background:rgba(179,208,239,.07);color:#eef7ff}
+#climatePanelList{display:flex;flex-direction:column;gap:3px}.climateChoice{display:grid;grid-template-columns:22px 1fr;grid-template-rows:auto auto;gap:1px 4px;min-height:36px;padding:5px 6px;border:1px solid rgba(182,209,238,.13);border-radius:4px;background:rgba(255,255,255,.024);color:#e7eff7;text-align:left}.climateChoice>span{grid-row:1/3;align-self:center;text-align:center;font-size:14px}.climateChoice strong{font:800 9px/1.15 monospace}.climateChoice small{color:#8da0b3;font:700 7px/1.1 monospace}.climateChoice.active{border-color:rgba(194,221,250,.50);background:rgba(132,179,224,.10)}.climateChoice.locked{opacity:.33}
+@media(max-width:600px){#basketPanel[data-basket-v2="1"]{width:94vw!important;max-height:80vh!important}#basketTabs{grid-template-columns:repeat(2,1fr)}.basketMemoryGrid,.basketStatsGrid{grid-template-columns:1fr}#climateBtn{left:max(94px,calc(env(safe-area-inset-left) + 92px));width:36px;height:36px}#climatePanel{left:max(94px,calc(env(safe-area-inset-left) + 92px));top:max(54px,calc(env(safe-area-inset-top) + 44px));width:160px}}

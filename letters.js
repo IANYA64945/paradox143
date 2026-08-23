@@ -1,0 +1,686 @@
+/* =========================================================
+   PARCHE: LUNA + CANASTA DE CARTAS
+   - 3 toques en la luna
+   - brillo especial
+   - mensaje secreto
+   - caída de una cartita
+   - canasta que guarda las cartas encontradas
+========================================================= */
+
+(() => {
+  const STORAGE_KEY = 'paradox143_letters_v1';
+
+  const LETTERS = {
+    intro: {
+      title: 'Primera carta',
+      mark: '♡',
+      text: '“Te amaré un día más por cada tulipán aquí plantado.”'
+    },
+    moon: {
+      title: 'Carta de la luna',
+      mark: '☾',
+      text: 'Si llegaste hasta aquí y miraste la luna tres veces, encontraste un pedacito más de mí. Incluso cuando el campo duerme, sigo pensando en ti. ♡'
+    },
+    final: {
+      title: 'Carta encontrada',
+      mark: '✦',
+      text: 'Y si algún día dudas de cuánto te quiero, vuelve a mirar este campo. Todavía quedan infinitos tulipanes por contar.'
+    }
+  };
+
+  function safeLoad() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      return new Set(Array.isArray(arr) ? arr : []);
+    } catch (_) {
+      return new Set();
+    }
+  }
+
+  function safeSave() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([...collected]));
+    } catch (_) {}
+  }
+
+  const collected = safeLoad();
+
+
+  const MOON_MUSIC_SRC =
+    'musica_luna.mp3';
+
+  let moonMusicTimer=0;
+
+
+  function playMoonMusic(){
+
+    clearTimeout(
+      moonMusicTimer
+    );
+
+
+    if(
+      window.ParadoxAudio
+    ){
+
+      window.ParadoxAudio
+        .playSpecial(
+          MOON_MUSIC_SRC,
+          .44,
+          {
+            owner:'moon',
+            trackId:'moon',
+            label:'Luna'
+          }
+        );
+
+
+      /*
+        Tiempo suficiente para ver el brillo,
+        recoger la carta y leerla.
+      */
+
+      moonMusicTimer=
+        setTimeout(
+          ()=>{
+            if(window.ParadoxAudio){
+              window.ParadoxAudio
+                .restoreNormal(
+                  'moon'
+                );
+            }
+          },
+          42000
+        );
+    }
+  }
+
+  /* =====================================================
+     CREAR ELEMENTOS
+  ===================================================== */
+
+  const moonHotspot = document.createElement('button');
+  moonHotspot.id = 'moonHotspot';
+  moonHotspot.setAttribute('aria-label', 'Luna');
+  moonHotspot.type = 'button';
+  document.body.appendChild(moonHotspot);
+
+  const moonWhisper = document.createElement('div');
+  moonWhisper.id = 'moonWhisper';
+  moonWhisper.innerHTML = '<span>☾</span><p>La luna también quería decirte algo...</p>';
+  document.body.appendChild(moonWhisper);
+
+  const moonLetterDrop = document.createElement('button');
+  moonLetterDrop.id = 'moonLetterDrop';
+  moonLetterDrop.type = 'button';
+  moonLetterDrop.setAttribute('aria-label', 'Carta de la luna');
+  moonLetterDrop.innerHTML = `
+    <span class="moonMiniEnvelope">
+      <span class="moonSeal">♡</span>
+    </span>
+    <span class="moonLetterSpark">✦</span>
+  `;
+  document.body.appendChild(moonLetterDrop);
+
+  const basketBtn = document.createElement('button');
+  basketBtn.id = 'letterBasketBtn';
+  basketBtn.type = 'button';
+  basketBtn.setAttribute('aria-label', 'Canasta de cartas');
+  basketBtn.innerHTML = `
+    <img class="basketPixelImage" src="basket.png" alt="" aria-hidden="true">
+    <span id="basketCount">0</span>
+  `;
+  document.body.appendChild(basketBtn);
+
+  const basketOverlay = document.createElement('div');
+  basketOverlay.id = 'basketOverlay';
+  basketOverlay.innerHTML = `
+    <div id="basketPanel">
+      <button id="basketClose" type="button" aria-label="Cerrar">×</button>
+      <div class="basketTitle">CANASTA DE CARTAS</div>
+      <div class="basketSubtitle">Aquí se guardan las cartas que encuentres ♡</div>
+      <div id="basketLetters"></div>
+    </div>
+  `;
+  document.body.appendChild(basketOverlay);
+
+  const letterReader = document.createElement('div');
+  letterReader.id = 'letterReader';
+  letterReader.innerHTML = `
+    <div class="readerPaper">
+      <button id="readerClose" type="button" aria-label="Cerrar">×</button>
+      <div id="readerMark">♡</div>
+      <h2 id="readerTitle">Carta</h2>
+      <p id="readerText"></p>
+      <button id="readerKeep" type="button">Guardar en la canasta ♡</button>
+    </div>
+  `;
+  document.body.appendChild(letterReader);
+
+  const basketCount = document.getElementById('basketCount');
+  const basketLetters = document.getElementById('basketLetters');
+  const basketClose = document.getElementById('basketClose');
+  const readerClose = document.getElementById('readerClose');
+  const readerMark = document.getElementById('readerMark');
+  const readerTitle = document.getElementById('readerTitle');
+  const readerText = document.getElementById('readerText');
+  const readerKeep = document.getElementById('readerKeep');
+
+  let currentReaderId = null;
+  let basketUnlocked = collected.has('intro');
+  let moonClicks = 0;
+  let moonResetTimer = 0;
+  let moonTriggered = false;
+
+  /* =====================================================
+     CANASTA
+  ===================================================== */
+
+  function pulseBasket() {
+    basketBtn.classList.remove('pulse');
+    void basketBtn.offsetWidth;
+    basketBtn.classList.add('pulse');
+  }
+
+  function updateBasket() {
+    basketCount.textContent = String(collected.size);
+
+    const order = ['intro', 'moon', 'final'];
+    const html = order
+      .filter(id => collected.has(id))
+      .map(id => {
+        const item = LETTERS[id];
+        return `
+          <button class="basketLetterItem" data-letter="${id}" type="button">
+            <span class="basketLetterMark">${item.mark}</span>
+            <span>
+              <strong>${item.title}</strong>
+              <small>Toca para volver a leerla</small>
+            </span>
+          </button>
+        `;
+      })
+      .join('');
+
+    basketLetters.innerHTML = html || `
+      <div class="basketEmpty">
+        Todavía no hay cartas guardadas.
+      </div>
+    `;
+
+    basketLetters.querySelectorAll('.basketLetterItem').forEach(btn => {
+      btn.addEventListener('click', () => {
+        basketOverlay.classList.remove('show');
+        openLetter(btn.dataset.letter, false);
+      });
+    });
+  }
+
+  function collectLetter(id, pulse = true) {
+    if (!LETTERS[id]) return;
+
+    const wasNew = !collected.has(id);
+    collected.add(id);
+    safeSave();
+    updateBasket();
+
+    if (id === 'intro') basketUnlocked = true;
+
+    if (pulse && wasNew) pulseBasket();
+  }
+
+  function showBasketWhenFieldIsVisible() {
+    if (!basketUnlocked) return;
+    basketBtn.classList.add('visible');
+  }
+
+  basketBtn.addEventListener('click', () => {
+    updateBasket();
+    basketOverlay.classList.add('show');
+  });
+
+  basketClose.addEventListener('click', () => {
+    basketOverlay.classList.remove('show');
+  });
+
+  basketOverlay.addEventListener('click', e => {
+    if (e.target === basketOverlay) basketOverlay.classList.remove('show');
+  });
+
+  /* =====================================================
+     LECTOR DE CARTAS
+  ===================================================== */
+
+  function openLetter(id, canCollect = true) {
+    const item = LETTERS[id];
+    if (!item) return;
+
+    currentReaderId = id;
+    readerMark.textContent = item.mark;
+    readerTitle.textContent = item.title;
+    readerText.textContent = item.text;
+
+    if (canCollect && !collected.has(id)) {
+      readerKeep.style.display = '';
+      readerKeep.textContent = 'Guardar en la canasta ♡';
+    } else {
+      readerKeep.style.display = 'none';
+    }
+
+    letterReader.classList.add('show');
+  }
+
+  function closeReader() {
+    letterReader.classList.remove('show');
+    currentReaderId = null;
+  }
+
+  readerClose.addEventListener('click', closeReader);
+
+  letterReader.addEventListener('click', e => {
+    if (e.target === letterReader) closeReader();
+  });
+
+  readerKeep.addEventListener('click', () => {
+    if (!currentReaderId) return;
+    collectLetter(currentReaderId);
+    readerKeep.textContent = 'Guardada ♡';
+    setTimeout(() => {
+      closeReader();
+      showBasketWhenFieldIsVisible();
+    }, 500);
+  });
+
+  /* =====================================================
+     PRIMERA CARTA
+
+     Al abrirla:
+     - se desbloquea la canasta
+     - la carta se guarda automáticamente
+     - la canasta aparecerá cuando entremos al campo
+  ===================================================== */
+
+  if (typeof introEnvelope !== 'undefined' && introEnvelope) {
+    introEnvelope.addEventListener('click', () => {
+      collectLetter('intro', false);
+      basketUnlocked = true;
+    });
+  }
+
+  if (typeof introContinue !== 'undefined' && introContinue) {
+    introContinue.addEventListener('click', () => {
+      setTimeout(showBasketWhenFieldIsVisible, 900);
+    });
+  }
+
+  /* Si ya estaba guardada en una visita anterior */
+  if (basketUnlocked && !document.body.classList.contains('intro-active')) {
+    showBasketWhenFieldIsVisible();
+  }
+
+  /* =====================================================
+     POSICIÓN DE LA LUNA
+
+     Usa exactamente la misma posición que field.js:
+     vertical:   x 82%, y 10%
+     horizontal: x 88%, y 13%
+  ===================================================== */
+
+  function moonGeometry() {
+    const rect = app.getBoundingClientRect();
+    const w = Math.max(1, rect.width);
+    const h = Math.max(1, rect.height);
+    const portrait = h > w;
+
+    const x = rect.left + (portrait ? w * .82 : w * .88);
+    const y = rect.top + (portrait ? h * .10 : h * .13);
+    const r = Math.max(15, Math.min(29, Math.min(w, h) * .055));
+
+    return { x, y, r };
+  }
+
+  function updateMoonHotspot() {
+    const { x, y, r } = moonGeometry();
+    const size = Math.max(46, r * 2.35);
+
+    moonHotspot.style.left = `${x}px`;
+    moonHotspot.style.top = `${y}px`;
+    moonHotspot.style.width = `${size}px`;
+    moonHotspot.style.height = `${size}px`;
+    moonHotspot.style.setProperty('--moonRadius', `${r}px`);
+  }
+
+  window.addEventListener('resize', updateMoonHotspot);
+  window.addEventListener('orientationchange', () => {
+    setTimeout(updateMoonHotspot, 250);
+  });
+  document.addEventListener('fullscreenchange', () => {
+    setTimeout(updateMoonHotspot, 120);
+  });
+
+  requestAnimationFrame(() => {
+    updateMoonHotspot();
+    setTimeout(updateMoonHotspot, 500);
+  });
+
+  /* =====================================================
+     MENSAJE DE LA LUNA
+  ===================================================== */
+
+  function showMoonWhisper(text) {
+    const { x, y, r } = moonGeometry();
+
+    moonWhisper.querySelector('p').textContent = text;
+    moonWhisper.style.left = `${Math.min(window.innerWidth - 135, Math.max(135, x))}px`;
+    moonWhisper.style.top = `${y + r + 24}px`;
+
+    moonWhisper.classList.remove('show');
+    void moonWhisper.offsetWidth;
+    moonWhisper.classList.add('show');
+
+    setTimeout(() => {
+      moonWhisper.classList.remove('show');
+    }, 3300);
+  }
+
+  /* =====================================================
+     SOLTAR CARTA DESDE LA LUNA
+  ===================================================== */
+
+  function releaseMoonLetter() {
+    /*
+      La carta de la luna puede volver a aparecer
+      todas las veces que se active el secreto.
+      La canasta NO duplica la carta.
+    */
+
+    const { x, y } = moonGeometry();
+
+    const targetX = window.innerWidth * (window.innerHeight > window.innerWidth ? .57 : .68);
+    const targetY = window.innerHeight * (window.innerHeight > window.innerWidth ? .42 : .48);
+
+    moonLetterDrop.style.left = `${x}px`;
+    moonLetterDrop.style.top = `${y}px`;
+    moonLetterDrop.style.setProperty('--moonLetterDX', `${targetX - x}px`);
+    moonLetterDrop.style.setProperty('--moonLetterDY', `${targetY - y}px`);
+
+    moonLetterDrop.classList.remove('fall', 'ready');
+    void moonLetterDrop.offsetWidth;
+    moonLetterDrop.classList.add('fall');
+
+    setTimeout(() => {
+      moonLetterDrop.classList.add('ready');
+    }, 1750);
+  }
+
+  moonLetterDrop.addEventListener('click', () => {
+    if (!moonLetterDrop.classList.contains('ready')) return;
+
+    moonLetterDrop.classList.remove('fall', 'ready');
+    moonLetterDrop.style.display = 'none';
+
+    openLetter('moon', true);
+
+    setTimeout(() => {
+      moonLetterDrop.style.display = '';
+    }, 450);
+  });
+
+  /* =====================================================
+     3 TOQUES EN LA LUNA
+  ===================================================== */
+
+  moonHotspot.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (document.body.classList.contains('intro-active')) return;
+    if (gameOverlay && gameOverlay.classList.contains('show')) return;
+
+    moonHotspot.classList.remove('tap');
+    void moonHotspot.offsetWidth;
+    moonHotspot.classList.add('tap');
+
+    clearTimeout(moonResetTimer);
+    moonClicks++;
+
+    if (moonClicks < 3) {
+      moonResetTimer = setTimeout(() => {
+        moonClicks = 0;
+      }, 2600);
+      return;
+    }
+
+    moonClicks = 0;
+    moonTriggered = true;
+
+    moonHotspot.classList.add('awakened');
+
+    playMoonMusic();
+
+    showMoonWhisper(
+      'La luna también quería decirte algo...'
+    );
+
+    setTimeout(releaseMoonLetter, 1200);
+
+    setTimeout(() => {
+      moonHotspot.classList.remove('awakened');
+      moonTriggered = false;
+    }, 5200);
+  });
+
+  /* =====================================================
+     GUARDAR LA CARTA FINAL DEL MINIJUEGO
+
+     No modifica game.js.
+     Observa cuando #finalLetter recibe la clase "show".
+  ===================================================== */
+
+  if (typeof finalLetter !== 'undefined' && finalLetter) {
+    const observer = new MutationObserver(() => {
+      if (finalLetter.classList.contains('show')) {
+        collectLetter('final');
+      }
+    });
+
+    observer.observe(finalLetter, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+  }
+
+  updateBasket();
+})();
+
+
+/* =========================================================
+   LADO OSCURO DE LA LUNA
+========================================================= */
+(() => {
+  const DARK_LETTER_ID='moon-dark';
+  const REQUIRED_TAPS=15;
+  const MOON_MUSIC_SRC='musica_luna.mp3';
+  const CLIMAX_START=120;
+  let moonTapCount=0;
+  let darkOverlay=null;
+  function getLetters(){ try{ const raw=localStorage.getItem('paradox143_letters_v1'); const arr=raw?JSON.parse(raw):[]; return Array.isArray(arr)?arr:[]; }catch(_){ return []; } }
+  function saveDarkLetter(){ try{ const set=new Set(getLetters()); set.add(DARK_LETTER_ID); localStorage.setItem('paradox143_letters_v1', JSON.stringify([...set])); }catch(_){} }
+  function refreshBasketCount(){ const count=document.getElementById('basketCount'); if(count) count.textContent=String(getLetters().length); }
+  function ensureOverlay(){ if(darkOverlay) return darkOverlay; darkOverlay=document.createElement('div'); darkOverlay.id='darkMoonOverlay'; darkOverlay.innerHTML=`<div class="darkMoonHalo"></div><div class="darkMoonPanel"><div class="darkMoonMark">◐</div><p>Aun en la penumbra de este lado<br>puedo llegar a sentir como<br>tu cálida presencia resuena en mí...</p><button type="button">guardar en canasta ♡</button></div>`; document.body.appendChild(darkOverlay); darkOverlay.querySelector('button').addEventListener('click',()=>{ saveDarkLetter(); refreshBasketCount(); darkOverlay.classList.remove('show'); if(window.ParadoxAudio){ window.ParadoxAudio.restoreNormal('moon-dark'); } }); return darkOverlay; }
+  function showDarkLetter(){ const overlay=ensureOverlay(); overlay.classList.add('show'); if(window.ParadoxAudio){ window.ParadoxAudio.playSpecial(MOON_MUSIC_SRC,.44,{owner:'moon-dark',trackId:'moon',label:'Lado oscuro de la luna',startAt:CLIMAX_START}); } }
+  window.ParadoxDarkMoonOpen=showDarkLetter;
+  function attachDarkMoon(){ const moon=document.getElementById('moonHotspot'); if(!moon) return false; if(moon.dataset.darkMoonBound==='1') return true; moon.dataset.darkMoonBound='1'; moon.addEventListener('click', ()=>{ moonTapCount++; moon.classList.add('darkMoonPulse'); setTimeout(()=>moon.classList.remove('darkMoonPulse'),380); if(moonTapCount>=REQUIRED_TAPS){ moonTapCount=0; showDarkLetter(); } }); return true; }
+  if(!attachDarkMoon()){ const retry=setInterval(()=>{ if(attachDarkMoon()) clearInterval(retry); },1000); }
+})();
+
+
+
+/* =========================================================
+   CANASTA 2.0
+========================================================= */
+(() => {
+  const LETTER_KEY='paradox143_letters_v1';
+  const MUSIC_KEY='paradox143_music_unlocks_v1';
+
+  const memories=[
+    ['intro','♡','Primera carta'],
+    ['moon','☾','Luna'],
+    ['moon-dark','◐','Lado oscuro de la luna'],
+    ['final','✦','Carta del minijuego'],
+    ['mewo','🐾','Mewo'],
+    ['weather-stars','✦','Lluvia de estrellas'],
+    ['weather-fog','◌','Neblina'],
+    ['weather-rain','◇','Lluvia'],
+    ['weather-snow','❄','Nevada'],
+    ['weather-storm','⚡','Tormenta']
+  ];
+
+  function loadSet(key){
+    try{
+      const raw=localStorage.getItem(key);
+      const arr=raw?JSON.parse(raw):[];
+      return new Set(Array.isArray(arr)?arr:[]);
+    }catch(_){ return new Set(); }
+  }
+
+  function stat(key){
+    return window.ParadoxStats?window.ParadoxStats.get(key):0;
+  }
+
+  function init(){
+    const panel=document.getElementById('basketPanel');
+    const lettersList=document.getElementById('basketLetters');
+    const overlay=document.getElementById('basketOverlay');
+    if(!panel || !lettersList || !overlay) return false;
+    if(panel.dataset.basketV2==='1') return true;
+    panel.dataset.basketV2='1';
+
+    const title=panel.querySelector('.basketTitle');
+    const subtitle=panel.querySelector('.basketSubtitle');
+    if(title) title.textContent='CANASTA ♡';
+    if(subtitle) subtitle.textContent='Cartas, recuerdos y todo lo que has vivido en el campo.';
+
+    const tabs=document.createElement('div');
+    tabs.id='basketTabs';
+    tabs.innerHTML=`
+      <button class="basketTab active" data-tab="cards" type="button">💌 CARTAS</button>
+      <button class="basketTab" data-tab="memories" type="button">✦ RECUERDOS</button>
+      <button class="basketTab" data-tab="mewo" type="button">🐈 MEWO</button>
+      <button class="basketTab" data-tab="history" type="button">📊 HISTORIA</button>
+    `;
+    lettersList.parentNode.insertBefore(tabs,lettersList);
+
+    const cards=document.createElement('div');
+    cards.className='basketPane active';
+    cards.dataset.pane='cards';
+    lettersList.parentNode.insertBefore(cards,lettersList);
+    cards.appendChild(lettersList);
+
+    const memoriesPane=document.createElement('div');
+    memoriesPane.className='basketPane'; memoriesPane.dataset.pane='memories'; panel.appendChild(memoriesPane);
+    const mewoPane=document.createElement('div');
+    mewoPane.className='basketPane'; mewoPane.dataset.pane='mewo'; panel.appendChild(mewoPane);
+    const historyPane=document.createElement('div');
+    historyPane.className='basketPane'; historyPane.dataset.pane='history'; panel.appendChild(historyPane);
+
+    function addDarkMoonCard(){
+      const collected=loadSet(LETTER_KEY);
+      lettersList.querySelectorAll('.basketV2DarkMoon').forEach(el=>el.remove());
+      if(!collected.has('moon-dark')) return;
+      const btn=document.createElement('button');
+      btn.type='button';
+      btn.className='basketLetterItem basketV2DarkMoon';
+      btn.innerHTML=`<span class="basketLetterMark">◐</span><span><strong>Lado oscuro de la luna</strong><small>Toca para volver a leerla</small></span>`;
+      btn.addEventListener('click',()=>{
+        overlay.classList.remove('show');
+        if(window.ParadoxDarkMoonOpen) window.ParadoxDarkMoonOpen();
+      });
+      lettersList.appendChild(btn);
+    }
+
+    function renderMemories(){
+      const collected=loadSet(LETTER_KEY);
+      const found=memories.filter(([id])=>collected.has(id)).length;
+      const music=loadSet(MUSIC_KEY);
+      const climates=['weather-stars','weather-fog','weather-rain','weather-snow','weather-storm'].filter(id=>collected.has(id)).length;
+      memoriesPane.innerHTML=`
+        <div class="basketSectionHead"><strong>ÁLBUM DE RECUERDOS</strong><span>${found}/${memories.length}</span></div>
+        <div class="basketMemoryGrid">
+          ${memories.map(([id,mark,name])=>{const ok=collected.has(id);return `<div class="basketMemory ${ok?'found':'locked'}"><span>${ok?mark:'?'}</span><strong>${ok?name:'???'}</strong><small>${ok?'descubierto':'por descubrir'}</small></div>`}).join('')}
+        </div>
+        <div class="basketProgressBox">
+          <div><span>♫ músicas</span><strong>${Math.max(1,music.size)}/8</strong></div>
+          <div><span>☁ climas</span><strong>${climates}/5</strong></div>
+        </div>
+      `;
+    }
+
+    function bond(){
+      return Math.min(100,stat('mewoAppearances')*5+stat('mewoPlaySessions')*7+stat('mewoFeedSessions')*7+stat('mewoPetSessions')*9+stat('mewoTracksCompleted')*4);
+    }
+
+    function renderMewo(){
+      const b=bond();
+      let state='todavía está conociendo el campo';
+      if(b>=75) state='confía muchísimo en ti ♡';
+      else if(b>=45) state='cada vez se siente más en casa';
+      else if(b>=20) state='ya reconoce tu cariño';
+      mewoPane.innerHTML=`
+        <div class="basketMewoCard"><img src="mewo.png" alt=""><div><strong>MEWO ♡</strong><small>${state}</small></div></div>
+        <div class="mewoBondLabel"><span>VÍNCULO</span><strong>${b}%</strong></div>
+        <div class="mewoBondBar"><span style="width:${b}%"></span></div>
+        <div class="basketStatsGrid">
+          <div><span>🐈 apariciones</span><strong>${stat('mewoAppearances')}</strong></div>
+          <div><span>● juegos</span><strong>${stat('mewoPlaySessions')}</strong></div>
+          <div><span>⌁ comidas</span><strong>${stat('mewoFeedSessions')}</strong></div>
+          <div><span>♡ mimitos</span><strong>${stat('mewoPetSessions')}</strong></div>
+          <div><span>🐾 rastros</span><strong>${stat('mewoTracksCompleted')}</strong></div>
+          <div><span>zZ descansos</span><strong>${stat('mewoRested')}</strong></div>
+        </div>
+        <div class="mewoFutureHome"><span>⌂</span><div><strong>RINCÓN DE MEWO</strong><small>${b>=60?'casi listo para desbloquearse...':'sigue cuidándola para acercarte a este secreto'}</small></div></div>
+      `;
+    }
+
+    function renderHistory(){
+      const weather=stat('weather_stars')+stat('weather_fog')+stat('weather_rain')+stat('weather_snow')+stat('weather_storm');
+      historyPane.innerHTML=`
+        <div class="basketSectionHead"><strong>HISTORIA DEL CAMPO</strong><span>♡</span></div>
+        <div class="basketStatsGrid">
+          <div><span>🌷 tulipanes tocados</span><strong>${stat('tulipsTouched')}</strong></div>
+          <div><span>🌱 tulipanes plantados</span><strong>${stat('tulipsPlanted')}</strong></div>
+          <div><span>✨ luciérnagas</span><strong>${stat('firefliesCaught')}</strong></div>
+          <div><span>⭐ constelaciones</span><strong>${stat('constellationsCompleted')}</strong></div>
+          <div><span>🌸 pétalos</span><strong>${stat('petalsCaught')}</strong></div>
+          <div><span>💫 estrellas a la luna</span><strong>${stat('starsDeliveredToMoon')}</strong></div>
+          <div><span>🪨 piedritas</span><strong>${stat('stonesFound')}</strong></div>
+          <div><span>☁ climas vividos</span><strong>${weather}</strong></div>
+        </div>
+        <div class="weatherHistoryMini"><span>✦ ${stat('weather_stars')}</span><span>◌ ${stat('weather_fog')}</span><span>◇ ${stat('weather_rain')}</span><span>❄ ${stat('weather_snow')}</span><span>⚡ ${stat('weather_storm')}</span></div>
+        <p class="basketStatsNote">Las estadísticas empiezan a guardarse desde esta actualización.</p>
+      `;
+    }
+
+    function refresh(){ const count=document.getElementById('basketCount'); if(count) count.textContent=String(loadSet(LETTER_KEY).size); addDarkMoonCard(); renderMemories(); renderMewo(); renderHistory(); }
+
+    tabs.querySelectorAll('.basketTab').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        tabs.querySelectorAll('.basketTab').forEach(b=>b.classList.remove('active'));
+        panel.querySelectorAll('.basketPane').forEach(p=>p.classList.remove('active'));
+        btn.classList.add('active');
+        panel.querySelector(`.basketPane[data-pane="${btn.dataset.tab}"]`).classList.add('active');
+        refresh();
+      });
+    });
+
+    new MutationObserver(()=>{ if(overlay.classList.contains('show')) setTimeout(refresh,0); }).observe(overlay,{attributes:true,attributeFilter:['class']});
+    document.addEventListener('paradox-stats-changed',refresh);
+    refresh();
+    return true;
+  }
+
+  if(!init()){
+    const retry=setInterval(()=>{ if(init()) clearInterval(retry); },800);
+  }
+})();
