@@ -1,0 +1,764 @@
+/* =========================================================
+   PARADOX143 — CANASTA 2.0 · COLECCIÓN DE 43 CARTAS
+========================================================= */
+(() => {
+  'use strict';
+
+  const LETTER_KEY='paradox143_letters_v1';
+  const SEEN_KEY='paradox143_basket2_seen_v1';
+  const INSTALL_KEY='paradox143_basket2_installed_v1';
+  const TOTAL=43;
+
+  const CARDS={
+  "intro": {
+    "title": "Primera carta",
+    "mark": "♡",
+    "text": "“Te amaré un día más por cada tulipán aquí plantado.”"
+  },
+  "moon": {
+    "title": "Carta de la luna",
+    "mark": "☾",
+    "text": "Si llegaste hasta aquí y miraste la luna tres veces, encontraste un pedacito más de mí. Incluso cuando el campo duerme, sigo pensando en ti. ♡"
+  },
+  "final": {
+    "title": "Carta encontrada",
+    "mark": "✦",
+    "text": "Y si algún día dudas de cuánto te quiero, vuelve a mirar este campo. Todavía quedan infinitos tulipanes por contar."
+  },
+  "game-lost": {
+    "title": "No te rindas ♡",
+    "mark": "♡",
+    "text": "Mientras sigas intentando, jamás habrás fracasado para mí.."
+  },
+  "garden-first": {
+    "title": "Un pequeño refugio ♡",
+    "mark": "⌂",
+    "text": "entre tantos tulipanes encontramos un pequeño lugar para descansar.. un rinconcito donde incluso el mundo parece hablar un poquito mas bajito ♡"
+  },
+  "garden-return": {
+    "title": "Volviste ♡",
+    "mark": "↺",
+    "text": "me gusta pensar que algunos lugares dejan de ser solo lugares cuando alguien decide volver a ellos.."
+  },
+  "garden-pillow": {
+    "title": "Su lugar favorito",
+    "mark": "☾",
+    "text": "al final no importaba cuanto tardaramos en hacerla.. verla descansar aqui hizo que cada pequeño esfuerzo valiera la pena ♡"
+  },
+  "garden-sleep": {
+    "title": "Mientras duerme",
+    "mark": "zZ",
+    "text": "shhh.. por un momento dejemos que todo siga girando sin nosotros. ella duerme tranquila y yo me quedaria aqui contigo un poquito mas.."
+  },
+  "garden-pet": {
+    "title": "Un poquito de cariño",
+    "mark": "♡",
+    "text": "a veces algo tan pequeño como una caricia basta para recordarnos que sentirse querido tambien puede ser un hogar."
+  },
+  "garden-feed": {
+    "title": "Hora de comer",
+    "mark": "◇",
+    "text": "quizas cuidar a alguien tambien sea esto.. recordar las cosas pequeñas incluso cuando nadie nos pide que lo hagamos ♡"
+  },
+  "garden-play": {
+    "title": "Solo un rato más",
+    "mark": "✦",
+    "text": "si alguna vez todo se vuelve demasiado serio espero que podamos seguir encontrando razones tontas para jugar un rato mas.."
+  },
+  "garden-ball": {
+    "title": "La pelotita",
+    "mark": "●",
+    "text": "no se quien se divierte mas persiguiendo esa pelota.. mewo o yo viendola hacerlo ♡"
+  },
+  "garden-fish": {
+    "title": "El pececito",
+    "mark": "◇",
+    "text": "lo empuja, lo mira, vuelve a empujarlo y actua como si nada hubiera pasado.. definitivamente este juguete ya tiene dueña."
+  },
+  "garden-yarn": {
+    "title": "Un pequeño desastre",
+    "mark": "⌁",
+    "text": "el ovillo ya no esta donde lo dejamos y probablemente nunca vuelva a estarlo.. creo que eso significa que a mewo le gusto ♡"
+  },
+  "garden-scratcher": {
+    "title": "Valió la pena",
+    "mark": "⌂",
+    "text": "lo construimos poco a poco y ahora ella lo usa como si siempre hubiera estado aqui.. algunas cosas tardan en construirse pero pueden terminar sintiendose como hogar."
+  },
+  "garden-all-toys": {
+    "title": "Sus tesoros",
+    "mark": "✦",
+    "text": "una pelota, un pececito, un ovillo y una gata completamente convencida de que absolutamente todo este jardin le pertenece ♡"
+  },
+  "garden-rain": {
+    "title": "Lluvia afuera",
+    "mark": "◇",
+    "text": "puedo escuchar la lluvia desde aqui.. pero esta vez no tenemos que correr. podemos quedarnos bajo techo mirando como cae juntos ♡"
+  },
+  "garden-storm": {
+    "title": "Mientras truena",
+    "mark": "⚡",
+    "text": "afuera puede hacer todo el ruido que quiera.. mientras tengamos un pequeño lugar al cual volver no todo tiene que dar miedo."
+  },
+  "garden-snow": {
+    "title": "Frío afuera",
+    "mark": "❄",
+    "text": "el frio puede quedarse en los bordes del jardin.. aqui dentro tenemos almohadas, una gatita y suficientes razones para quedarnos un rato mas ♡"
+  },
+  "garden-stars": {
+    "title": "Desde aquí también se ven",
+    "mark": "✦",
+    "text": "no hace falta estar en medio del cielo para pedir un deseo.. desde este pequeño rincon las estrellas siguen encontrandonos."
+  },
+  "garden-night": {
+    "title": "Cuando todo está tranquilo",
+    "mark": "☾",
+    "text": "hay momentos en los que no pasa absolutamente nada.. y aun asi no quisiera estar en ningun otro lugar."
+  },
+  "garden-home": {
+    "title": "Hogar ♡",
+    "mark": "⌂",
+    "text": "primero fue solo un claro entre los arboles.. luego llego una almohada, algunos juguetes, mewo y un monton de pequeños recuerdos. supongo que asi empiezan los hogares."
+  },
+  "garden-gray-arrival": {
+    "title": "¿Me extrañaste?",
+    "mark": "♡",
+    "text": "me extrañaste?.. volvi a este pequeño refugio porque yo tambien queria estar cerquita de ti.. hay cariños que siempre encuentran el camino de regreso ♡"
+  },
+  "garden-orange-arrival": {
+    "title": "Y trajo compañía ♡",
+    "mark": "♡",
+    "text": "y no llego sola.. con ella tambien vino un pequeño solecito naranja. quizas no compartan sangre, pero el cariño tambien sabe formar familia ♡"
+  },
+  "family-more": {
+    "title": "Ahora somos más ♡",
+    "mark": "♡",
+    "text": "por un momento los mire a los tres juntitos y el refugio se sintio diferente.. ya no era solo un rincon para descansar. ahora habia una pequeña familia viviendo dentro ♡"
+  },
+  "family-pillow": {
+    "title": "No cabemos >w<",
+    "mark": "zZ",
+    "text": "parece que una sola almohada no fue pensada para tanto gatito.. pero eso no les impidio intentarlo de todas formas >w< ♡"
+  },
+  "family-let-sleep": {
+    "title": "Déjala mimir",
+    "mark": "!",
+    "text": "marie solo queria mimir tranquila.. tuluz tenia otros planes. creo que tener hermanitos tambien significa aprender cuando dejar de molestar.. o intentarlo al menos ♡"
+  },
+  "family-siblings": {
+    "title": "Hermanitos",
+    "mark": "♡",
+    "text": "no necesitan parecerse ni compartir la misma sangre para saber que pertenecen juntos.. a veces la familia simplemente se encuentra ♡"
+  },
+  "family-close": {
+    "title": "Todos cerquita",
+    "mark": "☾",
+    "text": "mewo, marie y tuluz se quedaron cerquita sin hacer absolutamente nada.. y por alguna razon ese pequeño momento se sintio suficiente ♡"
+  },
+  "family-full": {
+    "title": "El refugio está lleno ♡",
+    "mark": "⌂",
+    "text": "primero construimos un lugar para descansar. despues llegaron almohadas, juguetes, recuerdos y tres pequeñas vidas que decidieron quedarse.. ahora si puedo decir que este refugio esta lleno ♡"
+  },
+  "secret-garden-moon": {
+    "title": "La lunita del refugio ☾",
+    "mark": "☾",
+    "text": "esta lunita es mas pequeña que la del campo.. pero desde aqui parece cuidar el refugio mientras todos mimimos tranquilos ♡"
+  },
+  "secret-garden-lantern": {
+    "title": "Una lucecita encendida",
+    "mark": "✦",
+    "text": "hay luces que no necesitan alumbrar todo el camino.. a veces basta con que nos recuerden donde esta nuestro pequeño lugar seguro ♡"
+  },
+  "secret-garden-tree": {
+    "title": "Debajo del árbol",
+    "mark": "⌂",
+    "text": "tantas cositas pasaron debajo de este arbol que ya parece guardar nuestros secretos entre sus ramitas.. shhh ♡"
+  },
+  "secret-garden-flowers": {
+    "title": "También crecieron aquí",
+    "mark": "✿",
+    "text": "no plantamos estas florecitas una por una como los tulipanes.. aun asi crecieron cerquita de nosotros. tal vez algunas cosas bonitas aparecen cuando un lugar recibe suficiente cariño ♡"
+  },
+  "secret-three-wishes": {
+    "title": "Tres deseos ♡",
+    "mark": "✦",
+    "text": "una estrellita para mewo, otra para marie y otra para tuluz.. aunque pensandolo bien mi deseo favorito sigue siendo poder compartir este pequeño mundo contigo ♡"
+  },
+  "secret-stay-longer": {
+    "title": "Quédate un ratito más",
+    "mark": "☾",
+    "text": "no esta pasando nada especial ahora mismo.. nadie corre, nadie juega, nadie llama. y aun asi me gustaria que te quedaras un ratito mas aqui conmigo ♡"
+  },
+  "moon-dark": {
+    "title": "Lado oscuro de la lunita",
+    "mark": "◐",
+    "text": "Aun en la penumbra de este lado\npuedo llegar a sentir como\ntu cálida presencia resuena en mí..."
+  },
+  "mewo": {
+    "title": "Cartita de Mewo >w<",
+    "mark": "🐾",
+    "text": "eres y seras la mejoll mama gata de todas!!"
+  },
+  "weather-stars": {
+    "title": "Cartita de la lluvia de estrellas",
+    "mark": "✦",
+    "text": "cada deseo que llegue a tener lo usare para tener la posibilidad de estar cerca de ti.. cerca de la estrellita mas brillante tu.."
+  },
+  "weather-fog": {
+    "title": "Carta de la neblina",
+    "mark": "♡",
+    "text": "aun en la oscuridad mas profunda pordria verte y sentirte como siempre mi calida amada"
+  },
+  "weather-rain": {
+    "title": "Cartita de la lluvia",
+    "mark": "◇",
+    "text": "sea cual sea el clima te acopañare frio o calor me es igual si es a tu lado.."
+  },
+  "weather-storm": {
+    "title": "Cartita de la tormentita",
+    "mark": "⚡",
+    "text": "aunque todo fuera mal yo volveria contigo una y otra vez para volver a intentarlo porque un momento contigo vale mas que una historia completa con cualquiera..."
+  },
+  "weather-snow": {
+    "title": "Cartita de la nieve",
+    "mark": "❄",
+    "text": "aunque el frio llegue a mi cuerpo la luz y el calor que me das nunca se paagaran.. mi pequeña"
+  }
+};
+  const CATEGORIES=[
+  {
+    "id": "field",
+    "label": "CAMPO",
+    "icon": "🌷",
+    "description": "Cartas del campo, la luna y el minijuego.",
+    "cards": [
+      "intro",
+      "moon",
+      "moon-dark",
+      "game-lost",
+      "final"
+    ]
+  },
+  {
+    "id": "weather",
+    "label": "CLIMA",
+    "icon": "☁",
+    "description": "Recuerdos encontrados cuando el cielo cambia.",
+    "cards": [
+      "weather-stars",
+      "weather-fog",
+      "weather-rain",
+      "weather-storm",
+      "weather-snow",
+      "garden-rain",
+      "garden-storm",
+      "garden-snow",
+      "garden-stars"
+    ]
+  },
+  {
+    "id": "mewo",
+    "label": "MEWO",
+    "icon": "🐾",
+    "description": "El refugio, sus juguetes y los recuerdos de Mewo.",
+    "cards": [
+      "mewo",
+      "garden-first",
+      "garden-return",
+      "garden-pillow",
+      "garden-sleep",
+      "garden-pet",
+      "garden-feed",
+      "garden-play",
+      "garden-ball",
+      "garden-fish",
+      "garden-yarn",
+      "garden-scratcher",
+      "garden-all-toys",
+      "garden-night",
+      "garden-home"
+    ]
+  },
+  {
+    "id": "marie-tuluz",
+    "label": "MARIE Y TULUZ",
+    "icon": "♡",
+    "description": "Las dos llegadas que cambiaron el Claro.",
+    "cards": [
+      "garden-gray-arrival",
+      "garden-orange-arrival"
+    ]
+  },
+  {
+    "id": "family",
+    "label": "FAMILIA",
+    "icon": "⌂",
+    "description": "Momentos que ocurren cuando los tres están juntos.",
+    "cards": [
+      "family-more",
+      "family-pillow",
+      "family-let-sleep",
+      "family-siblings",
+      "family-close",
+      "family-full"
+    ]
+  },
+  {
+    "id": "secrets",
+    "label": "SECRETOS",
+    "icon": "✦",
+    "description": "Pequeños secretos escondidos dentro del Claro.",
+    "cards": [
+      "secret-garden-moon",
+      "secret-garden-lantern",
+      "secret-garden-tree",
+      "secret-garden-flowers",
+      "secret-three-wishes",
+      "secret-stay-longer"
+    ]
+  }
+];
+  const SPECIAL={
+  "moon-dark": "lunar",
+  "garden-gray-arrival": "arrival-marie",
+  "garden-orange-arrival": "arrival-tuluz",
+  "secret-garden-moon": "secret",
+  "secret-garden-lantern": "secret",
+  "secret-garden-tree": "secret",
+  "secret-garden-flowers": "secret",
+  "secret-three-wishes": "secret",
+  "secret-stay-longer": "secret"
+};
+
+  let basketButton=null;
+  let basketCount=null;
+  let overlay=null;
+  let panel=null;
+  let categoryTabs=null;
+  let grid=null;
+  let reader=null;
+  let activeCategory='all';
+
+  function readSet(key){
+    try{
+      const raw=localStorage.getItem(key);
+      const arr=raw?JSON.parse(raw):[];
+      return new Set(Array.isArray(arr)?arr:[]);
+    }catch(_){
+      return new Set();
+    }
+  }
+
+  function writeSet(key,set){
+    try{
+      localStorage.setItem(key,JSON.stringify([...set]));
+    }catch(_){}
+  }
+
+  function collected(){
+    const all=readSet(LETTER_KEY);
+    return new Set([...all].filter(id=>CARDS[id]));
+  }
+
+  function seen(){
+    return readSet(SEEN_KEY);
+  }
+
+  function ensureFirstInstall(){
+    let installed=false;
+    try{
+      installed=localStorage.getItem(INSTALL_KEY)==='1';
+    }catch(_){}
+
+    if(installed) return;
+
+    // Evita que todas las cartas antiguas aparezcan como NUEVA.
+    writeSet(SEEN_KEY,collected());
+
+    try{
+      localStorage.setItem(INSTALL_KEY,'1');
+    }catch(_){}
+  }
+
+  function foundCountFor(category){
+    const have=collected();
+    return category.cards.filter(id=>have.has(id)).length;
+  }
+
+  function progressPercent(){
+    return Math.round(collected().size/TOTAL*100);
+  }
+
+  function specialClass(id){
+    const value=SPECIAL[id];
+    return value ? ` basket2-special-${value}` : '';
+  }
+
+  function isNew(id){
+    const have=collected();
+    const opened=seen();
+    return have.has(id) && !opened.has(id);
+  }
+
+  function markSeen(id){
+    const current=seen();
+    current.add(id);
+    writeSet(SEEN_KEY,current);
+  }
+
+  function cardCategory(id){
+    return CATEGORIES.find(category=>category.cards.includes(id));
+  }
+
+  function createDOM(){
+    basketButton=document.getElementById('letterBasketBtn');
+    basketCount=document.getElementById('basketCount');
+
+    if(!basketButton) return false;
+
+    if(document.getElementById('basket2Overlay')){
+      overlay=document.getElementById('basket2Overlay');
+      panel=document.getElementById('basket2Panel');
+      categoryTabs=document.getElementById('basket2CategoryTabs');
+      grid=document.getElementById('basket2Grid');
+      reader=document.getElementById('basket2Reader');
+      return true;
+    }
+
+    overlay=document.createElement('div');
+    overlay.id='basket2Overlay';
+    overlay.setAttribute('aria-hidden','true');
+    overlay.innerHTML=`
+      <section id="basket2Panel" role="dialog" aria-modal="true" aria-label="Colección de cartas">
+        <button id="basket2Close" class="basket2-close" type="button" aria-label="Cerrar colección">×</button>
+
+        <header class="basket2-header">
+          <div class="basket2-mini-basket">
+            <img src="basket.png" alt="" aria-hidden="true">
+          </div>
+          <div class="basket2-heading">
+            <strong>CANASTA DE RECUERDOS ♡</strong>
+            <small>todos los pedacitos encontrados en este pequeño mundo</small>
+          </div>
+        </header>
+
+        <div class="basket2-overall">
+          <div class="basket2-progress-head">
+            <span>PROGRESO DEL PEQUEÑO MUNDO</span>
+            <strong id="basket2OverallCount">0/${TOTAL}</strong>
+          </div>
+          <div class="basket2-progress" aria-hidden="true">
+            <span id="basket2OverallBar"></span>
+          </div>
+          <p id="basket2ProgressMessage"></p>
+        </div>
+
+        <nav id="basket2CategoryTabs" class="basket2-category-tabs" aria-label="Categorías de cartas"></nav>
+        <div id="basket2CategoryIntro" class="basket2-category-intro"></div>
+        <div id="basket2Grid" class="basket2-grid"></div>
+      </section>
+    `;
+    document.body.appendChild(overlay);
+
+    reader=document.createElement('div');
+    reader.id='basket2Reader';
+    reader.setAttribute('aria-hidden','true');
+    reader.innerHTML=`
+      <article class="basket2-reader-paper" role="dialog" aria-modal="true" aria-label="Carta">
+        <button id="basket2ReaderClose" class="basket2-reader-close" type="button" aria-label="Cerrar carta">×</button>
+        <div id="basket2ReaderMark" class="basket2-reader-mark">♡</div>
+        <div id="basket2ReaderCategory" class="basket2-reader-category"></div>
+        <h2 id="basket2ReaderTitle"></h2>
+        <p id="basket2ReaderText"></p>
+        <button id="basket2ReaderBack" class="basket2-reader-back" type="button">Volver a la colección ♡</button>
+      </article>
+    `;
+    document.body.appendChild(reader);
+
+    panel=document.getElementById('basket2Panel');
+    categoryTabs=document.getElementById('basket2CategoryTabs');
+    grid=document.getElementById('basket2Grid');
+
+    document.getElementById('basket2Close').addEventListener('click',closeBasket);
+    document.getElementById('basket2ReaderClose').addEventListener('click',closeReader);
+    document.getElementById('basket2ReaderBack').addEventListener('click',closeReader);
+
+    overlay.addEventListener('click',event=>{
+      if(event.target===overlay) closeBasket();
+    });
+
+    reader.addEventListener('click',event=>{
+      if(event.target===reader) closeReader();
+    });
+
+    document.addEventListener('keydown',event=>{
+      if(event.key!=='Escape') return;
+
+      if(reader.classList.contains('show')){
+        closeReader();
+        return;
+      }
+
+      if(overlay.classList.contains('show')){
+        closeBasket();
+      }
+    });
+
+    /*
+      La canasta antigua conserva toda su lógica.
+      Este listener CAPTURE abre la colección nueva antes
+      de que se ejecute el listener visual antiguo.
+    */
+    basketButton.addEventListener('click',event=>{
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      document.getElementById('basketOverlay')?.classList.remove('show');
+      openBasket();
+    },true);
+
+    return true;
+  }
+
+  function renderTabs(){
+    if(!categoryTabs) return;
+
+    const have=collected();
+    const totalNew=[...have].filter(id=>isNew(id)).length;
+
+    const allButton=`
+      <button class="basket2-category-tab ${activeCategory==='all'?'active':''}" data-category="all" type="button">
+        <span>♡</span>
+        <strong>TODAS</strong>
+        <small>${have.size}/${TOTAL}</small>
+        ${totalNew?`<i>${totalNew}</i>`:''}
+      </button>
+    `;
+
+    const categoryButtons=CATEGORIES.map(category=>{
+      const found=foundCountFor(category);
+      const newCount=category.cards.filter(id=>isNew(id)).length;
+
+      return `
+        <button class="basket2-category-tab ${activeCategory===category.id?'active':''}" data-category="${category.id}" type="button">
+          <span>${category.icon}</span>
+          <strong>${category.label}</strong>
+          <small>${found}/${category.cards.length}</small>
+          ${newCount?`<i>${newCount}</i>`:''}
+        </button>
+      `;
+    }).join('');
+
+    categoryTabs.innerHTML=allButton+categoryButtons;
+
+    categoryTabs.querySelectorAll('[data-category]').forEach(button=>{
+      button.addEventListener('click',()=>{
+        activeCategory=button.dataset.category;
+        render();
+      });
+    });
+  }
+
+  function currentCategoryInfo(){
+    if(activeCategory==='all'){
+      return {
+        label:'TODAS LAS CARTAS',
+        icon:'♡',
+        description:'Encontradas y todavía escondidas, sin revelar sus secretos.',
+        cards:CATEGORIES.flatMap(category=>category.cards)
+      };
+    }
+
+    return CATEGORIES.find(category=>category.id===activeCategory) || CATEGORIES[0];
+  }
+
+  function escapeAttr(text){
+    return String(text)
+      .replaceAll('&','&amp;')
+      .replaceAll('"','&quot;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;');
+  }
+
+  function renderGrid(){
+    const info=currentCategoryInfo();
+    const have=collected();
+    const intro=document.getElementById('basket2CategoryIntro');
+
+    if(intro){
+      const found=info.cards.filter(id=>have.has(id)).length;
+      intro.innerHTML=`
+        <span>${info.icon}</span>
+        <div>
+          <strong>${info.label}</strong>
+          <small>${info.description}</small>
+        </div>
+        <b>${found}/${info.cards.length}</b>
+      `;
+    }
+
+    grid.innerHTML=info.cards.map((id,index)=>{
+      const item=CARDS[id];
+      const unlocked=have.has(id);
+      const newBadge=isNew(id);
+      const category=cardCategory(id);
+      const extraClass=specialClass(id);
+      const aria=unlocked ? escapeAttr(item.title) : 'Carta todavía no encontrada';
+
+      return `
+        <button
+          class="basket2-card ${unlocked?'found':'locked'} ${newBadge?'new':''}${extraClass}"
+          data-letter="${id}"
+          type="button"
+          ${unlocked?'':'disabled'}
+          aria-label="${aria}"
+        >
+          <span class="basket2-card-number">${String(index+1).padStart(2,'0')}</span>
+          ${newBadge?'<span class="basket2-new-badge">NUEVA</span>':''}
+          <span class="basket2-card-mark">${unlocked?item.mark:'?'}</span>
+          <span class="basket2-card-copy">
+            <strong>${unlocked?item.title:'???'}</strong>
+            <small>${unlocked?category.label:'por descubrir'}</small>
+          </span>
+          <span class="basket2-card-corner">${unlocked?'♡':'·'}</span>
+        </button>
+      `;
+    }).join('');
+
+    grid.querySelectorAll('.basket2-card.found').forEach(button=>{
+      button.addEventListener('click',()=>{
+        openReader(button.dataset.letter);
+      });
+    });
+  }
+
+  function renderProgress(){
+    const have=collected();
+    const count=have.size;
+    const percentage=progressPercent();
+
+    if(basketCount){
+      basketCount.textContent=String(count);
+    }
+
+    const countEl=document.getElementById('basket2OverallCount');
+    const barEl=document.getElementById('basket2OverallBar');
+    const messageEl=document.getElementById('basket2ProgressMessage');
+
+    if(countEl) countEl.textContent=`${count}/${TOTAL}`;
+    if(barEl) barEl.style.width=`${percentage}%`;
+
+    if(messageEl){
+      let message='Todavía quedan pequeños recuerdos escondidos por encontrar.';
+
+      if(percentage>=35){
+        message='Tu canasta empieza a guardar muchos pedacitos de este mundo ♡';
+      }
+
+      if(percentage>=65){
+        message='Ya conoces gran parte de este pequeño mundo... pero aún guarda secretos.';
+      }
+
+      if(percentage>=90 && count<TOTAL){
+        message='Quedan muy poquitos recuerdos escondidos ♡';
+      }
+
+      if(count>=TOTAL){
+        message='Encontraste todas las cartas que existen por ahora ♡';
+      }
+
+      messageEl.textContent=`${percentage}% · ${message}`;
+    }
+  }
+
+  function render(){
+    renderProgress();
+    renderTabs();
+    renderGrid();
+  }
+
+  function openBasket(){
+    if(!overlay) return;
+
+    render();
+
+    overlay.classList.add('show');
+    overlay.setAttribute('aria-hidden','false');
+    document.body.classList.add('basket2-open');
+  }
+
+  function closeBasket(){
+    overlay?.classList.remove('show');
+    overlay?.setAttribute('aria-hidden','true');
+    document.body.classList.remove('basket2-open');
+  }
+
+  function openReader(id){
+    const item=CARDS[id];
+
+    if(!item || !collected().has(id)) return;
+
+    markSeen(id);
+
+    const category=cardCategory(id);
+
+    document.getElementById('basket2ReaderMark').textContent=item.mark;
+    document.getElementById('basket2ReaderCategory').textContent=`${category.icon} ${category.label}`;
+    document.getElementById('basket2ReaderTitle').textContent=item.title;
+    document.getElementById('basket2ReaderText').textContent=item.text;
+
+    reader.dataset.special=SPECIAL[id] || 'normal';
+
+    reader.classList.add('show');
+    reader.setAttribute('aria-hidden','false');
+
+    render();
+  }
+
+  function closeReader(){
+    reader?.classList.remove('show');
+    reader?.setAttribute('aria-hidden','true');
+  }
+
+  function refresh(){
+    if(!createDOM()) return;
+    render();
+  }
+
+  ensureFirstInstall();
+
+  window.addEventListener('paradox-letter-collected',()=>{
+    setTimeout(refresh,60);
+  });
+
+  /*
+    Algunas cartas externas escriben directamente en localStorage.
+    Este chequeo liviano mantiene todo sincronizado.
+  */
+  let lastSnapshot='';
+
+  setInterval(()=>{
+    const snapshot=JSON.stringify([...collected()].sort());
+
+    if(snapshot!==lastSnapshot){
+      lastSnapshot=snapshot;
+      refresh();
+    }
+  },1400);
+
+  const initTimer=setInterval(()=>{
+    if(createDOM()){
+      clearInterval(initTimer);
+      refresh();
+    }
+  },300);
+
+  window.ParadoxBasket2={
+    open:openBasket,
+    close:closeBasket,
+    refresh,
+    total:TOTAL,
+    collected:()=>[...collected()]
+  };
+})();
