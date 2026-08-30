@@ -158,6 +158,46 @@
       title: 'Y trajo compañía ♡',
       mark: '♡',
       text: 'y no llego sola.. con ella tambien vino un pequeño solecito naranja. quizas no compartan sangre, pero el cariño tambien sabe formar familia ♡'
+    },
+
+    /* =====================================================
+       CONVIVENCIA DE LA FAMILIA — ETAPA 1
+    ===================================================== */
+
+    'family-more': {
+      title: 'Ahora somos más ♡',
+      mark: '♡',
+      text: 'por un momento los mire a los tres juntitos y el refugio se sintio diferente.. ya no era solo un rincon para descansar. ahora habia una pequeña familia viviendo dentro ♡'
+    },
+
+    'family-pillow': {
+      title: 'No cabemos >w<',
+      mark: 'zZ',
+      text: 'parece que una sola almohada no fue pensada para tanto gatito.. pero eso no les impidio intentarlo de todas formas >w< ♡'
+    },
+
+    'family-let-sleep': {
+      title: 'Déjala mimir',
+      mark: '!',
+      text: 'marie solo queria mimir tranquila.. tuluz tenia otros planes. creo que tener hermanitos tambien significa aprender cuando dejar de molestar.. o intentarlo al menos ♡'
+    },
+
+    'family-siblings': {
+      title: 'Hermanitos',
+      mark: '♡',
+      text: 'no necesitan parecerse ni compartir la misma sangre para saber que pertenecen juntos.. a veces la familia simplemente se encuentra ♡'
+    },
+
+    'family-close': {
+      title: 'Todos cerquita',
+      mark: '☾',
+      text: 'mewo, marie y tuluz se quedaron cerquita sin hacer absolutamente nada.. y por alguna razon ese pequeño momento se sintio suficiente ♡'
+    },
+
+    'family-full': {
+      title: 'El refugio está lleno ♡',
+      mark: '⌂',
+      text: 'primero construimos un lugar para descansar. despues llegaron almohadas, juguetes, recuerdos y tres pequeñas vidas que decidieron quedarse.. ahora si puedo decir que este refugio esta lleno ♡'
     }
   };
 
@@ -417,7 +457,14 @@
       'garden-night',
       'garden-home',
       'garden-gray-arrival',
-      'garden-orange-arrival'
+      'garden-orange-arrival',
+
+      'family-more',
+      'family-pillow',
+      'family-let-sleep',
+      'family-siblings',
+      'family-close',
+      'family-full'
     ];
     const html = order
       .filter(id => collected.has(id))
