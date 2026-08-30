@@ -133,6 +133,14 @@
         volume:.35
       },
 
+      garden:{
+        id:'garden',
+        label:'Claro de Mewo',
+        detail:'🐾',
+        src:'musica_claro.mp3',
+        volume:.38
+      },
+
       moon:{
         id:'moon',
         label:'Luna',
@@ -191,6 +199,8 @@
 
     };
 
+
+    let gardenTime=0;
 
     let fadeTimer=0;
     let requestToken=0;
@@ -934,7 +944,10 @@
 
       if(
         currentSrcName()===
-        'musica.mp3'
+          TRACKS.main.src
+        ||
+        currentSrcName()===
+          MAIN_FALLBACK.src
       ){
 
         principalTime=
@@ -1086,9 +1099,104 @@
     }
 
 
+    async function playGarden(){
+
+      /*
+        Música exclusiva del Claro.
+        Mientras estás dentro, los climas siguen
+        visualmente en los bordes pero no sustituyen
+        esta canción.
+      */
+
+      specialOwner=null;
+      specialTrackId=null;
+
+      specialChip.classList.remove(
+        'show'
+      );
+
+
+      const available=
+        await exists(
+          TRACKS.garden.src
+        );
+
+
+      if(!available){
+        return playMain();
+      }
+
+
+      specialOwner='cat-garden';
+      specialTrackId='garden';
+
+      unlocked.add(
+        'garden'
+      );
+
+      saveUnlocks();
+
+
+      specialLabel.textContent=
+        '♫ Claro de Mewo';
+
+      specialChip.classList.add(
+        'show'
+      );
+
+
+      const ok=
+        await switchTrack(
+          TRACKS.garden,
+          gardenTime
+        );
+
+
+      renderTracks();
+
+      return ok;
+    }
+
+
+    async function leaveGardenMusic(){
+
+      if(
+        specialOwner!=='cat-garden'
+      ){
+        return false;
+      }
+
+
+      specialOwner=null;
+      specialTrackId=null;
+
+      specialChip.classList.remove(
+        'show'
+      );
+
+
+      return playMain();
+    }
+
+
     async function playManual(
       trackId
     ){
+
+      if(trackId==='main'){
+
+        const ok=
+          await playMain();
+
+        if(ok){
+          toast('♫ Campo');
+        }
+
+        closePanel();
+
+        return ok;
+      }
+
 
       const track=
         TRACKS[trackId];
@@ -1396,14 +1504,28 @@
         ()=>{
 
           if(
-            currentSrcName()===
-            'musica.mp3' &&
-            Number.isFinite(
+            !Number.isFinite(
               audio.currentTime
             )
           ){
+            return;
+          }
 
+
+          if(
+            currentSrcName()===
+            TRACKS.main.src
+          ){
             principalTime=
+              audio.currentTime;
+          }
+
+
+          if(
+            currentSrcName()===
+            TRACKS.garden.src
+          ){
+            gardenTime=
               audio.currentTime;
           }
         }
@@ -1445,6 +1567,8 @@
       playSpecial,
       restoreNormal,
       playMain,
+      playGarden,
+      leaveGardenMusic,
       playManual,
       unlock,
       tracks:TRACKS,
@@ -1462,6 +1586,27 @@
 
   const paradoxAudio =
     createParadoxAudioManager();
+
+
+  /*
+    El módulo del Jardín ya emite estos eventos.
+    No hay que tocar la lógica de Mewo ni del claro.
+  */
+
+  window.addEventListener(
+    'paradox-cat-garden-open',
+    ()=>{
+      paradoxAudio.playGarden();
+    }
+  );
+
+
+  window.addEventListener(
+    'paradox-cat-garden-close',
+    ()=>{
+      paradoxAudio.leaveGardenMusic();
+    }
+  );
 
 
   /* =====================================================

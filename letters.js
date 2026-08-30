@@ -30,6 +30,118 @@
       title: 'No te rindas ♡',
       mark: '♡',
       text: 'Mientras sigas intentando, jamás habrás fracasado para mí..'
+    },
+
+    /* =====================================================
+       COLECCIÓN JARDÍN DE GATOS I — 18 CARTAS
+    ===================================================== */
+
+    'garden-first': {
+      title: 'Un pequeño refugio ♡',
+      mark: '⌂',
+      text: 'entre tantos tulipanes encontramos un pequeño lugar para descansar.. un rinconcito donde incluso el mundo parece hablar un poquito mas bajito ♡'
+    },
+
+    'garden-return': {
+      title: 'Volviste ♡',
+      mark: '↺',
+      text: 'me gusta pensar que algunos lugares dejan de ser solo lugares cuando alguien decide volver a ellos..'
+    },
+
+    'garden-pillow': {
+      title: 'Su lugar favorito',
+      mark: '☾',
+      text: 'al final no importaba cuanto tardaramos en hacerla.. verla descansar aqui hizo que cada pequeño esfuerzo valiera la pena ♡'
+    },
+
+    'garden-sleep': {
+      title: 'Mientras duerme',
+      mark: 'zZ',
+      text: 'shhh.. por un momento dejemos que todo siga girando sin nosotros. ella duerme tranquila y yo me quedaria aqui contigo un poquito mas..'
+    },
+
+    'garden-pet': {
+      title: 'Un poquito de cariño',
+      mark: '♡',
+      text: 'a veces algo tan pequeño como una caricia basta para recordarnos que sentirse querido tambien puede ser un hogar.'
+    },
+
+    'garden-feed': {
+      title: 'Hora de comer',
+      mark: '◇',
+      text: 'quizas cuidar a alguien tambien sea esto.. recordar las cosas pequeñas incluso cuando nadie nos pide que lo hagamos ♡'
+    },
+
+    'garden-play': {
+      title: 'Solo un rato más',
+      mark: '✦',
+      text: 'si alguna vez todo se vuelve demasiado serio espero que podamos seguir encontrando razones tontas para jugar un rato mas..'
+    },
+
+    'garden-ball': {
+      title: 'La pelotita',
+      mark: '●',
+      text: 'no se quien se divierte mas persiguiendo esa pelota.. mewo o yo viendola hacerlo ♡'
+    },
+
+    'garden-fish': {
+      title: 'El pececito',
+      mark: '◇',
+      text: 'lo empuja, lo mira, vuelve a empujarlo y actua como si nada hubiera pasado.. definitivamente este juguete ya tiene dueña.'
+    },
+
+    'garden-yarn': {
+      title: 'Un pequeño desastre',
+      mark: '⌁',
+      text: 'el ovillo ya no esta donde lo dejamos y probablemente nunca vuelva a estarlo.. creo que eso significa que a mewo le gusto ♡'
+    },
+
+    'garden-scratcher': {
+      title: 'Valió la pena',
+      mark: '⌂',
+      text: 'lo construimos poco a poco y ahora ella lo usa como si siempre hubiera estado aqui.. algunas cosas tardan en construirse pero pueden terminar sintiendose como hogar.'
+    },
+
+    'garden-all-toys': {
+      title: 'Sus tesoros',
+      mark: '✦',
+      text: 'una pelota, un pececito, un ovillo y una gata completamente convencida de que absolutamente todo este jardin le pertenece ♡'
+    },
+
+    'garden-rain': {
+      title: 'Lluvia afuera',
+      mark: '◇',
+      text: 'puedo escuchar la lluvia desde aqui.. pero esta vez no tenemos que correr. podemos quedarnos bajo techo mirando como cae juntos ♡'
+    },
+
+    'garden-storm': {
+      title: 'Mientras truena',
+      mark: '⚡',
+      text: 'afuera puede hacer todo el ruido que quiera.. mientras tengamos un pequeño lugar al cual volver no todo tiene que dar miedo.'
+    },
+
+    'garden-snow': {
+      title: 'Frío afuera',
+      mark: '❄',
+      text: 'el frio puede quedarse en los bordes del jardin.. aqui dentro tenemos almohadas, una gatita y suficientes razones para quedarnos un rato mas ♡'
+    },
+
+    'garden-stars': {
+      title: 'Desde aquí también se ven',
+      mark: '✦',
+      text: 'no hace falta estar en medio del cielo para pedir un deseo.. desde este pequeño rincon las estrellas siguen encontrandonos.'
+    },
+
+    'garden-night': {
+      title: 'Cuando todo está tranquilo',
+      mark: '☾',
+      text: 'hay momentos en los que no pasa absolutamente nada.. y aun asi no quisiera estar en ningun otro lugar.'
+    },
+
+    'garden-home': {
+      title: 'Hogar ♡',
+      mark: '⌂',
+      text: 'primero fue solo un claro entre los arboles.. luego llego una almohada, algunos juguetes, mewo y un monton de pequeños recuerdos. supongo que asi empiezan los hogares.'
     }
   };
 
@@ -265,7 +377,30 @@
   function updateBasket() {
     basketCount.textContent = String(collected.size);
 
-    const order = ['intro', 'moon', 'game-lost', 'final'];
+    const order = [
+      'intro',
+      'moon',
+      'game-lost',
+      'final',
+      'garden-first',
+      'garden-return',
+      'garden-pillow',
+      'garden-sleep',
+      'garden-pet',
+      'garden-feed',
+      'garden-play',
+      'garden-ball',
+      'garden-fish',
+      'garden-yarn',
+      'garden-scratcher',
+      'garden-all-toys',
+      'garden-rain',
+      'garden-storm',
+      'garden-snow',
+      'garden-stars',
+      'garden-night',
+      'garden-home'
+    ];
     const html = order
       .filter(id => collected.has(id))
       .map(id => {
@@ -307,6 +442,20 @@
     if (id === 'intro') basketUnlocked = true;
 
     if (pulse && wasNew) pulseBasket();
+
+    try{
+      window.dispatchEvent(
+        new CustomEvent(
+          'paradox-letter-collected',
+          {
+            detail:{
+              id,
+              wasNew
+            }
+          }
+        )
+      );
+    }catch(_){}
   }
 
   function showBasketWhenFieldIsVisible() {

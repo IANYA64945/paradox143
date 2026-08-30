@@ -1260,3 +1260,1073 @@
   syncGarden();
   checkUnlock();
 })();
+
+
+/* =========================================================
+   PARADOX143 — CARTAS DEL JARDÍN I
+   18 cartas con condiciones reales y cola persistente.
+========================================================= */
+
+(() => {
+  'use strict';
+
+  const PROGRESS_KEY=
+    'paradox143_garden_letter_progress_v1';
+
+  const PENDING_KEY=
+    'paradox143_garden_letters_pending_v1';
+
+  const HOME_KEY=
+    'paradox143_mewo_home_v1';
+
+
+  const LETTER_IDS=[
+    'garden-first',
+    'garden-return',
+    'garden-pillow',
+    'garden-sleep',
+    'garden-pet',
+    'garden-feed',
+    'garden-play',
+    'garden-ball',
+    'garden-fish',
+    'garden-yarn',
+    'garden-scratcher',
+    'garden-all-toys',
+    'garden-rain',
+    'garden-storm',
+    'garden-snow',
+    'garden-stars',
+    'garden-night',
+    'garden-home'
+  ];
+
+
+  const DEFAULT_PROGRESS={
+    visits:0,
+    timeMs:0,
+    pets:0,
+    feeds:0,
+    plays:0,
+    sleeps:0,
+    ball:0,
+    fish:0,
+    yarn:0,
+    scratcher:0
+  };
+
+
+  function loadJSON(
+    key,
+    fallback
+  ){
+
+    try{
+
+      const raw=
+        localStorage.getItem(
+          key
+        );
+
+      return raw
+        ? JSON.parse(raw)
+        : fallback;
+
+    }
+
+    catch(_){
+
+      return fallback;
+    }
+  }
+
+
+  function progress(){
+
+    const value=
+      loadJSON(
+        PROGRESS_KEY,
+        {}
+      );
+
+    return {
+      ...DEFAULT_PROGRESS,
+      ...(
+        value &&
+        typeof value==='object'
+        ? value
+        : {}
+      )
+    };
+  }
+
+
+  function saveProgress(
+    patch={}
+  ){
+
+    const next={
+      ...progress(),
+      ...patch
+    };
+
+
+    try{
+
+      localStorage.setItem(
+        PROGRESS_KEY,
+        JSON.stringify(next)
+      );
+
+    }
+
+    catch(_){}
+
+
+    return next;
+  }
+
+
+  function home(){
+
+    const value=
+      loadJSON(
+        HOME_KEY,
+        {}
+      );
+
+    return value &&
+      typeof value==='object'
+      ? value
+      : {};
+  }
+
+
+  function gardenState(){
+
+    try{
+
+      return (
+        window.ParadoxCatGarden
+          ?.getState
+          ?.()
+        || {}
+      );
+
+    }
+
+    catch(_){
+
+      return {};
+    }
+  }
+
+
+  function hasLetter(
+    id
+  ){
+
+    try{
+
+      return Boolean(
+        window.ParadoxLetters
+          ?.has
+          ?.(
+            id
+          )
+      );
+
+    }
+
+    catch(_){
+
+      return false;
+    }
+  }
+
+
+  function loadPending(){
+
+    const value=
+      loadJSON(
+        PENDING_KEY,
+        []
+      );
+
+
+    return Array.isArray(value)
+      ? value.filter(
+          id=>
+            LETTER_IDS.includes(id)
+        )
+      : [];
+  }
+
+
+  let pending=
+    loadPending();
+
+
+  function savePending(){
+
+    try{
+
+      localStorage.setItem(
+        PENDING_KEY,
+        JSON.stringify(
+          pending
+        )
+      );
+
+    }
+
+    catch(_){}
+  }
+
+
+  function cleanPending(){
+
+    pending=
+      pending.filter(
+        id=>
+          !hasLetter(id)
+      );
+
+    savePending();
+  }
+
+
+  /* ---------------------------------------------------------
+     CARTITA FÍSICA EN EL CLARO
+  --------------------------------------------------------- */
+
+  const garden=
+    document.getElementById(
+      'catGarden'
+    );
+
+
+  if(!garden){
+    return;
+  }
+
+
+  const drop=
+    document.createElement(
+      'button'
+    );
+
+  drop.id=
+    'catGardenLetterDrop';
+
+  drop.type=
+    'button';
+
+  drop.setAttribute(
+    'aria-label',
+    'Cartita encontrada en el jardín'
+  );
+
+  drop.innerHTML=`
+    <span class="catGardenMiniEnvelope">
+      <span>♡</span>
+    </span>
+
+    <span class="catGardenLetterSpark">
+      ✦
+    </span>
+
+    <small id="catGardenLetterCount"></small>
+  `;
+
+  garden.appendChild(
+    drop
+  );
+
+
+  const count=
+    drop.querySelector(
+      '#catGardenLetterCount'
+    );
+
+
+  function refreshDrop(){
+
+    cleanPending();
+
+    const total=
+      pending.length;
+
+
+    drop.classList.toggle(
+      'show',
+      total>0
+    );
+
+
+    count.textContent=
+      total>1
+        ? `+${total-1}`
+        : '';
+
+
+    drop.setAttribute(
+      'aria-label',
+      total>1
+        ? `${total} cartitas encontradas en el jardín`
+        : 'Cartita encontrada en el jardín'
+    );
+  }
+
+
+  function smallNotice(
+    text
+  ){
+
+    const note=
+      document.getElementById(
+        'catGardenWeatherNote'
+      );
+
+
+    if(!note){
+      return;
+    }
+
+
+    note.classList.add(
+      'special'
+    );
+
+    note.textContent=text;
+
+
+    clearTimeout(
+      smallNotice.timer
+    );
+
+
+    smallNotice.timer=
+      setTimeout(
+        ()=>{
+
+          note.classList.remove(
+            'special'
+          );
+
+          window.ParadoxCatGarden
+            ?.refresh
+            ?.();
+
+        },
+        3000
+      );
+  }
+
+
+  function queueLetter(
+    id
+  ){
+
+    if(
+      !LETTER_IDS.includes(id) ||
+      hasLetter(id) ||
+      pending.includes(id)
+    ){
+      return false;
+    }
+
+
+    pending.push(id);
+    savePending();
+    refreshDrop();
+
+
+    smallNotice(
+      '💌 Una cartita apareció en el jardín...'
+    );
+
+
+    return true;
+  }
+
+
+  drop.addEventListener(
+    'click',
+    ()=>{
+
+      cleanPending();
+
+      const id=
+        pending[0];
+
+
+      if(!id){
+        refreshDrop();
+        return;
+      }
+
+
+      window.ParadoxLetters
+        ?.open
+        ?.(
+          id,
+          true
+        );
+    }
+  );
+
+
+  window.addEventListener(
+    'paradox-letter-collected',
+    event=>{
+
+      const id=
+        event
+          ?.detail
+          ?.id;
+
+
+      if(
+        !LETTER_IDS.includes(id)
+      ){
+        return;
+      }
+
+
+      pending=
+        pending.filter(
+          current=>
+            current!==id
+        );
+
+      savePending();
+      refreshDrop();
+    }
+  );
+
+
+  /* ---------------------------------------------------------
+     CONDICIONES
+  --------------------------------------------------------- */
+
+  let sessionStarted=0;
+
+
+  function currentTimeMs(){
+
+    const p=progress();
+
+    const extra=
+      (
+        sessionStarted &&
+        garden.classList.contains(
+          'show'
+        )
+      )
+      ? Math.max(
+          0,
+          Date.now()-
+          sessionStarted
+        )
+      : 0;
+
+
+    return (
+      Number(p.timeMs||0)+
+      extra
+    );
+  }
+
+
+  function saveSessionTime(){
+
+    if(!sessionStarted){
+      return;
+    }
+
+
+    const p=progress();
+
+    const elapsed=
+      Math.max(
+        0,
+        Date.now()-
+        sessionStarted
+      );
+
+
+    sessionStarted=
+      Date.now();
+
+
+    saveProgress({
+      timeMs:
+        Number(
+          p.timeMs||0
+        )+
+        elapsed
+    });
+  }
+
+
+  function evaluate(){
+
+    const p=progress();
+    const st=gardenState();
+    const h=home();
+
+
+    if(p.visits>=1){
+      queueLetter(
+        'garden-first'
+      );
+    }
+
+
+    if(p.visits>=3){
+      queueLetter(
+        'garden-return'
+      );
+    }
+
+
+    if(
+      p.sleeps>=1 &&
+      st.activePillow
+    ){
+      queueLetter(
+        'garden-pillow'
+      );
+    }
+
+
+    if(p.sleeps>=4){
+      queueLetter(
+        'garden-sleep'
+      );
+    }
+
+
+    if(p.pets>=5){
+      queueLetter(
+        'garden-pet'
+      );
+    }
+
+
+    if(p.feeds>=4){
+      queueLetter(
+        'garden-feed'
+      );
+    }
+
+
+    if(p.plays>=5){
+      queueLetter(
+        'garden-play'
+      );
+    }
+
+
+    if(p.ball>=3){
+      queueLetter(
+        'garden-ball'
+      );
+    }
+
+
+    if(p.fish>=3){
+      queueLetter(
+        'garden-fish'
+      );
+    }
+
+
+    if(p.yarn>=3){
+      queueLetter(
+        'garden-yarn'
+      );
+    }
+
+
+    if(p.scratcher>=1){
+      queueLetter(
+        'garden-scratcher'
+      );
+    }
+
+
+    if(
+      p.ball>=1 &&
+      p.fish>=1 &&
+      p.yarn>=1
+    ){
+      queueLetter(
+        'garden-all-toys'
+      );
+    }
+
+
+    const mewoHere=
+      Boolean(
+        h.resident &&
+        st.mewoLocation==='garden' &&
+        garden.classList.contains(
+          'show'
+        )
+      );
+
+
+    if(mewoHere){
+
+      const weather=
+        window.MAGIC_AMBIENT_ACTIVE;
+
+
+      if(weather==='rain'){
+        queueLetter(
+          'garden-rain'
+        );
+      }
+
+
+      if(weather==='storm'){
+        queueLetter(
+          'garden-storm'
+        );
+      }
+
+
+      if(weather==='snow'){
+        queueLetter(
+          'garden-snow'
+        );
+      }
+
+
+      if(weather==='stars'){
+        queueLetter(
+          'garden-stars'
+        );
+      }
+    }
+
+
+    if(
+      currentTimeMs()>=
+      90*1000
+    ){
+      queueLetter(
+        'garden-night'
+      );
+    }
+
+
+    const careTotal=
+      p.pets+
+      p.feeds+
+      p.plays+
+      p.sleeps;
+
+
+    if(
+      p.visits>=8 &&
+      careTotal>=14 &&
+      st.activePillow &&
+      Number(
+        st.scratcherStage||0
+      )>=4 &&
+      p.ball>=1 &&
+      p.fish>=1 &&
+      p.yarn>=1 &&
+      h.resident
+    ){
+      queueLetter(
+        'garden-home'
+      );
+    }
+  }
+
+
+  /* ---------------------------------------------------------
+     VISITAS + TIEMPO
+  --------------------------------------------------------- */
+
+  window.addEventListener(
+    'paradox-cat-garden-open',
+    ()=>{
+
+      const p=progress();
+
+      saveProgress({
+        visits:
+          Number(
+            p.visits||0
+          )+1
+      });
+
+
+      sessionStarted=
+        Date.now();
+
+
+      evaluate();
+    }
+  );
+
+
+  window.addEventListener(
+    'paradox-cat-garden-close',
+    ()=>{
+
+      saveSessionTime();
+      sessionStarted=0;
+      evaluate();
+    }
+  );
+
+
+  /* ---------------------------------------------------------
+     CUIDADOS
+     Captura = leemos el estado ANTES de la acción original.
+  --------------------------------------------------------- */
+
+  const care=
+    document.getElementById(
+      'catGardenCareActions'
+    );
+
+
+  if(care){
+
+    care.addEventListener(
+      'click',
+      event=>{
+
+        const button=
+          event.target.closest(
+            '[data-care]'
+          );
+
+
+        if(!button){
+          return;
+        }
+
+
+        const action=
+          button.dataset.care;
+
+        const p=progress();
+
+
+        if(action==='pet'){
+
+          saveProgress({
+            pets:p.pets+1
+          });
+        }
+
+
+        else if(action==='feed'){
+
+          saveProgress({
+            feeds:p.feeds+1
+          });
+        }
+
+
+        else if(action==='sleep'){
+
+          const h=home();
+
+          const wasSleeping=
+            Number(
+              h.sleepUntil||0
+            )>
+            Date.now();
+
+
+          if(!wasSleeping){
+
+            saveProgress({
+              sleeps:p.sleeps+1
+            });
+          }
+        }
+
+
+        else if(action==='play'){
+
+          /*
+            Esperamos a que el módulo principal decida
+            qué juguete usó Mewo.
+          */
+
+          setTimeout(
+            ()=>{
+
+              const nextP=
+                progress();
+
+              const st=
+                gardenState();
+
+              const scratcherReady=
+                Number(
+                  st.scratcherStage||0
+                )>=4;
+
+              const toy=
+                scratcherReady
+                ? (
+                    st.activeToy||
+                    'ball'
+                  )
+                : 'ball';
+
+
+              const patch={
+                plays:
+                  nextP.plays+1
+              };
+
+
+              if(toy==='ball'){
+                patch.ball=
+                  nextP.ball+1;
+              }
+
+
+              else if(toy==='fish'){
+                patch.fish=
+                  nextP.fish+1;
+              }
+
+
+              else if(toy==='yarn'){
+                patch.yarn=
+                  nextP.yarn+1;
+              }
+
+
+              saveProgress(
+                patch
+              );
+
+              evaluate();
+
+            },
+            0
+          );
+        }
+
+
+        if(
+          action!=='play'
+        ){
+          setTimeout(
+            evaluate,
+            0
+          );
+        }
+
+      },
+      true
+    );
+  }
+
+
+  /*
+    Tocar directamente a Mewo también cuenta como mimitos
+    cuando no estaba dormida.
+  */
+
+  const touch=
+    document.getElementById(
+      'catGardenMewoTouch'
+    );
+
+
+  if(touch){
+
+    touch.addEventListener(
+      'click',
+      ()=>{
+
+        const h=home();
+
+        const wasSleeping=
+          Number(
+            h.sleepUntil||0
+          )>
+          Date.now();
+
+
+        if(!wasSleeping){
+
+          const p=progress();
+
+          saveProgress({
+            pets:p.pets+1
+          });
+
+          setTimeout(
+            evaluate,
+            0
+          );
+        }
+
+      },
+      true
+    );
+  }
+
+
+  /* ---------------------------------------------------------
+     JUGUETES DIRECTOS
+  --------------------------------------------------------- */
+
+  const toyShelf=
+    document.getElementById(
+      'catGardenToyShelf'
+    );
+
+
+  if(toyShelf){
+
+    toyShelf.addEventListener(
+      'click',
+      event=>{
+
+        const button=
+          event.target.closest(
+            '[data-garden-toy]'
+          );
+
+
+        if(!button){
+          return;
+        }
+
+
+        const toy=
+          button.dataset.gardenToy;
+
+        const p=progress();
+
+        const patch={
+          plays:p.plays+1
+        };
+
+
+        if(toy==='ball'){
+          patch.ball=p.ball+1;
+        }
+
+
+        if(toy==='fish'){
+          patch.fish=p.fish+1;
+        }
+
+
+        if(toy==='yarn'){
+          patch.yarn=p.yarn+1;
+        }
+
+
+        saveProgress(
+          patch
+        );
+
+        setTimeout(
+          evaluate,
+          0
+        );
+
+      },
+      true
+    );
+  }
+
+
+  /* ---------------------------------------------------------
+     RASCADOR
+  --------------------------------------------------------- */
+
+  const scratcher=
+    document.getElementById(
+      'catGardenScratcherUse'
+    );
+
+
+  if(scratcher){
+
+    scratcher.addEventListener(
+      'click',
+      ()=>{
+
+        const st=
+          gardenState();
+
+
+        if(
+          Number(
+            st.scratcherStage||0
+          )<4 ||
+          st.mewoLocation!=='garden' ||
+          !home().resident
+        ){
+          return;
+        }
+
+
+        const p=progress();
+
+        saveProgress({
+          scratcher:
+            p.scratcher+1,
+          plays:
+            p.plays+1
+        });
+
+
+        setTimeout(
+          evaluate,
+          0
+        );
+
+      },
+      true
+    );
+  }
+
+
+  /*
+    Guardado de tiempo y chequeo de clima.
+  */
+
+  setInterval(
+    ()=>{
+
+      if(
+        garden.classList.contains(
+          'show'
+        )
+      ){
+        saveSessionTime();
+      }
+
+      evaluate();
+
+    },
+    5000
+  );
+
+
+  cleanPending();
+  refreshDrop();
+  evaluate();
+
+})();
