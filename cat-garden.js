@@ -2969,7 +2969,11 @@
   }
 
 
-  function arriveGray(){
+  function commitGrayArrival(
+    {
+      openLetter=true
+    }={}
+  ){
 
     const st=load();
 
@@ -2978,7 +2982,7 @@
     }
 
 
-    const next=save({
+    save({
       grayArrived:true,
       grayArrivedAt:Date.now(),
       grayMood:'happy',
@@ -3013,21 +3017,66 @@
     );
 
 
-    openArrivalLetter(
-      'garden-gray-arrival'
-    );
+    if(openLetter){
+
+      openArrivalLetter(
+        'garden-gray-arrival'
+      );
+    }
 
 
     /*
-      Si el jugador permanece en el Claro,
-      su hermanito puede seguirla un poco después.
-      Si sale antes, llegará en la próxima visita.
+      Tuluz NO llega inmediatamente.
+      Su evento queda reservado para una visita posterior,
+      para que la llegada de Marie tenga su propio espacio.
     */
-    scheduleOrangeArrival();
   }
 
 
-  function arriveOrange(){
+  function arriveGray(){
+
+    const st=load();
+
+    if(st.grayArrived){
+      return;
+    }
+
+
+    /*
+      Evento cinematográfico de Marie.
+      Si el módulo todavía no cargó por alguna razón,
+      conservamos un fallback seguro.
+    */
+    if(
+      window.ParadoxRefugeArrivalEvents &&
+      typeof window.ParadoxRefugeArrivalEvents
+        .startMarie==='function'
+    ){
+
+      window.ParadoxRefugeArrivalEvents
+        .startMarie({
+          onCommit:()=>{
+            commitGrayArrival({
+              openLetter:false
+            });
+          }
+        });
+
+      return;
+    }
+
+
+    commitGrayArrival({
+      openLetter:true
+    });
+  }
+
+
+  function commitOrangeArrival(
+    {
+      openLetter=true
+    }={}
+  ){
 
     const st=load();
 
@@ -3070,9 +3119,49 @@
     );
 
 
-    openArrivalLetter(
-      'garden-orange-arrival'
-    );
+    if(openLetter){
+
+      openArrivalLetter(
+        'garden-orange-arrival'
+      );
+    }
+  }
+
+
+  function arriveOrange(){
+
+    const st=load();
+
+    if(
+      !st.grayArrived ||
+      st.orangeArrived
+    ){
+      return;
+    }
+
+
+    if(
+      window.ParadoxRefugeArrivalEvents &&
+      typeof window.ParadoxRefugeArrivalEvents
+        .startTuluz==='function'
+    ){
+
+      window.ParadoxRefugeArrivalEvents
+        .startTuluz({
+          onCommit:()=>{
+            commitOrangeArrival({
+              openLetter:false
+            });
+          }
+        });
+
+      return;
+    }
+
+
+    commitOrangeArrival({
+      openLetter:true
+    });
   }
 
 
@@ -3129,6 +3218,10 @@
     }
 
 
+    /*
+      Tuluz llega en una visita POSTERIOR a la de Marie.
+      Esto evita que los dos eventos grandes se encimen.
+    */
     const nextVisit=
       Number(
         st.openCount||0
@@ -3138,16 +3231,9 @@
       );
 
 
-    /*
-      Si ya regresaste otra vez al Jardín,
-      el hermanito aparece rápido.
-      Si te quedaste en la misma visita,
-      aparece un poco después.
-    */
-    const delay=
-      nextVisit
-      ? 7000
-      : 30000;
+    if(!nextVisit){
+      return;
+    }
 
 
     arrivalOrangeTimer=
@@ -3159,7 +3245,7 @@
           }
 
         },
-        delay
+        8500
       );
   }
 
