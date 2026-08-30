@@ -1,3 +1,17 @@
+
+/* =========================================================
+   UI OCULTA DURANTE LA CARTA / ANIMACIÓN INICIAL
+========================================================= */
+
+body.intro-active #catGardenPawBtn,
+body.intro-active #climateBtn,
+body.intro-active #climatePanel,
+body.intro-active #mewoHomeLayer{
+  opacity:0 !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+}
+
 /* =========================================================
    PARADOX143 — JARDÍN DE GATOS
 ========================================================= */
@@ -26,7 +40,7 @@
   inset:0;
   background:url('cat_garden_clearing_bg.png') center/cover no-repeat;
   transform:scale(1.008);
-  filter:saturate(.94) brightness(.94);
+  filter:saturate(1.02) brightness(.96);
 }
 .catGardenVignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 54%,transparent 20%,rgba(0,8,10,.12) 55%,rgba(0,0,0,.48) 100%)}
 
@@ -46,11 +60,16 @@
   left:51%;
   bottom:17%;
   z-index:5;
-  width:min(8vw,82px);
+  width:min(6.4vw,64px);
   transform:translateX(-50%);
   opacity:0;
   visibility:hidden;
-  transition:.3s;
+  transition:
+    left .55s ease,
+    bottom .55s ease,
+    width .55s ease,
+    opacity .3s,
+    visibility .3s;
 }
 #catGardenMewoSpot.show{opacity:1;visibility:visible}
 
@@ -69,9 +88,45 @@
   display:block;
   width:100%;
   height:auto;
-  filter:drop-shadow(0 5px 6px rgba(0,0,0,.42));
+  object-fit:contain;
+  filter:drop-shadow(0 4px 5px rgba(0,0,0,.38));
   animation:gardenMewoBreathe 2.1s ease-in-out infinite;
 }
+
+/* Mewo usa la almohada cuando decide dormir. */
+#catGardenMewoSpot.using-pillow{
+  left:13.2%;
+  bottom:9.1%;
+  width:min(5.7vw,58px);
+}
+
+#catGardenMewoSpot.using-pillow #catGardenMewo{
+  animation:gardenMewoSleep 2.4s ease-in-out infinite;
+}
+
+@keyframes gardenMewoSleep{
+  0%,100%{transform:translateY(0) rotate(-2deg)}
+  50%{transform:translateY(-1px) rotate(-2deg)}
+}
+
+/* Las emociones aparecen FUERA del cuerpo. */
+#catGardenMewoSpot::before{
+  position:absolute;
+  right:-14px;
+  top:-11px;
+  z-index:9;
+  color:#fff0f8;
+  font:900 12px/1 monospace;
+  text-shadow:0 0 8px rgba(255,197,226,.58);
+  pointer-events:none;
+}
+
+#catGardenMewoSpot[data-mood="sleep"]::before{content:"zZ";color:#e9edff}
+#catGardenMewoSpot[data-mood="love"]::before{content:"♡";color:#ffb9dc}
+#catGardenMewoSpot[data-mood="happy"]::before{content:"✦";color:#ffe49b}
+#catGardenMewoSpot[data-mood="play"]::before{content:"!!";color:#ffe49b}
+#catGardenMewoSpot[data-mood="eat"]::before{content:"♡";color:#ffd6b1}
+#catGardenMewoSpot[data-mood="confused"]::before{content:"?";color:#f1f1f1}
 
 #catGardenMewoMood{
   position:absolute;
@@ -200,8 +255,8 @@
   position:absolute;
   left:7%;
   bottom:6%;
-  width:min(18vw,170px);
-  height:min(12vw,104px);
+  width:min(15vw,145px);
+  height:min(10vw,90px);
   z-index:3;
 }
 .catGardenBedShadow,.catGardenBedBase,#catGardenPillow{position:absolute;left:0;bottom:0;width:100%;height:100%;object-fit:contain}
@@ -248,7 +303,13 @@ body.cat-garden-open #mewoHomeLayer{
   #catGardenMewoSpot{
     left:52%;
     bottom:24%;
-    width:min(20vw,82px);
+    width:min(15vw,64px);
+  }
+
+  #catGardenMewoSpot.using-pillow{
+    left:16%;
+    bottom:11%;
+    width:min(13vw,55px);
   }
 
   #catGardenMewoMood{
@@ -263,10 +324,10 @@ body.cat-garden-open #mewoHomeLayer{
   }
 
   #catGardenBedZone{
-    left:2%;
+    left:2.5%;
     bottom:5%;
-    width:28vw;
-    height:18vw;
+    width:23vw;
+    height:15vw;
   }
 
   #catGardenCareActions{
@@ -300,4 +361,9 @@ body.cat-garden-open #mewoHomeLayer{
     font-size:8px;
     padding:7px;
   }
+}
+
+#mewoFollowRunner.step{
+  margin-bottom:2px;
+  transform-origin:50% 100%;
 }

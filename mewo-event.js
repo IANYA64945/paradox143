@@ -2489,8 +2489,11 @@
 
   homePillow.innerHTML=
     `
-      <span class="mewoPillowSymbol">♡</span>
-      <span class="mewoPillowThread">⌁</span>
+      <img
+        id="mewoHomePillowImg"
+        src=""
+        alt="Almohada de Mewo"
+      >
     `;
 
 
@@ -2699,13 +2702,13 @@
 
   function syncResidentSprite(){
 
-    if(
-      mewoImg &&
-      mewoImg.src
-    ){
-      residentImg.src=
-        mewoImg.src;
-    }
+    /*
+      La mascota residente usa un único cuerpo estable.
+      Antes copiaba el sprite del evento temporal y otro
+      módulo lo volvía a cambiar, causando saltos de tamaño.
+    */
+    residentImg.src=
+      'mewo_idle.png';
   }
 
 
@@ -2751,41 +2754,76 @@
     const state=
       loadHomeState();
 
-    const pair=
-      PILLOW_COLORS[
-        state.pillowColor
-      ] ||
-      PILLOW_COLORS.rose;
+    let gardenState={};
+    let owned=[];
 
+    try{
+      gardenState=
+        JSON.parse(
+          localStorage.getItem(
+            'paradox143_cat_garden_v1'
+          ) || '{}'
+        ) || {};
+    }catch(_){}
 
-    homePillow.style.setProperty(
-      '--pillow-a',
-      pair[0]
-    );
+    try{
+      const parsed=
+        JSON.parse(
+          localStorage.getItem(
+            'paradox143_pillows_v1'
+          ) || '[]'
+        );
 
-    homePillow.style.setProperty(
-      '--pillow-b',
-      pair[1]
-    );
+      owned=
+        Array.isArray(parsed)
+        ? parsed
+        : [];
+    }catch(_){}
 
+    const active=
+      gardenState.activePillow ||
+      owned[0] ||
+      null;
 
-    homePillow
-      .querySelector(
-        '.mewoPillowSymbol'
-      )
-      .textContent=
-        state.pillowSymbol ||
-        '♡';
+    const sources={
+      huella:'pillow_huella.png',
+      luna:'pillow_luna.png',
+      estrellas:'pillow_estrellas.png'
+    };
 
+    const src=
+      active
+      ? sources[active]
+      : '';
+
+    const pillowImg=
+      document.getElementById(
+        'mewoHomePillowImg'
+      );
+
+    if(pillowImg){
+      pillowImg.src=src;
+    }
+
+    const ready=
+      Boolean(
+        state.pillowMade &&
+        src
+      );
 
     homePillow.classList.toggle(
       'unfinished',
-      !state.pillowMade
+      !ready
     );
 
     homePillow.classList.toggle(
       'finished',
-      state.pillowMade
+      ready
+    );
+
+    homePillow.setAttribute(
+      'aria-hidden',
+      ready ? 'false' : 'true'
     );
   }
 
@@ -3099,9 +3137,24 @@
       residentMood();
 
 
+    residentImg.src=
+      'mewo_idle.png';
+
+
     residentCat.classList.toggle(
       'sleeping',
       mood==='sleeping'
+    );
+
+
+    homeLayer.classList.toggle(
+      'mewo-on-pillow',
+      Boolean(
+        mood==='sleeping' &&
+        homePillow.classList.contains(
+          'finished'
+        )
+      )
     );
 
 
@@ -3619,6 +3672,15 @@
       if(isMewoResident()){
         showResidentMewo();
       }
+    }
+  );
+
+
+  window.addEventListener(
+    'paradox-cat-garden-change',
+    ()=>{
+      applyPillow();
+      updateResidentMood();
     }
   );
 

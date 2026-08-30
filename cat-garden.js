@@ -273,14 +273,22 @@
      SPRITES Y ESTADOS
   ===================================================== */
 
+  /*
+    IMPORTANTE:
+    Mewo conserva SIEMPRE el mismo cuerpo/silueta.
+    Los estados se comunican mediante símbolos externos,
+    texto y animaciones, no cambiando el sprite del cuerpo.
+  */
+  const MEWO_STABLE_SPRITE='mewo_idle.png';
+
   const MOODS={
-    idle:'mewo_idle.png',
-    happy:'mewo_happy.png',
-    sleep:'mewo_sleep.png',
-    play:'mewo_play.png',
-    eat:'mewo_eat.png',
-    confused:'mewo_confused.png',
-    love:'mewo_love.png'
+    idle:MEWO_STABLE_SPRITE,
+    happy:MEWO_STABLE_SPRITE,
+    sleep:MEWO_STABLE_SPRITE,
+    play:MEWO_STABLE_SPRITE,
+    eat:MEWO_STABLE_SPRITE,
+    confused:MEWO_STABLE_SPRITE,
+    love:MEWO_STABLE_SPRITE
   };
 
   function activeWeather(){
@@ -332,10 +340,15 @@
     const hide=st.unlocked && st.mewoLocation==='garden';
     layer.style.display=hide ? 'none' : '';
 
+    /*
+      No cambiamos el src del Mewo del campo.
+      Antes cat-garden y mewo-event competían por el mismo
+      sprite cada pocos segundos y eso provocaba el cambio
+      constante de tamaño.
+    */
     const residentImg=document.getElementById('mewoResidentImg');
     if(residentImg && !hide){
-      const [mood]=currentMood();
-      residentImg.src=MOODS[mood]||MOODS.idle;
+      residentImg.src=MEWO_STABLE_SPRITE;
     }
   }
 
@@ -355,15 +368,32 @@
       mewoProp.setAttribute('aria-hidden','true');
     }
 
+    const [mood,text]=currentMood();
+
     if(here){
-      const [mood,text]=currentMood();
-      mewoImg.src=MOODS[mood]||MOODS.idle;
+      mewoImg.src=MEWO_STABLE_SPRITE;
       mewoMood.textContent=text;
+      mewoSpot.dataset.mood=mood;
+    }else{
+      mewoSpot.dataset.mood='';
     }
 
     const psrc=pillowSource(st.activePillow);
     pillowImg.src=psrc;
     pillowImg.classList.toggle('show',Boolean(psrc));
+
+    /*
+      Cuando duerme y existe una almohada activa,
+      Mewo se mueve físicamente hasta ella.
+    */
+    mewoSpot.classList.toggle(
+      'using-pillow',
+      Boolean(
+        here &&
+        psrc &&
+        mood==='sleep'
+      )
+    );
 
     const ssrc=scratcherSource(Number(st.scratcherStage||0));
     scratcherImg.src=ssrc;
@@ -639,15 +669,17 @@
     invitation.querySelector('button').addEventListener('click',()=>{
       const runner=document.createElement('img');
       runner.id='mewoFollowRunner';
-      runner.src='mewo_follow_1.png';
+      runner.src=MEWO_STABLE_SPRITE;
       document.body.appendChild(runner);
 
       invitation.classList.add('leaving');
 
-      let frame=1;
+      /*
+        El desplazamiento se anima sin sustituir el cuerpo.
+        Así Mewo mantiene exactamente la misma silueta.
+      */
       const walkFrames=setInterval(()=>{
-        frame=frame===1?2:1;
-        runner.src=`mewo_follow_${frame}.png`;
+        runner.classList.toggle('step');
       },180);
 
       setTimeout(()=>runner.classList.add('run'),50);
