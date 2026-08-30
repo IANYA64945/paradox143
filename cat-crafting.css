@@ -44,3 +44,121 @@ body.cat-garden-open .catMaterialDrop{display:none}
   .catRecipe{min-height:112px;display:grid;grid-template-columns:100px 1fr;grid-template-rows:auto auto auto;text-align:left}.catRecipe img{grid-row:1/4;width:95px;height:90px}.catRecipe em{margin:0;padding:0}
   #sewingBoard,#stuffingBoard,#appliqueBoard{width:86vw;height:78vw;min-height:300px}
 }
+
+
+/* =========================================================
+   PULIDO VISUAL DEL TALLER — COHERENTE CON EL JARDÍN
+========================================================= */
+
+#catCraftOverlay{
+  background:
+    radial-gradient(
+      circle at 50% 35%,
+      rgba(65,50,89,.18),
+      rgba(2,4,9,.84) 58%
+    );
+
+  backdrop-filter:blur(6px);
+}
+
+#catCraftPanel{
+  border:
+    1px solid
+    rgba(
+      235,
+      180,
+      212,
+      .46
+    );
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(91,70,109,.14),
+      transparent 42%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(20,18,29,.98),
+      rgba(7,9,15,.99)
+    );
+
+  box-shadow:
+    0 18px 55px
+    rgba(0,0,0,.48),
+    0 0 35px
+    rgba(222,145,190,.06),
+    inset 0 1px
+    rgba(255,255,255,.025);
+}
+
+#catCraftPanel::before{
+  content:"✦  ♡  ✦";
+  display:block;
+  position:absolute;
+  left:50%;
+  top:10px;
+  transform:translateX(-50%);
+  color:rgba(246,193,222,.42);
+  font:700 7px/1 monospace;
+  letter-spacing:.28em;
+  pointer-events:none;
+}
+
+.catInvItem,
+.catRecipe,
+.scratcherBuildCard,
+.ownedPillowRow button{
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.034),
+      rgba(255,255,255,.014)
+    );
+}
+
+.catRecipe,
+.scratcherBuildCard{
+  box-shadow:
+    inset 0 1px
+    rgba(255,255,255,.018);
+}
+
+.catRecipe img,
+.scratcherBuildCard img,
+.ownedPillowRow img{
+  filter:
+    drop-shadow(
+      0 5px 7px
+      rgba(0,0,0,.21)
+    );
+}
+
+.catRecipe:active,
+.ownedPillowRow button:active,
+.scratcherBuildCard button:active{
+  transform:scale(.985);
+}
+
+#sewingBoard,
+#stuffingBoard,
+#appliqueBoard{
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      rgba(112,77,112,.14),
+      rgba(4,7,12,.52) 68%
+    );
+
+  box-shadow:
+    inset 0 0 28px
+    rgba(224,149,195,.025);
+}
+
+.craftComplete img{
+  filter:
+    drop-shadow(
+      0 9px 12px
+      rgba(0,0,0,.25)
+    );
+}

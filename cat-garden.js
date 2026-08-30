@@ -18,6 +18,9 @@
     mewoLocation:'basket',
     activePillow:null,
     scratcherStage:0,
+    activeToy:'ball',
+    toyUses:0,
+    scratcherUses:0,
     discoveredAt:0
   };
 
@@ -79,6 +82,10 @@
   let gardenMoodTimer=0;
   let propTimer=0;
 
+  let gardenActivity=null;
+  let gardenActivityTimer=0;
+  let gardenNoticeTimer=0;
+
 
   function setGardenMood(
     mood,
@@ -100,6 +107,33 @@
       setTimeout(
         ()=>{
           gardenMoodOverride=null;
+          syncGarden();
+        },
+        duration
+      );
+  }
+
+
+  function showGardenNotice(
+    text,
+    duration=2800
+  ){
+
+    clearTimeout(
+      gardenNoticeTimer
+    );
+
+    weatherNote.textContent=text;
+    weatherNote.classList.add(
+      'special'
+    );
+
+    gardenNoticeTimer=
+      setTimeout(
+        ()=>{
+          weatherNote.classList.remove(
+            'special'
+          );
           syncGarden();
         },
         duration
@@ -137,6 +171,42 @@
         },
         duration
       );
+  }
+
+
+  function startGardenActivity(
+    name,
+    duration=3900
+  ){
+
+    clearTimeout(
+      gardenActivityTimer
+    );
+
+    gardenActivity=name;
+
+    syncGarden();
+
+    gardenActivityTimer=
+      setTimeout(
+        ()=>{
+          gardenActivity=null;
+          syncGarden();
+        },
+        duration
+      );
+  }
+
+
+  function stopGardenActivity(){
+
+    clearTimeout(
+      gardenActivityTimer
+    );
+
+    gardenActivity=null;
+
+    syncGarden();
   }
 
 
@@ -244,7 +314,49 @@
     </div>
 
     <div id="catGardenScratcherZone">
-      <img id="catGardenScratcher" alt="">
+      <button
+        id="catGardenScratcherUse"
+        type="button"
+        aria-label="Usar rascador"
+      >
+        <img id="catGardenScratcher" alt="">
+        <img
+          id="catGardenScratcherToy"
+          src="scratcher_toy.png"
+          alt=""
+        >
+      </button>
+
+      <div id="catGardenScratcherHint"></div>
+    </div>
+
+    <div
+      id="catGardenToyShelf"
+      aria-label="Juguetes de Mewo"
+    >
+      <button
+        type="button"
+        data-garden-toy="ball"
+        aria-label="Pelotita"
+      >
+        <img src="toy_ball.png" alt="">
+      </button>
+
+      <button
+        type="button"
+        data-garden-toy="fish"
+        aria-label="Pececito"
+      >
+        <img src="toy_fish.png" alt="">
+      </button>
+
+      <button
+        type="button"
+        data-garden-toy="yarn"
+        aria-label="Ovillo"
+      >
+        <img src="toy_yarn.png" alt="">
+      </button>
     </div>
 
     <div id="catGardenActions">
@@ -264,7 +376,37 @@
   const careActions=garden.querySelector('#catGardenCareActions');
   const mewoAway=garden.querySelector('#catGardenMewoAway');
   const pillowImg=garden.querySelector('#catGardenPillow');
-  const scratcherImg=garden.querySelector('#catGardenScratcher');
+
+  const scratcherZone=
+    garden.querySelector(
+      '#catGardenScratcherZone'
+    );
+
+  const scratcherUse=
+    garden.querySelector(
+      '#catGardenScratcherUse'
+    );
+
+  const scratcherImg=
+    garden.querySelector(
+      '#catGardenScratcher'
+    );
+
+  const scratcherToy=
+    garden.querySelector(
+      '#catGardenScratcherToy'
+    );
+
+  const scratcherHint=
+    garden.querySelector(
+      '#catGardenScratcherHint'
+    );
+
+  const toyShelf=
+    garden.querySelector(
+      '#catGardenToyShelf'
+    );
+
   const weatherNote=garden.querySelector('#catGardenWeatherNote');
   const craftBtn=garden.querySelector('#catGardenCraftBtn');
   const whereBtn=garden.querySelector('#catGardenMoveMewoBtn');
@@ -332,6 +474,25 @@
     return '';
   }
 
+
+  const GARDEN_TOYS={
+    ball:{
+      src:'toy_ball.png',
+      text:'✦ Mewo persigue la pelotita por el claro.'
+    },
+
+    fish:{
+      src:'toy_fish.png',
+      text:'♡ Mewo empuja el pececito con la nariz.'
+    },
+
+    yarn:{
+      src:'toy_yarn.png',
+      text:'⌁ Mewo juega con el ovillo sin soltarlo.'
+    }
+  };
+
+
   function syncFieldMewo(){
     const layer=document.getElementById('mewoHomeLayer');
     if(!layer) return;
@@ -383,23 +544,131 @@
     pillowImg.classList.toggle('show',Boolean(psrc));
 
     /*
-      Cuando duerme y existe una almohada activa,
-      Mewo se mueve físicamente hasta ella.
+      Mewo se mueve físicamente según lo que está haciendo.
+      Siempre mantiene el mismo sprite/cuerpo.
     */
-    mewoSpot.classList.toggle(
-      'using-pillow',
+    const sleepingOnPillow=
       Boolean(
         here &&
         psrc &&
-        mood==='sleep'
+        mood==='sleep' &&
+        !gardenActivity
+      );
+
+    mewoSpot.classList.toggle(
+      'using-pillow',
+      sleepingOnPillow
+    );
+
+    mewoSpot.classList.toggle(
+      'using-scratcher',
+      Boolean(
+        here &&
+        gardenActivity==='scratcher'
       )
     );
 
-    const ssrc=scratcherSource(Number(st.scratcherStage||0));
-    scratcherImg.src=ssrc;
-    scratcherImg.classList.toggle('show',Boolean(ssrc));
+    mewoSpot.classList.toggle(
+      'using-toy',
+      Boolean(
+        here &&
+        gardenActivity?.startsWith(
+          'toy-'
+        )
+      )
+    );
 
     const weather=activeWeather();
+
+    mewoSpot.classList.toggle(
+      'weather-shelter',
+      Boolean(
+        here &&
+        !gardenActivity &&
+        !sleepingOnPillow &&
+        weather==='storm'
+      )
+    );
+
+    mewoSpot.classList.toggle(
+      'weather-watch',
+      Boolean(
+        here &&
+        !gardenActivity &&
+        !sleepingOnPillow &&
+        weather==='stars'
+      )
+    );
+
+
+    const scratcherStage=
+      Number(
+        st.scratcherStage||0
+      );
+
+    const ssrc=
+      scratcherSource(
+        scratcherStage
+      );
+
+    scratcherImg.src=ssrc;
+
+    scratcherImg.classList.toggle(
+      'show',
+      Boolean(ssrc)
+    );
+
+    scratcherZone.classList.toggle(
+      'complete',
+      scratcherStage>=4
+    );
+
+    scratcherUse.disabled=
+      scratcherStage<=0;
+
+    scratcherHint.textContent=
+      scratcherStage>=4
+        ? 'tócalo para que Mewo juegue ♡'
+        : scratcherStage>0
+          ? `construcción ${scratcherStage}/4`
+          : 'aún no construido';
+
+    scratcherToy.classList.toggle(
+      'show',
+      Boolean(
+        scratcherStage>=4 &&
+        gardenActivity==='scratcher'
+      )
+    );
+
+
+    toyShelf.classList.toggle(
+      'show',
+      scratcherStage>=4
+    );
+
+    toyShelf.classList.toggle(
+      'disabled',
+      !here
+    );
+
+    toyShelf
+      .querySelectorAll(
+        '[data-garden-toy]'
+      )
+      .forEach(
+        button=>{
+          button.classList.toggle(
+            'active',
+            button.dataset.gardenToy===
+              (
+                st.activeToy ||
+                'ball'
+              )
+          );
+        }
+      );
+
     garden.dataset.weather=weather||'normal';
 
     const notes={
@@ -410,7 +679,15 @@
       stars:'✦ Desde aquí también se ven las estrellas.',
       normal:'☾ El claro está tranquilo.'
     };
-    weatherNote.textContent=notes[weather]||notes.normal;
+    if(
+      !weatherNote.classList.contains(
+        'special'
+      )
+    ){
+      weatherNote.textContent=
+        notes[weather]||
+        notes.normal;
+    }
 
     syncFieldMewo();
   }
@@ -418,6 +695,168 @@
   /* =====================================================
      INTERACCIONES DIRECTAS CON MEWO EN EL JARDÍN
   ===================================================== */
+
+  function playWithGardenToy(
+    toyId
+  ){
+
+    const st=state();
+
+    if(
+      !isResident() ||
+      st.mewoLocation!=='garden'
+    ){
+      showGardenNotice(
+        '🐾 Mewo no está en el jardín ahora mismo.'
+      );
+      return;
+    }
+
+
+    if(
+      Number(
+        st.scratcherStage||0
+      )<4
+    ){
+      showGardenNotice(
+        '🪵 Termina primero el rascador para abrir su rincón de juguetes.'
+      );
+      return;
+    }
+
+
+    const toy=
+      GARDEN_TOYS[toyId];
+
+    if(!toy){
+      return;
+    }
+
+
+    const h=home();
+    const now=Date.now();
+
+    save({
+      activeToy:toyId,
+      toyUses:
+        Number(
+          st.toyUses||0
+        )+1
+    });
+
+    saveHome({
+      lastPlay:now,
+      sleepUntil:0,
+      residentPlays:
+        Number(
+          h.residentPlays||0
+        )+1
+    });
+
+
+    startGardenActivity(
+      `toy-${toyId}`,
+      4300
+    );
+
+    showGardenProp(
+      toy.src,
+      3800
+    );
+
+    makeGardenBurst(
+      'play'
+    );
+
+    setGardenMood(
+      'play',
+      toy.text,
+      4300
+    );
+
+
+    try{
+      window.ParadoxStats
+        ?.inc
+        ?.(
+          'gardenToyUses'
+        );
+    }catch(_){}
+  }
+
+
+  function useGardenScratcher(){
+
+    const st=state();
+
+    if(
+      Number(
+        st.scratcherStage||0
+      )<4
+    ){
+      showGardenNotice(
+        `🪵 El rascador todavía está en construcción (${Number(st.scratcherStage||0)}/4).`
+      );
+      return;
+    }
+
+
+    if(
+      !isResident() ||
+      st.mewoLocation!=='garden'
+    ){
+      showGardenNotice(
+        '🐾 Mewo está junto a la canasta. Podrá usarlo cuando vuelva.'
+      );
+      return;
+    }
+
+
+    const h=home();
+    const now=Date.now();
+
+    save({
+      scratcherUses:
+        Number(
+          st.scratcherUses||0
+        )+1
+    });
+
+    saveHome({
+      lastPlay:now,
+      sleepUntil:0,
+      residentPlays:
+        Number(
+          h.residentPlays||0
+        )+1
+    });
+
+
+    startGardenActivity(
+      'scratcher',
+      5000
+    );
+
+    makeGardenBurst(
+      'play'
+    );
+
+    setGardenMood(
+      'play',
+      '✦ Mewo trepa, rasca y juega un rato en su rascador.',
+      5000
+    );
+
+
+    try{
+      window.ParadoxStats
+        ?.inc
+        ?.(
+          'scratcherUses'
+        );
+    }catch(_){}
+  }
+
 
   function careMewo(
     action
@@ -461,12 +900,54 @@
 
 
     if(action==='play'){
+
+      if(
+        Number(
+          st.scratcherStage||0
+        )>=4
+      ){
+
+        const toyIds=
+          Object.keys(
+            GARDEN_TOYS
+          );
+
+        const currentIndex=
+          Math.max(
+            0,
+            toyIds.indexOf(
+              st.activeToy||
+              'ball'
+            )
+          );
+
+        const nextToy=
+          toyIds[
+            (
+              currentIndex+1
+            )%
+            toyIds.length
+          ];
+
+        playWithGardenToy(
+          nextToy
+        );
+
+        return;
+      }
+
+
       saveHome({
         lastPlay:now,
         sleepUntil:0,
         residentPlays:
           Number(h.residentPlays||0)+1
       });
+
+      startGardenActivity(
+        'toy-ball',
+        3900
+      );
 
       showGardenProp(
         'toy_ball.png',
@@ -579,6 +1060,34 @@
   );
 
 
+  scratcherUse.addEventListener(
+    'click',
+    useGardenScratcher
+  );
+
+
+  toyShelf.addEventListener(
+    'click',
+    event=>{
+
+      const button=
+        event
+          .target
+          .closest(
+            '[data-garden-toy]'
+          );
+
+      if(!button){
+        return;
+      }
+
+      playWithGardenToy(
+        button.dataset.gardenToy
+      );
+    }
+  );
+
+
   mewoTouch.addEventListener(
     'click',
     ()=>{
@@ -612,6 +1121,8 @@
   }
 
   function closeGarden(){
+    stopGardenActivity();
+
     garden.classList.remove('show');
     garden.setAttribute('aria-hidden','true');
     document.body.classList.remove('cat-garden-open');

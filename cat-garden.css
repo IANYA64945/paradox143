@@ -367,3 +367,492 @@ body.cat-garden-open #mewoHomeLayer{
   margin-bottom:2px;
   transform-origin:50% 100%;
 }
+
+
+/* =========================================================
+   PULIDO FINAL + JUGUETES + RASCADOR INTERACTIVO
+========================================================= */
+
+#catGardenWeatherNote.special{
+  border-color:rgba(255,205,229,.45);
+  background:rgba(25,12,28,.76);
+  color:#ffe8f5;
+  box-shadow:
+    0 0 18px rgba(235,150,204,.12);
+}
+
+/* Sombras suaves para integrar muebles con el suelo. */
+#catGardenBedZone::after,
+#catGardenScratcherZone::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:0;
+  z-index:-1;
+  width:86%;
+  height:18%;
+  transform:translateX(-50%);
+  border-radius:50%;
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(0,0,0,.32),
+      transparent 70%
+    );
+  filter:blur(4px);
+  pointer-events:none;
+}
+
+#catGardenBedZone{
+  filter:
+    drop-shadow(
+      0 5px 7px
+      rgba(0,0,0,.18)
+    );
+}
+
+#catGardenPillow.show{
+  filter:
+    drop-shadow(
+      0 5px 6px
+      rgba(0,0,0,.22)
+    )
+    saturate(.96);
+}
+
+/*
+  Mewo puede desplazarse por el claro.
+  Se mantiene exactamente el mismo sprite.
+*/
+#catGardenMewoSpot.using-scratcher{
+  left:78%;
+  bottom:13%;
+  width:min(7.2vw,72px);
+}
+
+#catGardenMewoSpot.using-toy{
+  left:58%;
+  bottom:15%;
+  width:min(7.7vw,77px);
+}
+
+#catGardenMewoSpot.weather-shelter{
+  left:27%;
+  bottom:15%;
+}
+
+#catGardenMewoSpot.weather-watch{
+  left:45%;
+  bottom:19%;
+}
+
+/* El objeto de juego acompaña a Mewo. */
+#catGardenMewoSpot.using-toy ~ #catGardenMewoProp{
+  left:64%;
+  bottom:13%;
+}
+
+#catGardenMewoSpot.using-scratcher ~ #catGardenMewoProp{
+  left:73%;
+  bottom:16%;
+}
+
+/* ---------------------------------------------------------
+   RASCADOR
+--------------------------------------------------------- */
+
+#catGardenScratcherZone{
+  right:4%;
+  bottom:7%;
+  width:min(28vw,235px);
+  height:min(42vh,325px);
+  z-index:3;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+}
+
+#catGardenScratcherUse{
+  position:relative;
+  width:100%;
+  height:100%;
+  padding:0;
+  border:0;
+  background:transparent;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+
+#catGardenScratcherUse:disabled{
+  cursor:default;
+}
+
+#catGardenScratcher{
+  position:absolute;
+  left:50%;
+  bottom:0;
+  max-width:100%;
+  max-height:100%;
+  object-fit:contain;
+  opacity:0;
+  transform:
+    translateX(-50%)
+    scale(.96);
+  transform-origin:50% 100%;
+  transition:
+    opacity .3s,
+    transform .25s;
+  filter:
+    drop-shadow(
+      0 8px 9px
+      rgba(0,0,0,.34)
+    )
+    saturate(.96);
+}
+
+#catGardenScratcher.show{
+  opacity:1;
+}
+
+#catGardenScratcherZone.complete
+#catGardenScratcherUse:hover
+#catGardenScratcher{
+  transform:
+    translateX(-50%)
+    scale(1);
+}
+
+#catGardenScratcherZone.complete
+#catGardenScratcherUse:active
+#catGardenScratcher{
+  transform:
+    translateX(-50%)
+    scale(.97);
+}
+
+#catGardenScratcherToy{
+  position:absolute;
+  right:20%;
+  top:28%;
+  width:34px;
+  height:52px;
+  object-fit:contain;
+  opacity:0;
+  transform-origin:50% 0;
+  pointer-events:none;
+}
+
+#catGardenScratcherToy.show{
+  opacity:1;
+  animation:
+    catGardenScratchToy
+    .52s
+    ease-in-out
+    infinite alternate;
+}
+
+@keyframes catGardenScratchToy{
+  from{
+    transform:
+      rotate(-10deg);
+  }
+  to{
+    transform:
+      rotate(13deg);
+  }
+}
+
+#catGardenScratcherHint{
+  position:absolute;
+  left:50%;
+  bottom:-3px;
+  width:max-content;
+  max-width:150px;
+  transform:translateX(-50%);
+  padding:3px 5px;
+  border-radius:5px;
+  background:rgba(4,7,12,.56);
+  color:rgba(255,239,248,.76);
+  font:700 6px/1.2 monospace;
+  text-align:center;
+  pointer-events:none;
+}
+
+/* ---------------------------------------------------------
+   RINCÓN DE JUGUETES
+--------------------------------------------------------- */
+
+#catGardenToyShelf{
+  position:absolute;
+  right:25%;
+  bottom:7%;
+  z-index:6;
+
+  display:flex;
+  align-items:flex-end;
+  gap:6px;
+
+  padding:5px 7px;
+
+  border:
+    1px solid
+    rgba(
+      240,
+      185,
+      218,
+      .16
+    );
+
+  border-radius:12px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(21,19,31,.42),
+      rgba(5,8,13,.55)
+    );
+
+  box-shadow:
+    0 6px 16px
+    rgba(0,0,0,.18);
+
+  opacity:0;
+  visibility:hidden;
+  transform:
+    translateY(8px)
+    scale(.96);
+
+  pointer-events:none;
+
+  transition:.25s;
+}
+
+#catGardenToyShelf.show{
+  opacity:1;
+  visibility:visible;
+  transform:
+    translateY(0)
+    scale(1);
+
+  pointer-events:auto;
+}
+
+#catGardenToyShelf.disabled{
+  opacity:.42;
+  pointer-events:none;
+}
+
+#catGardenToyShelf button{
+  position:relative;
+  width:43px;
+  height:43px;
+  padding:3px;
+
+  border:
+    1px solid
+    transparent;
+
+  border-radius:50%;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      .025
+    );
+
+  -webkit-tap-highlight-color:transparent;
+}
+
+#catGardenToyShelf button.active{
+  border-color:
+    rgba(
+      248,
+      189,
+      221,
+      .48
+    );
+
+  background:
+    rgba(
+      225,
+      149,
+      195,
+      .09
+    );
+
+  box-shadow:
+    0 0 14px
+    rgba(
+      239,
+      157,
+      204,
+      .10
+    );
+}
+
+#catGardenToyShelf img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  filter:
+    drop-shadow(
+      0 3px 4px
+      rgba(0,0,0,.28)
+    );
+}
+
+#catGardenToyShelf button:active{
+  transform:scale(.9);
+}
+
+/* ---------------------------------------------------------
+   CLIMA: se siente afuera, no invade el refugio
+--------------------------------------------------------- */
+
+#catGarden::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:2;
+  pointer-events:none;
+  opacity:0;
+}
+
+#catGarden[data-weather="storm"]::after{
+  opacity:1;
+  background:
+    radial-gradient(
+      circle at 78% 8%,
+      rgba(205,218,255,.10),
+      transparent 30%
+    );
+  animation:
+    catGardenDistantLightning
+    6.8s
+    infinite;
+}
+
+#catGarden[data-weather="rain"]::after{
+  opacity:1;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(115,148,181,.06),
+      transparent 45%
+    );
+}
+
+#catGarden[data-weather="snow"]::after{
+  opacity:1;
+  background:
+    radial-gradient(
+      circle at 50% 4%,
+      rgba(222,235,255,.08),
+      transparent 45%
+    );
+}
+
+#catGarden[data-weather="stars"]::after{
+  opacity:1;
+  background:
+    radial-gradient(
+      circle at 56% 8%,
+      rgba(196,174,255,.07),
+      transparent 42%
+    );
+}
+
+@keyframes catGardenDistantLightning{
+  0%,71%,73%,100%{
+    opacity:0;
+  }
+  72%{
+    opacity:.9;
+  }
+}
+
+/* ---------------------------------------------------------
+   BOTONES DEL JARDÍN MÁS INTEGRADOS
+--------------------------------------------------------- */
+
+#catGardenActions button,
+#catGardenCareActions button{
+  border-color:
+    rgba(
+      241,
+      190,
+      220,
+      .24
+    );
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(28,22,38,.69),
+      rgba(7,9,16,.72)
+    );
+
+  box-shadow:
+    0 4px 12px
+    rgba(0,0,0,.18),
+    inset 0 1px
+    rgba(255,255,255,.025);
+}
+
+#catGardenActions button:active,
+#catGardenCareActions button:active{
+  transform:scale(.95);
+}
+
+/* Móvil */
+@media(max-width:600px){
+
+  #catGardenMewoSpot.using-scratcher{
+    left:76%;
+    bottom:17%;
+    width:min(17vw,72px);
+  }
+
+  #catGardenMewoSpot.using-toy{
+    left:55%;
+    bottom:21%;
+    width:min(18vw,77px);
+  }
+
+  #catGardenMewoSpot.weather-shelter{
+    left:29%;
+    bottom:22%;
+  }
+
+  #catGardenMewoSpot.weather-watch{
+    left:44%;
+    bottom:26%;
+  }
+
+  #catGardenScratcherZone{
+    right:1%;
+    bottom:7%;
+    width:29vw;
+    height:31vh;
+  }
+
+  #catGardenScratcherHint{
+    max-width:100px;
+    font-size:5.5px;
+  }
+
+  #catGardenToyShelf{
+    right:24%;
+    bottom:8%;
+    gap:3px;
+    padding:4px;
+  }
+
+  #catGardenToyShelf button{
+    width:34px;
+    height:34px;
+  }
+}
