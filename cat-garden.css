@@ -60,7 +60,7 @@ body.intro-active #mewoHomeLayer{
   left:51%;
   bottom:17%;
   z-index:5;
-  width:min(6.4vw,64px);
+  width:min(7.7vw,77px);
   transform:translateX(-50%);
   opacity:0;
   visibility:hidden;
@@ -97,7 +97,7 @@ body.intro-active #mewoHomeLayer{
 #catGardenMewoSpot.using-pillow{
   left:13.2%;
   bottom:9.1%;
-  width:min(5.7vw,58px);
+  width:min(6.8vw,70px);
 }
 
 #catGardenMewoSpot.using-pillow #catGardenMewo{
@@ -303,13 +303,13 @@ body.cat-garden-open #mewoHomeLayer{
   #catGardenMewoSpot{
     left:52%;
     bottom:24%;
-    width:min(15vw,64px);
+    width:min(18vw,77px);
   }
 
   #catGardenMewoSpot.using-pillow{
     left:16%;
     bottom:11%;
-    width:min(13vw,55px);
+    width:min(15.6vw,66px);
   }
 
   #catGardenMewoMood{

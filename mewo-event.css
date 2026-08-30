@@ -851,8 +851,8 @@ body.intro-active #mewoHomeLayer{
   left:64px;
   bottom:28px;
   z-index:4;
-  width:64px;
-  height:64px;
+  width:77px;
+  height:77px;
   padding:0;
   border:0;
   background:transparent;
@@ -1194,8 +1194,8 @@ body.intro-active #mewoHomeLayer{
 #mewoHomeLayer.mewo-on-pillow #mewoResidentCat.sleeping{
   left:62px;
   bottom:19px;
-  width:64px;
-  height:64px;
+  width:77px;
+  height:77px;
   transform:translate(-50%,0) scale(.78) rotate(-3deg);
 }
 
