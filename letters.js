@@ -198,6 +198,46 @@
       title: 'El refugio está lleno ♡',
       mark: '⌂',
       text: 'primero construimos un lugar para descansar. despues llegaron almohadas, juguetes, recuerdos y tres pequeñas vidas que decidieron quedarse.. ahora si puedo decir que este refugio esta lleno ♡'
+    },
+
+    /* =====================================================
+       SECRETOS DEL CLARO — COLECCIÓN I
+    ===================================================== */
+
+    'secret-garden-moon': {
+      title: 'La lunita del refugio ☾',
+      mark: '☾',
+      text: 'esta lunita es mas pequeña que la del campo.. pero desde aqui parece cuidar el refugio mientras todos mimimos tranquilos ♡'
+    },
+
+    'secret-garden-lantern': {
+      title: 'Una lucecita encendida',
+      mark: '✦',
+      text: 'hay luces que no necesitan alumbrar todo el camino.. a veces basta con que nos recuerden donde esta nuestro pequeño lugar seguro ♡'
+    },
+
+    'secret-garden-tree': {
+      title: 'Debajo del árbol',
+      mark: '⌂',
+      text: 'tantas cositas pasaron debajo de este arbol que ya parece guardar nuestros secretos entre sus ramitas.. shhh ♡'
+    },
+
+    'secret-garden-flowers': {
+      title: 'También crecieron aquí',
+      mark: '✿',
+      text: 'no plantamos estas florecitas una por una como los tulipanes.. aun asi crecieron cerquita de nosotros. tal vez algunas cosas bonitas aparecen cuando un lugar recibe suficiente cariño ♡'
+    },
+
+    'secret-three-wishes': {
+      title: 'Tres deseos ♡',
+      mark: '✦',
+      text: 'una estrellita para mewo, otra para marie y otra para tuluz.. aunque pensandolo bien mi deseo favorito sigue siendo poder compartir este pequeño mundo contigo ♡'
+    },
+
+    'secret-stay-longer': {
+      title: 'Quédate un ratito más',
+      mark: '☾',
+      text: 'no esta pasando nada especial ahora mismo.. nadie corre, nadie juega, nadie llama. y aun asi me gustaria que te quedaras un ratito mas aqui conmigo ♡'
     }
   };
 
@@ -464,7 +504,14 @@
       'family-let-sleep',
       'family-siblings',
       'family-close',
-      'family-full'
+      'family-full',
+
+      'secret-garden-moon',
+      'secret-garden-lantern',
+      'secret-garden-tree',
+      'secret-garden-flowers',
+      'secret-three-wishes',
+      'secret-stay-longer'
     ];
     const html = order
       .filter(id => collected.has(id))
