@@ -16,36 +16,36 @@
    CONFIGURACIÓN
 ===================================================== */
 
-const GAME_V2_DURATION = 32;
+const GAME_V2_DURATION = 30;
 
 const GAME_V2_PHASES = [
   {
     start:0,
-    end:8,
+    end:7.5,
     name:'LLUVIA DE PÉTALOS',
     hint:'Mira arriba ♡',
-    interval:.52
+    interval:.66
   },
   {
-    start:8,
-    end:16,
+    start:7.5,
+    end:15,
     name:'VIENTO CRUZADO',
     hint:'Los lados también despiertan.',
-    interval:.43
+    interval:.57
   },
   {
-    start:16,
-    end:24,
+    start:15,
+    end:22.5,
     name:'PÉTALOS QUE TE BUSCAN',
     hint:'No te quedes quieta.',
-    interval:.56
+    interval:.70
   },
   {
-    start:24,
-    end:32,
+    start:22.5,
+    end:30,
     name:'JARDÍN DE LUZ',
     hint:'Última fase. Sigue latiendo ♡',
-    interval:.68
+    interval:.82
   }
 ];
 
@@ -108,6 +108,42 @@ gameVictoryGlow.id =
 
 gameOverlay.appendChild(
   gameVictoryGlow
+);
+
+
+/* =====================================================
+   CARTA EXTRA AL PERDER
+===================================================== */
+
+const loseLetterBtn=
+  document.createElement('button');
+
+loseLetterBtn.id=
+  'loseLetterBtn';
+
+loseLetterBtn.type='button';
+loseLetterBtn.className='gameBtn';
+loseLetterBtn.textContent='Abrir cartita ♡';
+
+losePanel.insertBefore(
+  loseLetterBtn,
+  leaveGameBtn
+);
+
+loseLetterBtn.addEventListener(
+  'click',
+  ()=>{
+
+    if(
+      window.ParadoxLetters &&
+      window.ParadoxLetters.open
+    ){
+      window.ParadoxLetters.open(
+        'game-lost',
+        true
+      );
+    }
+  }
 );
 
 
@@ -267,8 +303,8 @@ function resizeGame(){
 
   heart.speed =
     gameW < 700
-      ? 300
-      : 275;
+      ? 325
+      : 295;
 
 
   if(!gameRunning){
@@ -2124,7 +2160,7 @@ function updateProjectiles(
       gameHP--;
 
       gameInvulnUntil =
-        now+1000;
+        now+1200;
 
 
       burstParticles(

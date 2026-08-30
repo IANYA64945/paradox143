@@ -327,3 +327,11 @@
     gap:6px;
   }
 }
+
+
+/* Carta de consuelo al perder */
+#loseLetterBtn{
+  border-color:#f0a9cf;
+  color:#ffe4f3;
+  box-shadow:0 0 14px rgba(235,132,190,.12);
+}

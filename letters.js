@@ -25,6 +25,11 @@
       title: 'Carta encontrada',
       mark: '✦',
       text: 'Y si algún día dudas de cuánto te quiero, vuelve a mirar este campo. Todavía quedan infinitos tulipanes por contar.'
+    },
+    'game-lost': {
+      title: 'No te rindas ♡',
+      mark: '♡',
+      text: 'Mientras sigas intentando, jamás habrás fracasado para mí..'
     }
   };
 
@@ -133,6 +138,80 @@
   `;
   document.body.appendChild(basketBtn);
 
+  /* =====================================================
+     OCULTAR / MOSTRAR CANASTA
+  ===================================================== */
+
+  const BASKET_HIDDEN_KEY =
+    'paradox143_basket_hidden_v1';
+
+  const basketVisibilityToggle =
+    document.createElement('button');
+
+  basketVisibilityToggle.id =
+    'basketVisibilityToggle';
+
+  basketVisibilityToggle.type =
+    'button';
+
+  basketVisibilityToggle.setAttribute(
+    'aria-label',
+    'Ocultar canasta'
+  );
+
+  basketVisibilityToggle.textContent =
+    '◀';
+
+  document.body.appendChild(
+    basketVisibilityToggle
+  );
+
+  function basketUserHidden(){
+    try{
+      return localStorage.getItem(BASKET_HIDDEN_KEY)==='1';
+    }catch(_){
+      return false;
+    }
+  }
+
+  function applyBasketVisibility(){
+    const hidden=basketUserHidden();
+
+    basketBtn.classList.toggle(
+      'userHidden',
+      hidden
+    );
+
+    basketVisibilityToggle.textContent=
+      hidden ? '♡' : '◀';
+
+    basketVisibilityToggle.setAttribute(
+      'aria-label',
+      hidden
+        ? 'Mostrar canasta'
+        : 'Ocultar canasta'
+    );
+  }
+
+  basketVisibilityToggle.addEventListener(
+    'click',
+    e=>{
+      e.preventDefault();
+      e.stopPropagation();
+
+      const next=!basketUserHidden();
+
+      try{
+        localStorage.setItem(
+          BASKET_HIDDEN_KEY,
+          next ? '1' : '0'
+        );
+      }catch(_){ }
+
+      applyBasketVisibility();
+    }
+  );
+
   const basketOverlay = document.createElement('div');
   basketOverlay.id = 'basketOverlay';
   basketOverlay.innerHTML = `
@@ -186,7 +265,7 @@
   function updateBasket() {
     basketCount.textContent = String(collected.size);
 
-    const order = ['intro', 'moon', 'final'];
+    const order = ['intro', 'moon', 'game-lost', 'final'];
     const html = order
       .filter(id => collected.has(id))
       .map(id => {
@@ -233,6 +312,8 @@
   function showBasketWhenFieldIsVisible() {
     if (!basketUnlocked) return;
     basketBtn.classList.add('visible');
+    basketVisibilityToggle.classList.add('visible');
+    applyBasketVisibility();
   }
 
   basketBtn.addEventListener('click', () => {
@@ -491,6 +572,15 @@
     });
   }
 
+  window.ParadoxLetters={
+    open:openLetter,
+    collect:collectLetter,
+    has:id=>collected.has(id),
+    list:()=>[...collected],
+    refresh:updateBasket
+  };
+
+  applyBasketVisibility();
   updateBasket();
 })();
 
@@ -529,6 +619,7 @@
     ['moon','☾','Luna'],
     ['moon-dark','◐','Lado oscuro de la luna'],
     ['final','✦','Carta del minijuego'],
+    ['game-lost','♡','No te rindas'],
     ['mewo','🐾','Mewo'],
     ['weather-stars','✦','Lluvia de estrellas'],
     ['weather-fog','◌','Neblina'],
