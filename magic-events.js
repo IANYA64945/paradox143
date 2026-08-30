@@ -302,6 +302,39 @@
       catch(_){}
 
 
+      /*
+        Migración del Claro:
+        si el Jardín de Mewo ya estaba desbloqueado antes
+        de añadir su música, también debe aparecer como
+        música desbloqueada en el menú.
+      */
+
+      try{
+
+        const raw=
+          localStorage.getItem(
+            'paradox143_cat_garden_v1'
+          );
+
+        const garden=
+          raw
+          ? JSON.parse(raw)
+          : null;
+
+
+        if(
+          garden &&
+          garden.unlocked
+        ){
+          result.add(
+            'garden'
+          );
+        }
+
+      }
+      catch(_){}
+
+
       return result;
     }
 
@@ -880,7 +913,7 @@
             src,
             {
               method:'HEAD',
-              cache:'force-cache'
+              cache:'no-store'
             }
           );
 
@@ -889,10 +922,28 @@
           response.ok;
 
 
-        existsCache.set(
-          src,
-          ok
-        );
+        /*
+          Solo memorizamos los archivos que SÍ existen.
+          Si hoy falta un MP3 y luego lo subes a GitHub,
+          el juego podrá detectarlo sin quedar atrapado
+          en un 404 guardado.
+        */
+
+        if(ok){
+
+          existsCache.set(
+            src,
+            true
+          );
+
+        }
+
+        else{
+
+          existsCache.delete(
+            src
+          );
+        }
 
 
         return ok;
@@ -900,9 +951,8 @@
       }
       catch(_){
 
-        existsCache.set(
-          src,
-          false
+        existsCache.delete(
+          src
         );
 
         return false;
@@ -945,9 +995,6 @@
       if(
         currentSrcName()===
           TRACKS.main.src
-        ||
-        currentSrcName()===
-          MAIN_FALLBACK.src
       ){
 
         principalTime=
@@ -1108,6 +1155,16 @@
         esta canción.
       */
 
+      /*
+        Entrar al Jardín ya cuenta como descubrir
+        su pista. Así aparece correctamente en el menú.
+      */
+      unlock(
+        'garden',
+        false
+      );
+
+
       specialOwner=null;
       specialTrackId=null;
 
@@ -1123,19 +1180,23 @@
 
 
       if(!available){
+
+        /*
+          El Jardín sigue funcionando aunque todavía
+          no exista su MP3. Mostramos el motivo real.
+        */
+
+        toast(
+          'Falta musica_claro.mp3 en la raíz del juego.',
+          3600
+        );
+
         return playMain();
       }
 
 
       specialOwner='cat-garden';
       specialTrackId='garden';
-
-      unlocked.add(
-        'garden'
-      );
-
-      saveUnlocks();
-
 
       specialLabel.textContent=
         '♫ Claro de Mewo';

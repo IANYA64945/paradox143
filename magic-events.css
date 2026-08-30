@@ -5265,3 +5265,102 @@ body.weather-snow #magicWindVeil{opacity:.12;background:repeating-linear-gradien
     transform:translateX(3px);
   }
 }
+
+
+/* =========================================================
+   CORRECCIÓN MENÚ DE MÚSICAS — JARDÍN DE MEWO
+========================================================= */
+
+/*
+  El Jardín usa z-index:90.
+  Antes el botón y el panel de músicas quedaban detrás
+  del refugio, por eso parecían dejar de funcionar.
+  Los dejamos por encima del Jardín, pero por debajo
+  de la invitación especial de Mewo (z-index:105).
+*/
+
+#musicBtn{
+  z-index:96 !important;
+}
+
+#specialMusicChip{
+  z-index:96 !important;
+}
+
+#unlockMusicPanel{
+  z-index:97 !important;
+
+  max-height:
+    calc(
+      100dvh -
+      68px -
+      env(safe-area-inset-bottom)
+    );
+
+  overflow:hidden;
+}
+
+#unlockMusicToast{
+  z-index:98 !important;
+}
+
+#unlockMusicList{
+  max-height:
+    calc(
+      100dvh -
+      118px -
+      env(safe-area-inset-bottom)
+    );
+
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;
+}
+
+
+/*
+  La lista puede tener muchas canciones.
+  En horizontal o en pantallas pequeñas ahora
+  se desplaza en lugar de salirse de la pantalla.
+*/
+@media(max-height:430px){
+
+  #unlockMusicPanel{
+    top:
+      max(
+        48px,
+        calc(
+          env(safe-area-inset-top)
+          + 43px
+        )
+      );
+
+    max-height:
+      calc(
+        100dvh -
+        56px
+      );
+  }
+
+  #unlockMusicList{
+    max-height:
+      calc(
+        100dvh -
+        102px
+      );
+  }
+}
+
+
+/*
+  La carta/animación inicial continúa teniendo prioridad:
+  el botón y el menú siguen ocultos allí.
+*/
+body.intro-active #musicBtn,
+body.intro-active #unlockMusicPanel,
+body.intro-active #specialMusicChip,
+body.intro-active #unlockMusicToast{
+  opacity:0 !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+}
