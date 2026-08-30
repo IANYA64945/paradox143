@@ -238,6 +238,84 @@
       title: 'Quédate un ratito más',
       mark: '☾',
       text: 'no esta pasando nada especial ahora mismo.. nadie corre, nadie juega, nadie llama. y aun asi me gustaria que te quedaras un ratito mas aqui conmigo ♡'
+    },
+
+    /* =====================================================
+       ACTO I · ETAPA 1 — PEQUEÑOS DÍAS
+       Cartas 44–55
+    ===================================================== */
+
+    'act1-five-minutes': {
+      title: 'Cinco minutitos más',
+      mark: '☾',
+      text: 'dije cinco minutitos mas y sin darme cuenta me quedaria aqui contigo mucho mas tiempo.. supongo que algunos lugares se sienten bonitos porque tu tambien estas en ellos ♡'
+    },
+
+    'act1-tuluz-ball': {
+      title: 'No era para ti, Tuluz',
+      mark: '●',
+      text: 'esa pelotita ya paso por medio jardin antes de volver a sus patitas.. tuluz puede convertir cualquier rincon tranquilo en una pequeña aventura >w<'
+    },
+
+    'act1-marie-trail': {
+      title: '¿A dónde vas, Marie?',
+      mark: '🐾',
+      text: 'segui sus huellitas pensando que escondia algo importante.. al final solo queria encontrar un rinconcito tranquilo. creo que yo tambien te seguiria aunque no supiera a donde vamos ♡'
+    },
+
+    'act1-fireflies': {
+      title: 'Luciérnagas',
+      mark: '✦',
+      text: 'por unos segundos las lucecitas parecian pequeñas estrellas que decidieron bajar a visitarnos.. me alegra haberlas visto contigo ♡'
+    },
+
+    'act1-after-rain': {
+      title: 'Después de la lluvia',
+      mark: '◇',
+      text: 'la lluvia termino y todo quedo brillando un poquito diferente.. me gusta pensar que incluso despues de los dias grises siempre podemos encontrar algo bonito que mirar juntos ♡'
+    },
+
+    'act1-save-toy': {
+      title: 'A salvo ♡',
+      mark: '⌂',
+      text: 'era solo un juguetito afuera bajo la lluvia, pero ninguno de nuestros pequeños tesoros tenia por que quedarse solo.. aqui adentro siempre hay espacio ♡'
+    },
+
+    'act1-fallen-star': {
+      title: 'Una estrellita cayó',
+      mark: '✦',
+      text: 'una estrellita se cayo demasiado cerca del campo.. asi que la guardamos un ratito. si pudiera pedirle algo seria tener muchos dias mas para compartir contigo ♡'
+    },
+
+    'act1-field-loop': {
+      title: 'Otra vuelta por el campo',
+      mark: '↺',
+      text: 'camine tanto entre los tulipanes que por un momento senti que habia vuelto al mismo lugar.. aunque contigo no me molestaria recorrer el mismo camino otra vez ♡'
+    },
+
+    'act1-our-tulip': {
+      title: 'Nuestro tulipán ♡',
+      mark: '✿',
+      text: 'este no aparecio por casualidad. elegiste donde plantarlo y ahora tiene su propio rinconcito entre todos los demas.. un pequeño tulipan que solo existe porque estuvimos aqui ♡'
+    },
+
+    'act1-choice-place': {
+      title: 'Donde sea contigo',
+      mark: '♡',
+      text: 'debajo del arbol, junto a las flores o cerquita de los gatitos.. al final el lugar nunca fue lo importante. lo bonito era poder quedarme contigo ♡'
+    },
+
+    'act1-three-sleep': {
+      title: 'Shhh... los tres mimieron',
+      mark: 'zZ',
+      text: 'shhh.. los tres se quedaron mimidos al mismo tiempo. por unos segundos el refugio estuvo tan quietito que parecia que hasta la noche tenia miedo de despertarlos ♡'
+    },
+
+    'act1-little-world': {
+      title: 'Nuestro pequeño mundo ♡',
+      mark: '⌂',
+      text: 'empezo con tulipanes y una cartita.. y sin darnos cuenta aparecieron una lunita, tormentas, juguetes, un refugio y tres pequeñas vidas. mira todo lo que nuestro pequeño mundo ya tiene ♡'
+
     }
   };
 
@@ -511,7 +589,20 @@
       'secret-garden-tree',
       'secret-garden-flowers',
       'secret-three-wishes',
-      'secret-stay-longer'
+      'secret-stay-longer',
+
+      'act1-five-minutes',
+      'act1-tuluz-ball',
+      'act1-marie-trail',
+      'act1-fireflies',
+      'act1-after-rain',
+      'act1-save-toy',
+      'act1-fallen-star',
+      'act1-field-loop',
+      'act1-our-tulip',
+      'act1-choice-place',
+      'act1-three-sleep',
+      'act1-little-world'
     ];
     const html = order
       .filter(id => collected.has(id))
