@@ -899,143 +899,403 @@ body.intro-active
 
 
 /* =========================================================
-   MARIE + TULUZ — MOVIMIENTO CONSTANTE
+   JARDÍN DE GATOS 2.0
+   VIDA AUTÓNOMA DE MEWO + MARIE + TULUZ
 ========================================================= */
 
-/*
-  Ahora la transición entre puntos del Claro es más larga
-  que la transición original del sprite, para que parezca
-  que realmente caminan y no se teletransportan.
-*/
-#catGarden
-.refugeFamilyCat{
-  transition:
-    left 1.45s cubic-bezier(.22,.70,.26,1),
-    bottom 1.05s cubic-bezier(.22,.70,.26,1),
-    opacity .35s,
-    visibility .35s,
-    transform .35s;
+/* ---------------------------------------------------------
+   CAPA AMBIENTAL
+--------------------------------------------------------- */
+
+#refugeGarden2Environment{
+  position:absolute;
+  inset:0;
+  z-index:4;
+  pointer-events:none;
 }
 
 
-/*
-  Marie: movimiento más suave.
-*/
-#catGarden
-.refugeGrayCat.family-walking-marie{
+.garden2AmbientZone{
+  position:absolute;
+  pointer-events:none;
+}
+
+
+/* Pequeña zona cálida junto a la cama. */
+#refugeGarden2WarmPatch{
+  left:20%;
+  bottom:5.5%;
+
+  width:22%;
+  height:17%;
+
+  border-radius:50%;
+
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(255,211,152,.08),
+      rgba(255,211,152,.025) 48%,
+      transparent 72%
+    );
+
+  filter:blur(.2px);
+
+  opacity:.75;
+
   animation:
-    marieWalkingBob
-    .72s
+    garden2WarmBreath
+    4.8s
+    ease-in-out
+    infinite;
+}
+
+
+@keyframes garden2WarmBreath{
+  0%,100%{opacity:.47}
+  50%{opacity:.82}
+}
+
+
+/* Mirador: solo una pequeña estrellita ambiente. */
+#refugeGarden2Lookout{
+  left:48%;
+  top:19%;
+
+  width:30px;
+  height:30px;
+
+  display:grid;
+  place-items:center;
+
+  color:
+    rgba(
+      255,
+      226,
+      161,
+      .42
+    );
+
+  font:
+    900 9px/1
+    monospace;
+
+  text-shadow:
+    0 0 8px
+    rgba(
+      255,
+      220,
+      144,
+      .28
+    );
+
+  animation:
+    garden2LookoutGlow
+    3.6s
+    ease-in-out
+    infinite;
+}
+
+
+@keyframes garden2LookoutGlow{
+  0%,100%{
+    opacity:.28;
+    transform:scale(.85);
+  }
+  50%{
+    opacity:.72;
+    transform:scale(1.06);
+  }
+}
+
+
+/* ---------------------------------------------------------
+   COMEDERO PERMANENTE
+--------------------------------------------------------- */
+
+#refugeGarden2FoodZone{
+  position:absolute;
+
+  right:18%;
+  bottom:6%;
+
+  z-index:4;
+
+  width:min(6.2vw,58px);
+  aspect-ratio:1/1;
+
+  padding:0;
+  border:0;
+
+  background:transparent;
+
+  pointer-events:auto;
+
+  -webkit-tap-highlight-color:transparent;
+}
+
+
+#refugeGarden2FoodZone img{
+  display:block;
+
+  width:100%;
+  height:100%;
+
+  object-fit:contain;
+
+  filter:
+    drop-shadow(
+      0 4px 5px
+      rgba(0,0,0,.28)
+    );
+
+  transition:
+    transform .2s ease,
+    filter .2s ease;
+}
+
+
+#refugeGarden2FoodZone > span{
+  position:absolute;
+
+  left:50%;
+  top:2%;
+
+  color:#ffd6b3;
+
+  font:
+    900 11px/1
+    monospace;
+
+  opacity:0;
+
+  transform:
+    translate(-50%,0);
+
+  pointer-events:none;
+}
+
+
+#refugeGarden2FoodZone.used img{
+  animation:
+    garden2FoodBowl
+    .65s
     ease-in-out
     2;
 }
 
 
-@keyframes marieWalkingBob{
+#refugeGarden2FoodZone.used > span::before{
+  content:"♡";
+}
 
-  0%,
-  100%{
-    margin-bottom:0;
+
+#refugeGarden2FoodZone.used > span{
+  animation:
+    garden2FoodHeart
+    1.6s
+    ease-out
+    forwards;
+}
+
+
+@keyframes garden2FoodBowl{
+  0%,100%{
+    transform:
+      translateY(0)
+      rotate(0);
   }
 
   50%{
-    margin-bottom:3px;
+    transform:
+      translateY(-2px)
+      rotate(3deg);
   }
 }
 
 
-/*
-  Tuluz: movimiento más vivo y ligero.
-*/
-#catGarden
-.refugeOrangeCat.family-walking-tuluz{
+@keyframes garden2FoodHeart{
+  0%{
+    opacity:0;
+    transform:
+      translate(-50%,4px)
+      scale(.7);
+  }
+
+  25%{
+    opacity:1;
+  }
+
+  100%{
+    opacity:0;
+    transform:
+      translate(-50%,-22px)
+      scale(1.1);
+  }
+}
+
+
+/* ---------------------------------------------------------
+   HUELLITAS MUY SUAVES AL CAMINAR
+--------------------------------------------------------- */
+
+#refugeGarden2Footprints{
+  position:absolute;
+  inset:0;
+
+  z-index:2;
+
+  overflow:hidden;
+
+  pointer-events:none;
+}
+
+
+.garden2Footprint{
+  position:absolute;
+
+  color:
+    rgba(
+      239,
+      219,
+      230,
+      .32
+    );
+
+  font:
+    900 13px/1
+    monospace;
+
+  pointer-events:none;
+
+  transform:
+    translate(-50%,50%);
+
   animation:
-    tuluzWalkingBob
-    .42s
+    garden2FootprintFade
+    1.75s
+    ease-out
+    forwards;
+}
+
+
+.garden2Footprint.tuluz{
+  color:
+    rgba(
+      242,
+      191,
+      132,
+      .27
+    );
+}
+
+
+@keyframes garden2FootprintFade{
+  0%{
+    opacity:0;
+    scale:.7;
+  }
+
+  18%{
+    opacity:.75;
+  }
+
+  100%{
+    opacity:0;
+    scale:1.06;
+  }
+}
+
+
+/* ---------------------------------------------------------
+   TRANSICIÓN REAL DE CAMINATA
+--------------------------------------------------------- */
+
+#catGarden
+.refugeFamilyCat{
+  transition:
+    left 1.15s cubic-bezier(.22,.72,.25,1),
+    bottom .95s cubic-bezier(.22,.72,.25,1),
+    opacity .35s,
+    visibility .35s,
+    transform .35s,
+    scale .35s;
+}
+
+
+/* Marie: pasos tranquilos. */
+#catGarden
+.refugeGrayCat.garden2-moving-marie{
+  animation:
+    garden2MarieWalk
+    .56s
+    ease-in-out
+    2;
+}
+
+
+@keyframes garden2MarieWalk{
+  0%,100%{
+    translate:0 0;
+    rotate:0deg;
+  }
+
+  50%{
+    translate:0 -3px;
+    rotate:-1deg;
+  }
+}
+
+
+/* Tuluz: pasitos más rápidos. */
+#catGarden
+.refugeOrangeCat.garden2-moving-tuluz{
+  animation:
+    garden2TuluzWalk
+    .34s
     ease-in-out
     3;
 }
 
 
-@keyframes tuluzWalkingBob{
-
-  0%,
-  100%{
-    margin-bottom:0;
+@keyframes garden2TuluzWalk{
+  0%,100%{
+    translate:0 0;
     rotate:0deg;
   }
 
   50%{
-    margin-bottom:4px;
+    translate:0 -4px;
     rotate:1.5deg;
   }
 }
 
 
-/*
-  Cuando Tuluz va hacia un juguete, el objeto se coloca
-  cerca de su zona actual.
-*/
+/* ---------------------------------------------------------
+   PROFUNDIDAD SEGÚN EL RINCÓN
+--------------------------------------------------------- */
+
 #catGarden
-#catGardenMewoProp.tuluz-wander-prop{
-  left:67% !important;
-  bottom:12% !important;
-
-  animation:
-    tuluzWanderToy
-    .58s
-    ease-in-out
-    infinite
-    alternate;
-}
-
-
-@keyframes tuluzWanderToy{
-
-  from{
-    transform:
-      translateY(0)
-      rotate(-3deg)
-      scale(.92);
-  }
-
-  to{
-    transform:
-      translateY(-3px)
-      rotate(4deg)
-      scale(1.02);
-  }
-}
-
-
-/*
-  Pequeños cambios de profundidad según el punto.
-  Sirven para que parezca que los gatos recorren
-  zonas ligeramente más cercanas o alejadas.
-*/
+.refugeFamilyCat[data-wander-spot="lookout"],
 #catGarden
 .refugeFamilyCat[data-wander-spot="tree"]{
-  scale:.92;
+  scale:.91;
 }
 
 
 #catGarden
-.refugeFamilyCat[data-wander-spot="center"]{
-  scale:1;
-}
-
-
-#catGarden
-.refugeFamilyCat[data-wander-spot="flowers"]{
-  scale:.96;
-}
-
-
-#catGarden
-.refugeFamilyCat[data-wander-spot="pillow"],
+.refugeFamilyCat[data-wander-spot="bed"],
 #catGarden
 .refugeFamilyCat[data-wander-spot="warm"]{
   scale:.94;
+}
+
+
+#catGarden
+.refugeFamilyCat[data-wander-spot="food"],
+#catGarden
+.refugeFamilyCat[data-wander-spot="toys"]{
+  scale:.98;
 }
 
 
@@ -1045,44 +1305,367 @@ body.intro-active
 }
 
 
-/*
-  No hay "hover-only": el comportamiento se percibe
-  completamente mediante movimiento automático.
-*/
-
-
 /* ---------------------------------------------------------
-   MÓVIL
+   JUGUETE DE TULUZ EN MOVIMIENTO NORMAL
 --------------------------------------------------------- */
 
-@media(max-width:600px){
+#catGarden
+#catGardenMewoProp.garden2-tuluz-prop{
+  left:66% !important;
+  bottom:12.5% !important;
 
-  #catGarden
-  .refugeFamilyCat{
-    transition:
-      left 1.2s cubic-bezier(.22,.70,.26,1),
-      bottom .95s cubic-bezier(.22,.70,.26,1),
-      opacity .35s,
-      visibility .35s,
-      transform .35s;
+  animation:
+    garden2ToyBounce
+    .52s
+    ease-in-out
+    infinite
+    alternate;
+}
+
+
+@keyframes garden2ToyBounce{
+  from{
+    transform:
+      translateY(0)
+      rotate(-3deg)
+      scale(.94);
+  }
+
+  to{
+    transform:
+      translateY(-3px)
+      rotate(4deg)
+      scale(1.03);
   }
 }
 
 
-/* ---------------------------------------------------------
+/* =========================================================
+   PEQUEÑAS ESCENAS ESPONTÁNEAS
+========================================================= */
+
+/* Tuluz persigue a Marie. */
+#catGarden.garden2-chase
+.refugeGrayCat{
+  left:38% !important;
+  bottom:16% !important;
+
+  animation:
+    garden2MarieChase
+    .58s
+    ease-in-out
+    infinite
+    alternate;
+}
+
+
+#catGarden.garden2-chase
+.refugeOrangeCat{
+  left:47% !important;
+  bottom:16% !important;
+
+  animation:
+    garden2TuluzChase
+    .42s
+    ease-in-out
+    infinite
+    alternate;
+}
+
+
+@keyframes garden2MarieChase{
+  from{
+    translate:-6px 0;
+  }
+
+  to{
+    translate:7px -2px;
+  }
+}
+
+
+@keyframes garden2TuluzChase{
+  from{
+    translate:-3px 0;
+  }
+
+  to{
+    translate:10px -4px;
+  }
+}
+
+
+/* Ambos se duermen cerca de la cama. */
+#catGarden.garden2-nap
+.refugeGrayCat{
+  left:12% !important;
+  bottom:9% !important;
+
+  scale:.91;
+}
+
+
+#catGarden.garden2-nap
+.refugeOrangeCat{
+  left:22% !important;
+  bottom:9.5% !important;
+
+  scale:.92;
+}
+
+
+#catGarden.garden2-nap
+#catGardenMewoSpot.show{
+  left:31% !important;
+  bottom:10% !important;
+}
+
+
+/* Saludan a Mewo. */
+#catGarden.garden2-greet
+.refugeGrayCat{
+  left:43% !important;
+  bottom:15% !important;
+}
+
+
+#catGarden.garden2-greet
+#catGardenMewoSpot.show{
+  left:51% !important;
+  bottom:15% !important;
+}
+
+
+#catGarden.garden2-greet
+.refugeOrangeCat{
+  left:59% !important;
+  bottom:15% !important;
+}
+
+
+/* Comedero compartido. */
+#catGarden.garden2-food
+.refugeGrayCat{
+  left:64% !important;
+  bottom:9.5% !important;
+}
+
+
+#catGarden.garden2-food
+.refugeOrangeCat{
+  left:74% !important;
+  bottom:9.5% !important;
+}
+
+
+/* Miran estrellas. */
+#catGarden.garden2-watch
+.refugeGrayCat{
+  left:42% !important;
+  bottom:22% !important;
+
+  scale:.91;
+}
+
+
+#catGarden.garden2-watch
+#catGardenMewoSpot.show{
+  left:51% !important;
+  bottom:22% !important;
+
+  width:min(6.9vw,70px);
+}
+
+
+#catGarden.garden2-watch
+.refugeOrangeCat{
+  left:61% !important;
+  bottom:22% !important;
+
+  scale:.91;
+}
+
+
+/* Se juntan si el clima se pone feo. */
+#catGarden.garden2-huddle
+.refugeGrayCat{
+  left:39% !important;
+  bottom:15% !important;
+}
+
+
+#catGarden.garden2-huddle
+#catGardenMewoSpot.show{
+  left:50% !important;
+  bottom:15% !important;
+}
+
+
+#catGarden.garden2-huddle
+.refugeOrangeCat{
+  left:61% !important;
+  bottom:15% !important;
+}
+
+
+/* =========================================================
+   MEWO — MOVIMIENTO AUTÓNOMO SIN CAMBIAR SU CUERPO
+========================================================= */
+
+#catGardenMewoSpot[data-garden2-spot="lookout"]{
+  width:min(6.9vw,70px);
+}
+
+
+#catGardenMewoSpot[data-garden2-spot="bed"],
+#catGardenMewoSpot[data-garden2-spot="warm"]{
+  width:min(7.1vw,72px);
+}
+
+
+/* =========================================================
+   COMPATIBILIDAD CON EVENTOS GRANDES
+========================================================= */
+
+body.refuge-arrival-event-open
+#refugeGarden2Environment{
+  opacity:.16;
+  pointer-events:none;
+}
+
+
+body.refuge-arrival-event-open
+#refugeGarden2FoodZone{
+  pointer-events:none;
+}
+
+
+/* =========================================================
+   MÓVIL
+========================================================= */
+
+@media(max-width:600px){
+
+  #refugeGarden2FoodZone{
+    right:13%;
+    bottom:8%;
+
+    width:min(13vw,55px);
+  }
+
+
+  #refugeGarden2WarmPatch{
+    left:13%;
+    bottom:7%;
+
+    width:29%;
+    height:18%;
+  }
+
+
+  #refugeGarden2Lookout{
+    left:47%;
+    top:20%;
+  }
+
+
+  #catGarden
+  .refugeFamilyCat{
+    transition:
+      left 1.02s cubic-bezier(.22,.72,.25,1),
+      bottom .88s cubic-bezier(.22,.72,.25,1),
+      opacity .35s,
+      visibility .35s,
+      transform .35s,
+      scale .35s;
+  }
+
+
+  #catGarden.garden2-nap
+  .refugeGrayCat{
+    left:8% !important;
+    bottom:11% !important;
+  }
+
+
+  #catGarden.garden2-nap
+  .refugeOrangeCat{
+    left:23% !important;
+    bottom:11% !important;
+  }
+
+
+  #catGarden.garden2-nap
+  #catGardenMewoSpot.show{
+    left:38% !important;
+    bottom:11% !important;
+  }
+
+
+  #catGarden.garden2-greet
+  .refugeGrayCat{
+    left:32% !important;
+  }
+
+
+  #catGarden.garden2-greet
+  #catGardenMewoSpot.show{
+    left:51% !important;
+  }
+
+
+  #catGarden.garden2-greet
+  .refugeOrangeCat{
+    left:69% !important;
+  }
+
+
+  #catGarden.garden2-food
+  .refugeGrayCat{
+    left:60% !important;
+    bottom:12% !important;
+  }
+
+
+  #catGarden.garden2-food
+  .refugeOrangeCat{
+    left:75% !important;
+    bottom:12% !important;
+  }
+
+
+  #catGarden.garden2-watch
+  .refugeGrayCat{
+    left:33% !important;
+  }
+
+
+  #catGarden.garden2-watch
+  #catGardenMewoSpot.show{
+    left:51% !important;
+  }
+
+
+  #catGarden.garden2-watch
+  .refugeOrangeCat{
+    left:69% !important;
+  }
+}
+
+
+/* =========================================================
    REDUCIR MOVIMIENTO
---------------------------------------------------------- */
+========================================================= */
 
 @media(prefers-reduced-motion:reduce){
 
+  #refugeGarden2Environment *,
   #catGarden
-  .refugeGrayCat.family-walking-marie,
-
+  .refugeGrayCat.garden2-moving-marie,
   #catGarden
-  .refugeOrangeCat.family-walking-tuluz,
-
+  .refugeOrangeCat.garden2-moving-tuluz,
   #catGarden
-  #catGardenMewoProp.tuluz-wander-prop{
+  #catGardenMewoProp.garden2-tuluz-prop{
     animation:none !important;
   }
 

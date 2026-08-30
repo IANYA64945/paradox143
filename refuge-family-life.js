@@ -1780,52 +1780,248 @@
 
 
   /* =====================================================
-     MOVIMIENTO CONSTANTE DE MARIE Y TULUZ
+     JARDÍN DE GATOS 2.0
+     VIDA AUTÓNOMA + ZONAS + INTERACCIONES ESPONTÁNEAS
 
      Marie:
-     - movimiento suave y tranquilo
-     - suele buscar almohada, Mewo, árbol y zonas cálidas
-     - pausas un poco más largas
+     - calmada
+     - busca lugares cálidos, cama, flores y compañía
+     - se mueve de forma constante pero suave
 
      Tuluz:
-     - movimiento más frecuente
-     - busca juguetes, rascador y distintos rincones
-     - cambia de dirección con más energía
+     - inquieto
+     - busca juguetes, rascador, árbol y comida
+     - se mueve más rápido y cambia de sitio con frecuencia
 
-     Durante escenas especiales, taller o eventos grandes
-     este motor se pausa automáticamente.
+     Mewo:
+     - conserva su lógica principal
+     - cuando está libre también puede cambiar de rincón
+     - nunca se cambia su sprite/cuerpo
   ===================================================== */
 
   let marieWalkTimer=0;
   let tuluzWalkTimer=0;
+  let mewoWalkTimer=0;
+  let socialTimer=0;
+  let microSceneTimer=0;
 
   let marieLastSpot='';
   let tuluzLastSpot='';
+  let mewoLastSpot='';
+
+  let microSceneRunning=false;
 
 
-  const MARIE_SPOTS=[
-    {id:'pillow',   left:17, bottom:10, mood:'sleep'},
-    {id:'mewo',     left:43, bottom:16, mood:'cuddle'},
-    {id:'tree',     left:39, bottom:21, mood:'idle'},
-    {id:'flowers',  left:26, bottom:13, mood:'happy'},
-    {id:'center',   left:46, bottom:14, mood:'idle'},
-    {id:'left',     left:22, bottom:18, mood:'idle'},
-    {id:'warm',     left:31, bottom:11, mood:'sleep'},
-    {id:'siblings', left:50, bottom:15, mood:'love'}
+  const GARDEN2_ZONES={
+
+    bed:{
+      left:15,
+      bottom:10
+    },
+
+    food:{
+      left:72,
+      bottom:9
+    },
+
+    flowers:{
+      left:24,
+      bottom:15
+    },
+
+    tree:{
+      left:39,
+      bottom:22
+    },
+
+    center:{
+      left:49,
+      bottom:15
+    },
+
+    warm:{
+      left:30,
+      bottom:11
+    },
+
+    lookout:{
+      left:51,
+      bottom:23
+    },
+
+    scratcher:{
+      left:79,
+      bottom:14
+    },
+
+    toys:{
+      left:62,
+      bottom:14
+    },
+
+    right:{
+      left:71,
+      bottom:18
+    },
+
+    left:{
+      left:24,
+      bottom:20
+    },
+
+    mewo:{
+      left:48,
+      bottom:16
+    },
+
+    marie:{
+      left:45,
+      bottom:15
+    },
+
+    tuluz:{
+      left:56,
+      bottom:15
+    }
+  };
+
+
+  /*
+    Los pesos hacen que cada gato tenga personalidad.
+    Un punto repetido varias veces tiene más probabilidad.
+  */
+  const MARIE_ROUTE=[
+    'bed',
+    'bed',
+    'warm',
+    'warm',
+    'flowers',
+    'flowers',
+    'tree',
+    'center',
+    'left',
+    'lookout',
+    'mewo',
+    'tuluz'
   ];
 
 
-  const TULUZ_SPOTS=[
-    {id:'ball',      left:62, bottom:14, mood:'happy'},
-    {id:'yarn',      left:70, bottom:18, mood:'happy'},
-    {id:'fish',      left:58, bottom:10, mood:'happy'},
-    {id:'scratcher', left:79, bottom:14, mood:'happy'},
-    {id:'center',    left:53, bottom:17, mood:'idle'},
-    {id:'tree',      left:63, bottom:22, mood:'confused'},
-    {id:'right',     left:73, bottom:11, mood:'idle'},
-    {id:'marie',     left:48, bottom:15, mood:'love'},
-    {id:'mewo',      left:57, bottom:16, mood:'happy'}
+  const TULUZ_ROUTE=[
+    'toys',
+    'toys',
+    'toys',
+    'scratcher',
+    'food',
+    'food',
+    'tree',
+    'center',
+    'right',
+    'lookout',
+    'marie',
+    'mewo'
   ];
+
+
+  const MEWO_ROUTE=[
+    'center',
+    'bed',
+    'lookout',
+    'warm',
+    'left',
+    'mewo'
+  ];
+
+
+  function ensureGarden2Environment(){
+
+    if(!garden){
+      return false;
+    }
+
+
+    if(
+      !document.getElementById(
+        'refugeGarden2Environment'
+      )
+    ){
+
+      const env=
+        document.createElement(
+          'div'
+        );
+
+      env.id=
+        'refugeGarden2Environment';
+
+      env.setAttribute(
+        'aria-hidden',
+        'true'
+      );
+
+      env.innerHTML=`
+        <div
+          id="refugeGarden2WarmPatch"
+          class="garden2AmbientZone warm"
+        ></div>
+
+        <div
+          id="refugeGarden2Lookout"
+          class="garden2AmbientZone lookout"
+        >
+          <span>✦</span>
+        </div>
+
+        <button
+          id="refugeGarden2FoodZone"
+          class="garden2FoodZone"
+          type="button"
+          aria-label="Comedero de los gatos"
+        >
+          <img
+            src="food_bowl.png"
+            alt=""
+          >
+          <span></span>
+        </button>
+
+        <div
+          id="refugeGarden2Footprints"
+          aria-hidden="true"
+        ></div>
+      `;
+
+
+      garden.appendChild(
+        env
+      );
+
+
+      const food=
+        env.querySelector(
+          '#refugeGarden2FoodZone'
+        );
+
+
+      food.addEventListener(
+        'click',
+        ()=>{
+          if(
+            !wanderingAllowed() ||
+            microSceneRunning
+          ){
+            return;
+          }
+
+          startFoodMoment(
+            true
+          );
+        }
+      );
+    }
+
+
+    return true;
+  }
 
 
   function wanderingAllowed(){
@@ -1834,72 +2030,510 @@
       isGardenOpen() &&
       bothNewCatsHere() &&
       !sceneRunning &&
+      !microSceneRunning &&
       !arrivalEventRunning() &&
       !workshopOpen()
     );
   }
 
 
-  function chooseDifferentSpot(
-    spots,
-    previous
+  function catBusy(
+    element
   ){
 
-    let choices=
-      spots.filter(
-        spot=>
-          spot.id!==previous
-      );
-
-
-    if(!choices.length){
-      choices=spots;
+    if(!element){
+      return true;
     }
 
 
-    return choices[
+    return Boolean(
+      element.classList.contains(
+        'using-pillow'
+      ) ||
+      element.classList.contains(
+        'using-scratcher'
+      ) ||
+      element.classList.contains(
+        'using-toy'
+      ) ||
+      element.classList.contains(
+        'weather-shelter'
+      ) ||
+      element.classList.contains(
+        'weather-watch'
+      )
+    );
+  }
+
+
+  function chooseRouteSpot(
+    route,
+    previous,
+    blocked=[]
+  ){
+
+    let candidates=
+      route.filter(
+        id=>
+          id!==previous &&
+          !blocked.includes(id)
+      );
+
+
+    if(!candidates.length){
+      candidates=
+        route.filter(
+          id=>
+            !blocked.includes(id)
+        );
+    }
+
+
+    if(!candidates.length){
+      candidates=route.slice();
+    }
+
+
+    return candidates[
       Math.floor(
         Math.random()*
-        choices.length
+        candidates.length
       )
     ];
   }
 
 
-  function applyCatPosition(
+  function occupiedZones(){
+
+    const result=[];
+
+
+    if(marieLastSpot){
+      result.push(
+        marieLastSpot
+      );
+    }
+
+
+    if(tuluzLastSpot){
+      result.push(
+        tuluzLastSpot
+      );
+    }
+
+
+    return result;
+  }
+
+
+  function zone(
+    id
+  ){
+
+    return (
+      GARDEN2_ZONES[id] ||
+      GARDEN2_ZONES.center
+    );
+  }
+
+
+  function moveCat(
     element,
-    spot,
-    catName
+    spotId,
+    who
+  ){
+
+    if(!element){
+      return;
+    }
+
+
+    const target=
+      zone(
+        spotId
+      );
+
+
+    element.dataset.wanderSpot=
+      spotId;
+
+
+    element.style.left=
+      `${target.left}%`;
+
+    element.style.bottom=
+      `${target.bottom}%`;
+
+
+    element.classList.remove(
+      'garden2-moving-marie',
+      'garden2-moving-tuluz'
+    );
+
+
+    void element.offsetWidth;
+
+
+    element.classList.add(
+      who==='marie'
+        ? 'garden2-moving-marie'
+        : 'garden2-moving-tuluz'
+    );
+
+
+    drawFootprint(
+      target.left,
+      target.bottom,
+      who
+    );
+  }
+
+
+  function drawFootprint(
+    left,
+    bottom,
+    who
+  ){
+
+    const layer=
+      document.getElementById(
+        'refugeGarden2Footprints'
+      );
+
+
+    if(!layer){
+      return;
+    }
+
+
+    const paw=
+      document.createElement(
+        'span'
+      );
+
+    paw.className=
+      `garden2Footprint ${who}`;
+
+    paw.textContent=
+      '·';
+
+
+    paw.style.left=
+      `${left}%`;
+
+    paw.style.bottom=
+      `${bottom}%`;
+
+
+    layer.appendChild(
+      paw
+    );
+
+
+    setTimeout(
+      ()=>paw.remove(),
+      1800
+    );
+  }
+
+
+  function marieArrivedAt(
+    id
+  ){
+
+    if(id==='bed'){
+
+      setMarieMood(
+        'sleep',
+        6000
+      );
+      return;
+    }
+
+
+    if(id==='warm'){
+
+      setMarieMood(
+        'sleep',
+        4700
+      );
+      return;
+    }
+
+
+    if(id==='mewo'){
+
+      setMarieMood(
+        'cuddle',
+        5200
+      );
+
+      if(allThreeHere()){
+        mewoMood(
+          'love'
+        );
+      }
+
+      return;
+    }
+
+
+    if(id==='tuluz'){
+
+      setMarieMood(
+        'love',
+        4400
+      );
+
+      if(
+        Math.random()<.45
+      ){
+
+        burst(
+          grayBtn,
+          ['♡','·']
+        );
+      }
+
+      return;
+    }
+
+
+    if(id==='flowers'){
+
+      setMarieMood(
+        'happy',
+        4200
+      );
+
+      return;
+    }
+
+
+    if(id==='lookout'){
+
+      setMarieMood(
+        window.MAGIC_AMBIENT_ACTIVE==='stars'
+          ? 'happy'
+          : 'idle',
+        4200
+      );
+
+      return;
+    }
+
+
+    setMarieMood(
+      Math.random()<.25
+        ? 'happy'
+        : 'idle',
+      3600
+    );
+  }
+
+
+  function tuluzArrivedAt(
+    id
   ){
 
     if(
-      !element ||
-      !spot
+      id==='toys'
+    ){
+
+      setTuluzMood(
+        'happy',
+        3900
+      );
+
+      showTuluzToy();
+      return;
+    }
+
+
+    if(
+      id==='scratcher'
+    ){
+
+      setTuluzMood(
+        'happy',
+        4300
+      );
+
+      const toy=
+        document.getElementById(
+          'catGardenScratcherToy'
+        );
+
+      toy?.classList.add(
+        'show'
+      );
+
+
+      setTimeout(
+        ()=>{
+          toy?.classList.remove(
+            'show'
+          );
+        },
+        3200
+      );
+
+      return;
+    }
+
+
+    if(id==='food'){
+
+      setTuluzMood(
+        'happy',
+        3800
+      );
+
+      pulseFoodBowl();
+      return;
+    }
+
+
+    if(id==='marie'){
+
+      setTuluzMood(
+        Math.random()<.52
+          ? 'love'
+          : 'happy',
+        3900
+      );
+
+      return;
+    }
+
+
+    if(id==='mewo'){
+
+      setTuluzMood(
+        'happy',
+        3600
+      );
+
+      if(
+        Math.random()<.35
+      ){
+
+        burst(
+          orangeBtn,
+          ['✦','♡']
+        );
+      }
+
+      return;
+    }
+
+
+    if(id==='tree'){
+
+      setTuluzMood(
+        'confused',
+        3000
+      );
+
+      return;
+    }
+
+
+    setTuluzMood(
+      Math.random()<.48
+        ? 'happy'
+        : 'idle',
+      3200
+    );
+  }
+
+
+  function showTuluzToy(){
+
+    const prop=
+      document.getElementById(
+        'catGardenMewoProp'
+      );
+
+    const img=
+      document.getElementById(
+        'catGardenMewoPropImg'
+      );
+
+
+    if(
+      !prop ||
+      !img
     ){
       return;
     }
 
 
-    element.style.left=
-      `${spot.left}%`;
+    const toys=[
+      'toy_ball.png',
+      'toy_fish.png',
+      'toy_yarn.png'
+    ];
 
-    element.style.bottom=
-      `${spot.bottom}%`;
 
-    element.dataset.wanderSpot=
-      spot.id;
+    img.src=
+      toys[
+        Math.floor(
+          Math.random()*
+          toys.length
+        )
+      ];
 
-    element.classList.remove(
-      'family-walking-marie',
-      'family-walking-tuluz'
+
+    prop.classList.add(
+      'show',
+      'garden2-tuluz-prop'
     );
 
-    void element.offsetWidth;
 
-    element.classList.add(
-      catName==='marie'
-        ? 'family-walking-marie'
-        : 'family-walking-tuluz'
+    setTimeout(
+      ()=>{
+        prop.classList.remove(
+          'show',
+          'garden2-tuluz-prop'
+        );
+      },
+      2900
+    );
+  }
+
+
+  function pulseFoodBowl(){
+
+    const food=
+      document.getElementById(
+        'refugeGarden2FoodZone'
+      );
+
+
+    if(!food){
+      return;
+    }
+
+
+    food.classList.remove(
+      'used'
+    );
+
+    void food.offsetWidth;
+
+    food.classList.add(
+      'used'
+    );
+
+
+    setTimeout(
+      ()=>{
+        food.classList.remove(
+          'used'
+        );
+      },
+      2200
     );
   }
 
@@ -1911,102 +2545,95 @@
     );
 
 
-    if(
-      !wanderingAllowed()
-    ){
+    if(!wanderingAllowed()){
 
       marieWalkTimer=
         setTimeout(
           wanderMarie,
-          1800
+          1200
         );
 
       return;
     }
 
 
-    const spot=
-      chooseDifferentSpot(
-        MARIE_SPOTS,
-        marieLastSpot
+    let blocked=
+      [];
+
+
+    /*
+      Marie puede compartir sitio con los otros sólo
+      si se dirige específicamente a ellos.
+    */
+    const occupied=
+      occupiedZones();
+
+
+    blocked=
+      occupied.filter(
+        id=>
+          ![
+            'mewo',
+            'tuluz'
+          ].includes(id)
+      );
+
+
+    const next=
+      chooseRouteSpot(
+        MARIE_ROUTE,
+        marieLastSpot,
+        blocked
       );
 
 
     marieLastSpot=
-      spot.id;
+      next;
 
 
-    applyCatPosition(
+    moveCat(
       grayBtn,
-      spot,
+      next,
       'marie'
     );
 
 
     /*
-      Marie no está "congelada": cambia de emoción suave
-      al llegar a distintos sitios.
+      La emoción aparece al aproximarse al destino,
+      no inmediatamente al iniciar el paseo.
     */
-    if(spot.mood==='sleep'){
+    setTimeout(
+      ()=>{
 
-      setMarieMood(
-        'sleep',
-        5200
-      );
-    }
+        if(
+          isGardenOpen() &&
+          !sceneRunning &&
+          !microSceneRunning
+        ){
 
-    else if(spot.mood==='cuddle'){
+          marieArrivedAt(
+            next
+          );
+        }
 
-      setMarieMood(
-        'cuddle',
-        4800
-      );
-
-      if(allThreeHere()){
-        mewoMood('love');
-      }
-    }
-
-    else if(spot.mood==='love'){
-
-      setMarieMood(
-        'love',
-        4500
-      );
-    }
-
-    else if(spot.mood==='happy'){
-
-      setMarieMood(
-        'happy',
-        3800
-      );
-    }
-
-    else{
-
-      setMarieMood(
-        Math.random()<.22
-          ? 'happy'
-          : 'idle',
-        3400
-      );
-    }
+      },
+      1150
+    );
 
 
     /*
-      Marie camina constantemente, pero de forma calmada:
-      aproximadamente cada 5.5–9 segundos.
+      Marie está viva continuamente, pero mantiene
+      un ritmo tranquilo.
     */
-    const next=
-      5500+
-      Math.random()*3500;
+    const delay=
+      4400+
+      Math.random()*2800;
 
 
     marieWalkTimer=
       setTimeout(
         wanderMarie,
-        next
+        delay
       );
   }
 
@@ -2018,14 +2645,12 @@
     );
 
 
-    if(
-      !wanderingAllowed()
-    ){
+    if(!wanderingAllowed()){
 
       tuluzWalkTimer=
         setTimeout(
           wanderTuluz,
-          1200
+          900
         );
 
       return;
@@ -2036,13 +2661,12 @@
       gardenState();
 
 
-    let spots=
-      TULUZ_SPOTS.slice();
+    let route=
+      TULUZ_ROUTE.slice();
 
 
     /*
-      Si el rascador aún no está terminado,
-      Tuluz no intenta usar ese punto.
+      No intenta usar el rascador si aún no está completo.
     */
     if(
       Number(
@@ -2050,155 +2674,639 @@
       )<4
     ){
 
-      spots=
-        spots.filter(
-          spot=>
-            spot.id!=='scratcher'
+      route=
+        route.filter(
+          id=>
+            id!=='scratcher'
         );
     }
 
 
-    const spot=
-      chooseDifferentSpot(
-        spots,
-        tuluzLastSpot
+    const blocked=
+      occupiedZones()
+        .filter(
+          id=>
+            ![
+              'marie',
+              'mewo'
+            ].includes(id)
+        );
+
+
+    const next=
+      chooseRouteSpot(
+        route,
+        tuluzLastSpot,
+        blocked
       );
 
 
     tuluzLastSpot=
-      spot.id;
+      next;
 
 
-    applyCatPosition(
+    moveCat(
       orangeBtn,
-      spot,
+      next,
       'tuluz'
     );
 
 
-    if(
-      ['ball','yarn','fish','scratcher']
-        .includes(
-          spot.id
-        )
-    ){
+    setTimeout(
+      ()=>{
 
-      setTuluzMood(
-        'happy',
-        3500
-      );
+        if(
+          isGardenOpen() &&
+          !sceneRunning &&
+          !microSceneRunning
+        ){
 
-
-      /*
-        Si va hacia un juguete, mostramos uno brevemente.
-      */
-      const prop=
-        document.getElementById(
-          'catGardenMewoProp'
-        );
-
-      const propImg=
-        document.getElementById(
-          'catGardenMewoPropImg'
-        );
-
-
-      if(
-        prop &&
-        propImg &&
-        spot.id!=='scratcher'
-      ){
-
-        const asset={
-          ball:'toy_ball.png',
-          yarn:'toy_yarn.png',
-          fish:'toy_fish.png'
-        }[spot.id];
-
-
-        if(asset){
-
-          propImg.src=asset;
-
-          prop.classList.add(
-            'show',
-            'family-prop',
-            'tuluz-wander-prop'
-          );
-
-
-          setTimeout(
-            ()=>{
-              prop.classList.remove(
-                'show',
-                'family-prop',
-                'tuluz-wander-prop'
-              );
-            },
-            2800
+          tuluzArrivedAt(
+            next
           );
         }
-      }
-    }
 
-    else if(spot.id==='marie'){
-
-      setTuluzMood(
-        Math.random()<.5
-          ? 'love'
-          : 'happy',
-        3600
-      );
-
-
-      if(
-        Math.random()<.35
-      ){
-
-        burst(
-          orangeBtn,
-          ['♡','✦']
-        );
-      }
-    }
-
-    else if(spot.id==='tree'){
-
-      setTuluzMood(
-        'confused',
-        3000
-      );
-    }
-
-    else{
-
-      setTuluzMood(
-        Math.random()<.45
-          ? 'happy'
-          : 'idle',
-        3000
-      );
-    }
+      },
+      850
+    );
 
 
     /*
-      Tuluz es inquieto:
-      aproximadamente cada 3.2–5.6 segundos.
+      Tuluz casi nunca permanece mucho rato quieto.
     */
-    const next=
-      3200+
-      Math.random()*2400;
+    const delay=
+      2500+
+      Math.random()*1900;
 
 
     tuluzWalkTimer=
       setTimeout(
         wanderTuluz,
-        next
+        delay
       );
   }
 
 
+  /* =====================================================
+     MEWO TAMBIÉN CAMBIA DE RINCÓN CUANDO ESTÁ LIBRE
+  ===================================================== */
+
+  function mewoAvailableToWander(){
+
+    return Boolean(
+      wanderingAllowed() &&
+      allThreeHere() &&
+      mewoSpot &&
+      mewoSpot.classList.contains(
+        'show'
+      ) &&
+      !catBusy(
+        mewoSpot
+      )
+    );
+  }
+
+
+  function clearMewoWanderPosition(){
+
+    if(!mewoSpot){
+      return;
+    }
+
+
+    mewoSpot.style.left='';
+    mewoSpot.style.bottom='';
+    mewoSpot.dataset.garden2Spot='';
+  }
+
+
+  function wanderMewo(){
+
+    clearTimeout(
+      mewoWalkTimer
+    );
+
+
+    if(
+      !mewoAvailableToWander()
+    ){
+
+      clearMewoWanderPosition();
+
+
+      mewoWalkTimer=
+        setTimeout(
+          wanderMewo,
+          2500
+        );
+
+      return;
+    }
+
+
+    let next=
+      chooseRouteSpot(
+        MEWO_ROUTE,
+        mewoLastSpot,
+        []
+      );
+
+
+    /*
+      "mewo" significa su posición original.
+    */
+    if(next==='mewo'){
+
+      clearMewoWanderPosition();
+    }
+
+    else{
+
+      const target=
+        zone(
+          next
+        );
+
+
+      mewoSpot.style.left=
+        `${target.left}%`;
+
+      mewoSpot.style.bottom=
+        `${target.bottom}%`;
+
+      mewoSpot.dataset.garden2Spot=
+        next;
+    }
+
+
+    mewoLastSpot=
+      next;
+
+
+    if(next==='bed'){
+      mewoMood(
+        'sleep'
+      );
+    }
+
+    else if(next==='lookout'){
+      mewoMood(
+        'happy'
+      );
+    }
+
+    else if(next==='warm'){
+      mewoMood(
+        'love'
+      );
+    }
+
+    else{
+      mewoMood(
+        'happy'
+      );
+    }
+
+
+    mewoWalkTimer=
+      setTimeout(
+        wanderMewo,
+        12500+
+        Math.random()*9000
+      );
+  }
+
+
+  /* =====================================================
+     PEQUEÑAS ESCENAS ESPONTÁNEAS
+     No desbloquean cartas ni cuentan como escenas de historia.
+  ===================================================== */
+
+  function beginMicroScene(
+    name,
+    duration=7000
+  ){
+
+    if(
+      !wanderingAllowed() ||
+      microSceneRunning
+    ){
+      return false;
+    }
+
+
+    microSceneRunning=true;
+
+
+    clearTimeout(
+      microSceneTimer
+    );
+
+
+    garden.classList.add(
+      `garden2-${name}`
+    );
+
+
+    microSceneTimer=
+      setTimeout(
+        ()=>{
+          endMicroScene(
+            name
+          );
+        },
+        duration
+      );
+
+
+    return true;
+  }
+
+
+  function endMicroScene(
+    name
+  ){
+
+    clearTimeout(
+      microSceneTimer
+    );
+
+
+    if(name){
+      garden.classList.remove(
+        `garden2-${name}`
+      );
+    }
+
+
+    [
+      'garden2-chase',
+      'garden2-nap',
+      'garden2-greet',
+      'garden2-food',
+      'garden2-watch',
+      'garden2-huddle'
+    ].forEach(
+      cls=>
+        garden.classList.remove(
+          cls
+        )
+    );
+
+
+    microSceneRunning=false;
+
+
+    startConstantWandering();
+  }
+
+
+  function startChaseMoment(){
+
+    if(
+      !beginMicroScene(
+        'chase',
+        6500
+      )
+    ){
+      return;
+    }
+
+
+    setTuluzMood(
+      'happy',
+      6200
+    );
+
+    setMarieMood(
+      'confused',
+      3500
+    );
+
+
+    burst(
+      orangeBtn,
+      ['!','✦']
+    );
+
+
+    if(
+      Math.random()<.42
+    ){
+
+      showSceneNote(
+        'Tuluz salió corriendo detrás de Marie >w<',
+        2600
+      );
+    }
+
+
+    setTimeout(
+      ()=>{
+
+        if(microSceneRunning){
+
+          setMarieMood(
+            'happy',
+            2600
+          );
+        }
+
+      },
+      3200
+    );
+  }
+
+
+  function startNapMoment(){
+
+    if(
+      !beginMicroScene(
+        'nap',
+        8500
+      )
+    ){
+      return;
+    }
+
+
+    setMarieMood(
+      'sleep',
+      8200
+    );
+
+    setTuluzMood(
+      'sleep',
+      8200
+    );
+
+
+    if(allThreeHere()){
+      mewoMood(
+        'sleep'
+      );
+    }
+  }
+
+
+  function startGreetingMoment(){
+
+    if(
+      !allThreeHere() ||
+      !beginMicroScene(
+        'greet',
+        7200
+      )
+    ){
+      return;
+    }
+
+
+    setMarieMood(
+      'love',
+      6900
+    );
+
+    setTuluzMood(
+      'happy',
+      6900
+    );
+
+    mewoMood(
+      'love'
+    );
+
+
+    burst(
+      grayBtn,
+      ['♡','·']
+    );
+
+    burst(
+      orangeBtn,
+      ['✦','♡']
+    );
+  }
+
+
+  function startFoodMoment(
+    manual=false
+  ){
+
+    if(
+      !beginMicroScene(
+        'food',
+        7200
+      )
+    ){
+      return;
+    }
+
+
+    pulseFoodBowl();
+
+
+    setMarieMood(
+      'happy',
+      6900
+    );
+
+    setTuluzMood(
+      'happy',
+      6900
+    );
+
+
+    if(
+      manual
+    ){
+
+      showSceneNote(
+        '◇ Marie y Tuluz fueron a mirar el comedero',
+        2500
+      );
+    }
+  }
+
+
+  function startWatchMoment(){
+
+    if(
+      window.MAGIC_AMBIENT_ACTIVE!=='stars' ||
+      !beginMicroScene(
+        'watch',
+        8500
+      )
+    ){
+      return;
+    }
+
+
+    setMarieMood(
+      'happy',
+      8200
+    );
+
+    setTuluzMood(
+      'happy',
+      8200
+    );
+
+
+    if(allThreeHere()){
+      mewoMood(
+        'happy'
+      );
+    }
+
+
+    showSceneNote(
+      '✦ por un ratito los tres miraron el cielo',
+      2800
+    );
+  }
+
+
+  function startHuddleMoment(){
+
+    if(
+      ![
+        'storm',
+        'snow',
+        'rain'
+      ].includes(
+        window.MAGIC_AMBIENT_ACTIVE
+      ) ||
+      !beginMicroScene(
+        'huddle',
+        8000
+      )
+    ){
+      return;
+    }
+
+
+    setMarieMood(
+      window.MAGIC_AMBIENT_ACTIVE==='snow'
+        ? 'sleep'
+        : 'love',
+      7700
+    );
+
+    setTuluzMood(
+      window.MAGIC_AMBIENT_ACTIVE==='storm'
+        ? 'confused'
+        : 'sleep',
+      7700
+    );
+
+
+    if(allThreeHere()){
+      mewoMood(
+        'love'
+      );
+    }
+  }
+
+
+  function chooseSocialMoment(){
+
+    if(
+      !wanderingAllowed()
+    ){
+      scheduleSocialMoment();
+      return;
+    }
+
+
+    const weather=
+      window.MAGIC_AMBIENT_ACTIVE;
+
+
+    if(
+      weather==='stars' &&
+      Math.random()<.55
+    ){
+
+      startWatchMoment();
+      scheduleSocialMoment();
+      return;
+    }
+
+
+    if(
+      [
+        'storm',
+        'snow',
+        'rain'
+      ].includes(weather) &&
+      Math.random()<.68
+    ){
+
+      startHuddleMoment();
+      scheduleSocialMoment();
+      return;
+    }
+
+
+    const gs=
+      gardenState();
+
+
+    const options=[
+      startChaseMoment,
+      startGreetingMoment,
+      startFoodMoment
+    ];
+
+
+    if(gs.activePillow){
+      options.push(
+        startNapMoment
+      );
+    }
+
+
+    const action=
+      options[
+        Math.floor(
+          Math.random()*
+          options.length
+        )
+      ];
+
+
+    action?.();
+
+
+    scheduleSocialMoment();
+  }
+
+
+  function scheduleSocialMoment(){
+
+    clearTimeout(
+      socialTimer
+    );
+
+
+    socialTimer=
+      setTimeout(
+        chooseSocialMoment,
+        16000+
+        Math.random()*12000
+      );
+  }
+
+
+  /* =====================================================
+     ARRANQUE / PAUSA DEL JARDÍN VIVO
+  ===================================================== */
+
   function startConstantWandering(){
+
+    ensureGarden2Environment();
+
 
     clearTimeout(
       marieWalkTimer
@@ -2208,22 +3316,39 @@
       tuluzWalkTimer
     );
 
+    clearTimeout(
+      mewoWalkTimer
+    );
+
 
     /*
-      Pequeño desfase para que no se muevan al mismo tiempo.
+      Se desincronizan para que el jardín no parezca mecánico.
     */
     marieWalkTimer=
       setTimeout(
         wanderMarie,
-        1200
+        700+
+        Math.random()*700
       );
 
 
     tuluzWalkTimer=
       setTimeout(
         wanderTuluz,
-        2300
+        1300+
+        Math.random()*650
       );
+
+
+    mewoWalkTimer=
+      setTimeout(
+        wanderMewo,
+        6000+
+        Math.random()*4000
+      );
+
+
+    scheduleSocialMoment();
   }
 
 
@@ -2237,20 +3362,53 @@
       tuluzWalkTimer
     );
 
+    clearTimeout(
+      mewoWalkTimer
+    );
+
+    clearTimeout(
+      socialTimer
+    );
+
+    clearTimeout(
+      microSceneTimer
+    );
+
+
+    microSceneRunning=false;
+
 
     grayBtn?.classList.remove(
-      'family-walking-marie'
+      'garden2-moving-marie'
     );
 
     orangeBtn?.classList.remove(
-      'family-walking-tuluz'
+      'garden2-moving-tuluz'
+    );
+
+
+    clearMewoWanderPosition();
+
+
+    [
+      'garden2-chase',
+      'garden2-nap',
+      'garden2-greet',
+      'garden2-food',
+      'garden2-watch',
+      'garden2-huddle'
+    ].forEach(
+      cls=>
+        garden?.classList.remove(
+          cls
+        )
     );
   }
 
 
   /*
-    Cuando termina una escena especial, reanudamos
-    el paseo en pocos segundos.
+    Cuando termina una escena narrativa de convivencia,
+    el jardín vuelve a respirar solo.
   */
   const originalEndScene=
     endScene;
@@ -2270,7 +3428,6 @@
         );
       }
     };
-
 
   /* =====================================================
      CICLO DE VIDA DEL JARDÍN
