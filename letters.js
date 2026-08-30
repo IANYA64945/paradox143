@@ -142,6 +142,22 @@
       title: 'Hogar ♡',
       mark: '⌂',
       text: 'primero fue solo un claro entre los arboles.. luego llego una almohada, algunos juguetes, mewo y un monton de pequeños recuerdos. supongo que asi empiezan los hogares.'
+    },
+
+    /* =====================================================
+       NUEVOS GATITOS DEL REFUGIO
+    ===================================================== */
+
+    'garden-gray-arrival': {
+      title: '¿Me extrañaste?',
+      mark: '♡',
+      text: 'me extrañaste?.. volvi a este pequeño refugio porque yo tambien queria estar cerquita de ti.. hay cariños que siempre encuentran el camino de regreso ♡'
+    },
+
+    'garden-orange-arrival': {
+      title: 'Y trajo compañía ♡',
+      mark: '♡',
+      text: 'y no llego sola.. con ella tambien vino un pequeño solecito naranja. quizas no compartan sangre, pero el cariño tambien sabe formar familia ♡'
     }
   };
 
@@ -399,7 +415,9 @@
       'garden-snow',
       'garden-stars',
       'garden-night',
-      'garden-home'
+      'garden-home',
+      'garden-gray-arrival',
+      'garden-orange-arrival'
     ];
     const html = order
       .filter(id => collected.has(id))

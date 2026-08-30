@@ -2330,3 +2330,1131 @@
   evaluate();
 
 })();
+
+
+/* =========================================================
+   PARADOX143 — FAMILIA DEL REFUGIO 1.0
+
+   Dos nuevos gatos:
+   - gatita gris y blanca
+   - gatito naranja
+
+   REGLA:
+   Estos dos gatos viven EXCLUSIVAMENTE en el Claro.
+   Nunca aparecen en el campo de tulipanes.
+
+   La llegada de cada uno desbloquea una cartita.
+========================================================= */
+
+(() => {
+  'use strict';
+
+  const KEY=
+    'paradox143_refuge_family_v1';
+
+
+  const DEFAULT={
+    installedAt:0,
+
+    grayArrived:false,
+    orangeArrived:false,
+
+    grayArrivedAt:0,
+    orangeArrivedAt:0,
+
+    grayMood:'idle',
+    orangeMood:'idle',
+
+    grayTouches:0,
+    orangeTouches:0,
+
+    openCount:0,
+    grayOpenCount:0
+  };
+
+
+  function load(){
+
+    try{
+
+      const raw=
+        localStorage.getItem(
+          KEY
+        );
+
+      const value=
+        raw
+        ? JSON.parse(raw)
+        : {};
+
+
+      const next={
+        ...DEFAULT,
+        ...(
+          value &&
+          typeof value==='object'
+          ? value
+          : {}
+        )
+      };
+
+
+      if(!next.installedAt){
+
+        next.installedAt=
+          Date.now();
+
+        localStorage.setItem(
+          KEY,
+          JSON.stringify(next)
+        );
+      }
+
+
+      return next;
+
+    }
+
+    catch(_){
+
+      return {
+        ...DEFAULT,
+        installedAt:Date.now()
+      };
+    }
+  }
+
+
+  function save(
+    patch={}
+  ){
+
+    const next={
+      ...load(),
+      ...patch
+    };
+
+
+    try{
+
+      localStorage.setItem(
+        KEY,
+        JSON.stringify(next)
+      );
+
+    }
+
+    catch(_){}
+
+
+    try{
+
+      window.dispatchEvent(
+        new CustomEvent(
+          'paradox-refuge-family-change',
+          {
+            detail:next
+          }
+        )
+      );
+
+    }
+
+    catch(_){}
+
+
+    return next;
+  }
+
+
+  const graySprites={
+    idle:'cat_gray_idle.png',
+    happy:'cat_gray_happy.png',
+    love:'cat_gray_love.png',
+    cuddle:'cat_gray_cuddle.png',
+    confused:'cat_gray_confused.png',
+    sleep:'cat_gray_sleep.png'
+  };
+
+
+  const orangeSprites={
+    idle:'cat_orange_idle.png',
+    happy:'cat_orange_happy.png',
+    love:'cat_orange_love.png',
+    confused:'cat_orange_confused.png',
+    sleep:'cat_orange_sleep.png'
+  };
+
+
+  let garden=null;
+  let familyLayer=null;
+
+  let grayBtn=null;
+  let orangeBtn=null;
+
+  let grayImg=null;
+  let orangeImg=null;
+
+  let grayMoodLabel=null;
+  let orangeMoodLabel=null;
+
+  let grayTimer=0;
+  let orangeTimer=0;
+
+  let arrivalGrayTimer=0;
+  let arrivalOrangeTimer=0;
+
+  let weatherTimer=0;
+
+
+  function isGardenOpen(){
+
+    return Boolean(
+      garden &&
+      garden.classList.contains(
+        'show'
+      )
+    );
+  }
+
+
+  function ensureDOM(){
+
+    garden=
+      document.getElementById(
+        'catGarden'
+      );
+
+
+    if(!garden){
+      return false;
+    }
+
+
+    if(
+      document.getElementById(
+        'refugeFamilyCats'
+      )
+    ){
+
+      familyLayer=
+        document.getElementById(
+          'refugeFamilyCats'
+        );
+
+      grayBtn=
+        document.getElementById(
+          'refugeGrayCat'
+        );
+
+      orangeBtn=
+        document.getElementById(
+          'refugeOrangeCat'
+        );
+
+      grayImg=
+        document.getElementById(
+          'refugeGrayCatImg'
+        );
+
+      orangeImg=
+        document.getElementById(
+          'refugeOrangeCatImg'
+        );
+
+      grayMoodLabel=
+        document.getElementById(
+          'refugeGrayMood'
+        );
+
+      orangeMoodLabel=
+        document.getElementById(
+          'refugeOrangeMood'
+        );
+
+      return true;
+    }
+
+
+    familyLayer=
+      document.createElement(
+        'div'
+      );
+
+    familyLayer.id=
+      'refugeFamilyCats';
+
+    familyLayer.innerHTML=`
+      <button
+        id="refugeGrayCat"
+        class="refugeFamilyCat refugeGrayCat"
+        type="button"
+        aria-label="Acariciar a la gatita gris y blanca"
+      >
+        <img
+          id="refugeGrayCatImg"
+          src="cat_gray_idle.png"
+          alt="Gatita gris y blanca"
+        >
+
+        <span
+          id="refugeGrayMood"
+          class="refugeFamilyMood"
+        ></span>
+      </button>
+
+
+      <button
+        id="refugeOrangeCat"
+        class="refugeFamilyCat refugeOrangeCat"
+        type="button"
+        aria-label="Acariciar al gatito naranja"
+      >
+        <img
+          id="refugeOrangeCatImg"
+          src="cat_orange_idle.png"
+          alt="Gatito naranja"
+        >
+
+        <span
+          id="refugeOrangeMood"
+          class="refugeFamilyMood"
+        ></span>
+      </button>
+    `;
+
+
+    garden.appendChild(
+      familyLayer
+    );
+
+
+    grayBtn=
+      familyLayer.querySelector(
+        '#refugeGrayCat'
+      );
+
+    orangeBtn=
+      familyLayer.querySelector(
+        '#refugeOrangeCat'
+      );
+
+    grayImg=
+      familyLayer.querySelector(
+        '#refugeGrayCatImg'
+      );
+
+    orangeImg=
+      familyLayer.querySelector(
+        '#refugeOrangeCatImg'
+      );
+
+    grayMoodLabel=
+      familyLayer.querySelector(
+        '#refugeGrayMood'
+      );
+
+    orangeMoodLabel=
+      familyLayer.querySelector(
+        '#refugeOrangeMood'
+      );
+
+
+    grayBtn.addEventListener(
+      'click',
+      ()=>{
+        interactGray();
+      }
+    );
+
+
+    orangeBtn.addEventListener(
+      'click',
+      ()=>{
+        interactOrange();
+      }
+    );
+
+
+    return true;
+  }
+
+
+  function setGrayMood(
+    mood='idle',
+    duration=3800
+  ){
+
+    const st=load();
+
+    if(!st.grayArrived){
+      return;
+    }
+
+
+    clearTimeout(
+      grayTimer
+    );
+
+
+    const safe=
+      graySprites[mood]
+      ? mood
+      : 'idle';
+
+
+    save({
+      grayMood:safe
+    });
+
+
+    render();
+
+
+    if(
+      safe!=='idle' &&
+      duration>0
+    ){
+
+      grayTimer=
+        setTimeout(
+          ()=>{
+            save({
+              grayMood:'idle'
+            });
+
+            render();
+          },
+          duration
+        );
+    }
+  }
+
+
+  function setOrangeMood(
+    mood='idle',
+    duration=3800
+  ){
+
+    const st=load();
+
+    if(!st.orangeArrived){
+      return;
+    }
+
+
+    clearTimeout(
+      orangeTimer
+    );
+
+
+    const safe=
+      orangeSprites[mood]
+      ? mood
+      : 'idle';
+
+
+    save({
+      orangeMood:safe
+    });
+
+
+    render();
+
+
+    if(
+      safe!=='idle' &&
+      duration>0
+    ){
+
+      orangeTimer=
+        setTimeout(
+          ()=>{
+            save({
+              orangeMood:'idle'
+            });
+
+            render();
+          },
+          duration
+        );
+    }
+  }
+
+
+  function grayMoodText(
+    mood
+  ){
+
+    if(mood==='sleep'){
+      return 'zZ';
+    }
+
+    if(
+      mood==='love' ||
+      mood==='cuddle'
+    ){
+      return '♡';
+    }
+
+    if(mood==='happy'){
+      return '✦';
+    }
+
+    if(mood==='confused'){
+      return '?';
+    }
+
+    return '';
+  }
+
+
+  function orangeMoodText(
+    mood
+  ){
+
+    if(mood==='sleep'){
+      return 'zZ';
+    }
+
+    if(mood==='love'){
+      return '♡';
+    }
+
+    if(mood==='happy'){
+      return '✦';
+    }
+
+    if(mood==='confused'){
+      return '?';
+    }
+
+    return '';
+  }
+
+
+  function render(){
+
+    if(!ensureDOM()){
+      return;
+    }
+
+
+    const st=load();
+
+
+    grayBtn.classList.toggle(
+      'arrived',
+      Boolean(
+        st.grayArrived
+      )
+    );
+
+
+    orangeBtn.classList.toggle(
+      'arrived',
+      Boolean(
+        st.orangeArrived
+      )
+    );
+
+
+    const grayMood=
+      graySprites[
+        st.grayMood
+      ]
+      ? st.grayMood
+      : 'idle';
+
+
+    const orangeMood=
+      orangeSprites[
+        st.orangeMood
+      ]
+      ? st.orangeMood
+      : 'idle';
+
+
+    grayImg.src=
+      graySprites[
+        grayMood
+      ];
+
+
+    orangeImg.src=
+      orangeSprites[
+        orangeMood
+      ];
+
+
+    grayMoodLabel.textContent=
+      grayMoodText(
+        grayMood
+      );
+
+
+    orangeMoodLabel.textContent=
+      orangeMoodText(
+        orangeMood
+      );
+
+
+    familyLayer.classList.toggle(
+      'both-arrived',
+      Boolean(
+        st.grayArrived &&
+        st.orangeArrived
+      )
+    );
+  }
+
+
+  function openArrivalLetter(
+    id
+  ){
+
+    setTimeout(
+      ()=>{
+
+        try{
+
+          window.ParadoxLetters
+            ?.open
+            ?.(
+              id,
+              true
+            );
+
+        }
+
+        catch(_){}
+
+      },
+      900
+    );
+  }
+
+
+  function showArrivalBurst(
+    catButton,
+    symbol='♡'
+  ){
+
+    if(!catButton){
+      return;
+    }
+
+
+    const burst=
+      document.createElement(
+        'span'
+      );
+
+    burst.className=
+      'refugeArrivalBurst';
+
+    burst.textContent=
+      symbol;
+
+
+    catButton.appendChild(
+      burst
+    );
+
+
+    setTimeout(
+      ()=>burst.remove(),
+      1800
+    );
+  }
+
+
+  function arriveGray(){
+
+    const st=load();
+
+    if(st.grayArrived){
+      return;
+    }
+
+
+    const next=save({
+      grayArrived:true,
+      grayArrivedAt:Date.now(),
+      grayMood:'happy',
+      grayOpenCount:
+        Number(
+          st.openCount||0
+        )
+    });
+
+
+    render();
+
+
+    grayBtn.classList.add(
+      'arrival'
+    );
+
+
+    showArrivalBurst(
+      grayBtn,
+      '♡'
+    );
+
+
+    setTimeout(
+      ()=>{
+        grayBtn.classList.remove(
+          'arrival'
+        );
+      },
+      2200
+    );
+
+
+    openArrivalLetter(
+      'garden-gray-arrival'
+    );
+
+
+    /*
+      Si el jugador permanece en el Claro,
+      su hermanito puede seguirla un poco después.
+      Si sale antes, llegará en la próxima visita.
+    */
+    scheduleOrangeArrival();
+  }
+
+
+  function arriveOrange(){
+
+    const st=load();
+
+    if(
+      !st.grayArrived ||
+      st.orangeArrived
+    ){
+      return;
+    }
+
+
+    save({
+      orangeArrived:true,
+      orangeArrivedAt:Date.now(),
+      orangeMood:'happy'
+    });
+
+
+    render();
+
+
+    orangeBtn.classList.add(
+      'arrival'
+    );
+
+
+    showArrivalBurst(
+      orangeBtn,
+      '♡'
+    );
+
+
+    setTimeout(
+      ()=>{
+        orangeBtn.classList.remove(
+          'arrival'
+        );
+      },
+      2200
+    );
+
+
+    openArrivalLetter(
+      'garden-orange-arrival'
+    );
+  }
+
+
+  function scheduleGrayArrival(){
+
+    clearTimeout(
+      arrivalGrayTimer
+    );
+
+
+    const st=load();
+
+    if(
+      st.grayArrived ||
+      !isGardenOpen()
+    ){
+      return;
+    }
+
+
+    /*
+      La gatita aparece de forma suave:
+      después de permanecer unos segundos en el refugio.
+    */
+    arrivalGrayTimer=
+      setTimeout(
+        ()=>{
+
+          if(isGardenOpen()){
+            arriveGray();
+          }
+
+        },
+        12000
+      );
+  }
+
+
+  function scheduleOrangeArrival(){
+
+    clearTimeout(
+      arrivalOrangeTimer
+    );
+
+
+    const st=load();
+
+    if(
+      !st.grayArrived ||
+      st.orangeArrived ||
+      !isGardenOpen()
+    ){
+      return;
+    }
+
+
+    const nextVisit=
+      Number(
+        st.openCount||0
+      )>
+      Number(
+        st.grayOpenCount||0
+      );
+
+
+    /*
+      Si ya regresaste otra vez al Jardín,
+      el hermanito aparece rápido.
+      Si te quedaste en la misma visita,
+      aparece un poco después.
+    */
+    const delay=
+      nextVisit
+      ? 7000
+      : 30000;
+
+
+    arrivalOrangeTimer=
+      setTimeout(
+        ()=>{
+
+          if(isGardenOpen()){
+            arriveOrange();
+          }
+
+        },
+        delay
+      );
+  }
+
+
+  function interactGray(){
+
+    const st=load();
+
+    if(!st.grayArrived){
+      return;
+    }
+
+
+    const options=[
+      'love',
+      'happy',
+      'cuddle',
+      'love',
+      'happy'
+    ];
+
+
+    const mood=
+      options[
+        Math.floor(
+          Math.random()*
+          options.length
+        )
+      ];
+
+
+    save({
+      grayTouches:
+        Number(
+          st.grayTouches||0
+        )+1
+    });
+
+
+    setGrayMood(
+      mood,
+      4200
+    );
+
+
+    showArrivalBurst(
+      grayBtn,
+      mood==='happy'
+        ? '✦'
+        : '♡'
+    );
+  }
+
+
+  function interactOrange(){
+
+    const st=load();
+
+    if(!st.orangeArrived){
+      return;
+    }
+
+
+    const options=[
+      'happy',
+      'love',
+      'happy',
+      'confused',
+      'love'
+    ];
+
+
+    const mood=
+      options[
+        Math.floor(
+          Math.random()*
+          options.length
+        )
+      ];
+
+
+    save({
+      orangeTouches:
+        Number(
+          st.orangeTouches||0
+        )+1
+    });
+
+
+    setOrangeMood(
+      mood,
+      4200
+    );
+
+
+    showArrivalBurst(
+      orangeBtn,
+      mood==='confused'
+        ? '?'
+        : (
+            mood==='happy'
+            ? '✦'
+            : '♡'
+          )
+    );
+  }
+
+
+  function reactToWeather(){
+
+    if(
+      !isGardenOpen()
+    ){
+      return;
+    }
+
+
+    const st=load();
+
+    const weather=
+      window.MAGIC_AMBIENT_ACTIVE;
+
+
+    if(st.grayArrived){
+
+      if(weather==='storm'){
+        setGrayMood(
+          'confused',
+          5200
+        );
+      }
+
+      else if(weather==='snow'){
+        setGrayMood(
+          'sleep',
+          6200
+        );
+      }
+
+      else if(weather==='stars'){
+        setGrayMood(
+          'happy',
+          4800
+        );
+      }
+
+      else if(weather==='fog'){
+        setGrayMood(
+          'confused',
+          4200
+        );
+      }
+    }
+
+
+    if(st.orangeArrived){
+
+      if(weather==='storm'){
+        setOrangeMood(
+          'confused',
+          5200
+        );
+      }
+
+      else if(weather==='snow'){
+        setOrangeMood(
+          'sleep',
+          6200
+        );
+      }
+
+      else if(weather==='stars'){
+        setOrangeMood(
+          'happy',
+          4800
+        );
+      }
+
+      else if(weather==='rain'){
+        setOrangeMood(
+          'sleep',
+          4700
+        );
+      }
+    }
+  }
+
+
+  function onGardenOpen(){
+
+    if(!ensureDOM()){
+      return;
+    }
+
+
+    const st=load();
+
+
+    save({
+      openCount:
+        Number(
+          st.openCount||0
+        )+1
+    });
+
+
+    render();
+
+
+    scheduleGrayArrival();
+    scheduleOrangeArrival();
+
+
+    clearInterval(
+      weatherTimer
+    );
+
+
+    weatherTimer=
+      setInterval(
+        reactToWeather,
+        9000
+      );
+
+
+    reactToWeather();
+  }
+
+
+  function onGardenClose(){
+
+    clearTimeout(
+      arrivalGrayTimer
+    );
+
+    clearTimeout(
+      arrivalOrangeTimer
+    );
+
+    clearInterval(
+      weatherTimer
+    );
+  }
+
+
+  window.addEventListener(
+    'paradox-cat-garden-open',
+    onGardenOpen
+  );
+
+
+  window.addEventListener(
+    'paradox-cat-garden-close',
+    onGardenClose
+  );
+
+
+  window.addEventListener(
+    'paradox-refuge-family-change',
+    render
+  );
+
+
+  /*
+    Carga inicial.
+  */
+  const initTimer=
+    setInterval(
+      ()=>{
+
+        if(ensureDOM()){
+
+          clearInterval(
+            initTimer
+          );
+
+          render();
+        }
+
+      },
+      500
+    );
+
+
+  /*
+    API pequeña para futuras cartas,
+    más gatos o minijuegos.
+  */
+  window.ParadoxRefugeFamily={
+    getState:load,
+    render,
+    grayMood:setGrayMood,
+    orangeMood:setOrangeMood,
+    arriveGray,
+    arriveOrange
+  };
+
+})();
