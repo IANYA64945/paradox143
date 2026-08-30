@@ -896,3 +896,199 @@ body.intro-active
     transition-duration:.01ms !important;
   }
 }
+
+
+/* =========================================================
+   MARIE + TULUZ — MOVIMIENTO CONSTANTE
+========================================================= */
+
+/*
+  Ahora la transición entre puntos del Claro es más larga
+  que la transición original del sprite, para que parezca
+  que realmente caminan y no se teletransportan.
+*/
+#catGarden
+.refugeFamilyCat{
+  transition:
+    left 1.45s cubic-bezier(.22,.70,.26,1),
+    bottom 1.05s cubic-bezier(.22,.70,.26,1),
+    opacity .35s,
+    visibility .35s,
+    transform .35s;
+}
+
+
+/*
+  Marie: movimiento más suave.
+*/
+#catGarden
+.refugeGrayCat.family-walking-marie{
+  animation:
+    marieWalkingBob
+    .72s
+    ease-in-out
+    2;
+}
+
+
+@keyframes marieWalkingBob{
+
+  0%,
+  100%{
+    margin-bottom:0;
+  }
+
+  50%{
+    margin-bottom:3px;
+  }
+}
+
+
+/*
+  Tuluz: movimiento más vivo y ligero.
+*/
+#catGarden
+.refugeOrangeCat.family-walking-tuluz{
+  animation:
+    tuluzWalkingBob
+    .42s
+    ease-in-out
+    3;
+}
+
+
+@keyframes tuluzWalkingBob{
+
+  0%,
+  100%{
+    margin-bottom:0;
+    rotate:0deg;
+  }
+
+  50%{
+    margin-bottom:4px;
+    rotate:1.5deg;
+  }
+}
+
+
+/*
+  Cuando Tuluz va hacia un juguete, el objeto se coloca
+  cerca de su zona actual.
+*/
+#catGarden
+#catGardenMewoProp.tuluz-wander-prop{
+  left:67% !important;
+  bottom:12% !important;
+
+  animation:
+    tuluzWanderToy
+    .58s
+    ease-in-out
+    infinite
+    alternate;
+}
+
+
+@keyframes tuluzWanderToy{
+
+  from{
+    transform:
+      translateY(0)
+      rotate(-3deg)
+      scale(.92);
+  }
+
+  to{
+    transform:
+      translateY(-3px)
+      rotate(4deg)
+      scale(1.02);
+  }
+}
+
+
+/*
+  Pequeños cambios de profundidad según el punto.
+  Sirven para que parezca que los gatos recorren
+  zonas ligeramente más cercanas o alejadas.
+*/
+#catGarden
+.refugeFamilyCat[data-wander-spot="tree"]{
+  scale:.92;
+}
+
+
+#catGarden
+.refugeFamilyCat[data-wander-spot="center"]{
+  scale:1;
+}
+
+
+#catGarden
+.refugeFamilyCat[data-wander-spot="flowers"]{
+  scale:.96;
+}
+
+
+#catGarden
+.refugeFamilyCat[data-wander-spot="pillow"],
+#catGarden
+.refugeFamilyCat[data-wander-spot="warm"]{
+  scale:.94;
+}
+
+
+#catGarden
+.refugeFamilyCat[data-wander-spot="scratcher"]{
+  scale:1.02;
+}
+
+
+/*
+  No hay "hover-only": el comportamiento se percibe
+  completamente mediante movimiento automático.
+*/
+
+
+/* ---------------------------------------------------------
+   MÓVIL
+--------------------------------------------------------- */
+
+@media(max-width:600px){
+
+  #catGarden
+  .refugeFamilyCat{
+    transition:
+      left 1.2s cubic-bezier(.22,.70,.26,1),
+      bottom .95s cubic-bezier(.22,.70,.26,1),
+      opacity .35s,
+      visibility .35s,
+      transform .35s;
+  }
+}
+
+
+/* ---------------------------------------------------------
+   REDUCIR MOVIMIENTO
+--------------------------------------------------------- */
+
+@media(prefers-reduced-motion:reduce){
+
+  #catGarden
+  .refugeGrayCat.family-walking-marie,
+
+  #catGarden
+  .refugeOrangeCat.family-walking-tuluz,
+
+  #catGarden
+  #catGardenMewoProp.tuluz-wander-prop{
+    animation:none !important;
+  }
+
+
+  #catGarden
+  .refugeFamilyCat{
+    transition-duration:.01ms !important;
+  }
+}

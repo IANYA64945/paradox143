@@ -1780,6 +1780,499 @@
 
 
   /* =====================================================
+     MOVIMIENTO CONSTANTE DE MARIE Y TULUZ
+
+     Marie:
+     - movimiento suave y tranquilo
+     - suele buscar almohada, Mewo, árbol y zonas cálidas
+     - pausas un poco más largas
+
+     Tuluz:
+     - movimiento más frecuente
+     - busca juguetes, rascador y distintos rincones
+     - cambia de dirección con más energía
+
+     Durante escenas especiales, taller o eventos grandes
+     este motor se pausa automáticamente.
+  ===================================================== */
+
+  let marieWalkTimer=0;
+  let tuluzWalkTimer=0;
+
+  let marieLastSpot='';
+  let tuluzLastSpot='';
+
+
+  const MARIE_SPOTS=[
+    {id:'pillow',   left:17, bottom:10, mood:'sleep'},
+    {id:'mewo',     left:43, bottom:16, mood:'cuddle'},
+    {id:'tree',     left:39, bottom:21, mood:'idle'},
+    {id:'flowers',  left:26, bottom:13, mood:'happy'},
+    {id:'center',   left:46, bottom:14, mood:'idle'},
+    {id:'left',     left:22, bottom:18, mood:'idle'},
+    {id:'warm',     left:31, bottom:11, mood:'sleep'},
+    {id:'siblings', left:50, bottom:15, mood:'love'}
+  ];
+
+
+  const TULUZ_SPOTS=[
+    {id:'ball',      left:62, bottom:14, mood:'happy'},
+    {id:'yarn',      left:70, bottom:18, mood:'happy'},
+    {id:'fish',      left:58, bottom:10, mood:'happy'},
+    {id:'scratcher', left:79, bottom:14, mood:'happy'},
+    {id:'center',    left:53, bottom:17, mood:'idle'},
+    {id:'tree',      left:63, bottom:22, mood:'confused'},
+    {id:'right',     left:73, bottom:11, mood:'idle'},
+    {id:'marie',     left:48, bottom:15, mood:'love'},
+    {id:'mewo',      left:57, bottom:16, mood:'happy'}
+  ];
+
+
+  function wanderingAllowed(){
+
+    return Boolean(
+      isGardenOpen() &&
+      bothNewCatsHere() &&
+      !sceneRunning &&
+      !arrivalEventRunning() &&
+      !workshopOpen()
+    );
+  }
+
+
+  function chooseDifferentSpot(
+    spots,
+    previous
+  ){
+
+    let choices=
+      spots.filter(
+        spot=>
+          spot.id!==previous
+      );
+
+
+    if(!choices.length){
+      choices=spots;
+    }
+
+
+    return choices[
+      Math.floor(
+        Math.random()*
+        choices.length
+      )
+    ];
+  }
+
+
+  function applyCatPosition(
+    element,
+    spot,
+    catName
+  ){
+
+    if(
+      !element ||
+      !spot
+    ){
+      return;
+    }
+
+
+    element.style.left=
+      `${spot.left}%`;
+
+    element.style.bottom=
+      `${spot.bottom}%`;
+
+    element.dataset.wanderSpot=
+      spot.id;
+
+    element.classList.remove(
+      'family-walking-marie',
+      'family-walking-tuluz'
+    );
+
+    void element.offsetWidth;
+
+    element.classList.add(
+      catName==='marie'
+        ? 'family-walking-marie'
+        : 'family-walking-tuluz'
+    );
+  }
+
+
+  function wanderMarie(){
+
+    clearTimeout(
+      marieWalkTimer
+    );
+
+
+    if(
+      !wanderingAllowed()
+    ){
+
+      marieWalkTimer=
+        setTimeout(
+          wanderMarie,
+          1800
+        );
+
+      return;
+    }
+
+
+    const spot=
+      chooseDifferentSpot(
+        MARIE_SPOTS,
+        marieLastSpot
+      );
+
+
+    marieLastSpot=
+      spot.id;
+
+
+    applyCatPosition(
+      grayBtn,
+      spot,
+      'marie'
+    );
+
+
+    /*
+      Marie no está "congelada": cambia de emoción suave
+      al llegar a distintos sitios.
+    */
+    if(spot.mood==='sleep'){
+
+      setMarieMood(
+        'sleep',
+        5200
+      );
+    }
+
+    else if(spot.mood==='cuddle'){
+
+      setMarieMood(
+        'cuddle',
+        4800
+      );
+
+      if(allThreeHere()){
+        mewoMood('love');
+      }
+    }
+
+    else if(spot.mood==='love'){
+
+      setMarieMood(
+        'love',
+        4500
+      );
+    }
+
+    else if(spot.mood==='happy'){
+
+      setMarieMood(
+        'happy',
+        3800
+      );
+    }
+
+    else{
+
+      setMarieMood(
+        Math.random()<.22
+          ? 'happy'
+          : 'idle',
+        3400
+      );
+    }
+
+
+    /*
+      Marie camina constantemente, pero de forma calmada:
+      aproximadamente cada 5.5–9 segundos.
+    */
+    const next=
+      5500+
+      Math.random()*3500;
+
+
+    marieWalkTimer=
+      setTimeout(
+        wanderMarie,
+        next
+      );
+  }
+
+
+  function wanderTuluz(){
+
+    clearTimeout(
+      tuluzWalkTimer
+    );
+
+
+    if(
+      !wanderingAllowed()
+    ){
+
+      tuluzWalkTimer=
+        setTimeout(
+          wanderTuluz,
+          1200
+        );
+
+      return;
+    }
+
+
+    const gs=
+      gardenState();
+
+
+    let spots=
+      TULUZ_SPOTS.slice();
+
+
+    /*
+      Si el rascador aún no está terminado,
+      Tuluz no intenta usar ese punto.
+    */
+    if(
+      Number(
+        gs.scratcherStage||0
+      )<4
+    ){
+
+      spots=
+        spots.filter(
+          spot=>
+            spot.id!=='scratcher'
+        );
+    }
+
+
+    const spot=
+      chooseDifferentSpot(
+        spots,
+        tuluzLastSpot
+      );
+
+
+    tuluzLastSpot=
+      spot.id;
+
+
+    applyCatPosition(
+      orangeBtn,
+      spot,
+      'tuluz'
+    );
+
+
+    if(
+      ['ball','yarn','fish','scratcher']
+        .includes(
+          spot.id
+        )
+    ){
+
+      setTuluzMood(
+        'happy',
+        3500
+      );
+
+
+      /*
+        Si va hacia un juguete, mostramos uno brevemente.
+      */
+      const prop=
+        document.getElementById(
+          'catGardenMewoProp'
+        );
+
+      const propImg=
+        document.getElementById(
+          'catGardenMewoPropImg'
+        );
+
+
+      if(
+        prop &&
+        propImg &&
+        spot.id!=='scratcher'
+      ){
+
+        const asset={
+          ball:'toy_ball.png',
+          yarn:'toy_yarn.png',
+          fish:'toy_fish.png'
+        }[spot.id];
+
+
+        if(asset){
+
+          propImg.src=asset;
+
+          prop.classList.add(
+            'show',
+            'family-prop',
+            'tuluz-wander-prop'
+          );
+
+
+          setTimeout(
+            ()=>{
+              prop.classList.remove(
+                'show',
+                'family-prop',
+                'tuluz-wander-prop'
+              );
+            },
+            2800
+          );
+        }
+      }
+    }
+
+    else if(spot.id==='marie'){
+
+      setTuluzMood(
+        Math.random()<.5
+          ? 'love'
+          : 'happy',
+        3600
+      );
+
+
+      if(
+        Math.random()<.35
+      ){
+
+        burst(
+          orangeBtn,
+          ['♡','✦']
+        );
+      }
+    }
+
+    else if(spot.id==='tree'){
+
+      setTuluzMood(
+        'confused',
+        3000
+      );
+    }
+
+    else{
+
+      setTuluzMood(
+        Math.random()<.45
+          ? 'happy'
+          : 'idle',
+        3000
+      );
+    }
+
+
+    /*
+      Tuluz es inquieto:
+      aproximadamente cada 3.2–5.6 segundos.
+    */
+    const next=
+      3200+
+      Math.random()*2400;
+
+
+    tuluzWalkTimer=
+      setTimeout(
+        wanderTuluz,
+        next
+      );
+  }
+
+
+  function startConstantWandering(){
+
+    clearTimeout(
+      marieWalkTimer
+    );
+
+    clearTimeout(
+      tuluzWalkTimer
+    );
+
+
+    /*
+      Pequeño desfase para que no se muevan al mismo tiempo.
+    */
+    marieWalkTimer=
+      setTimeout(
+        wanderMarie,
+        1200
+      );
+
+
+    tuluzWalkTimer=
+      setTimeout(
+        wanderTuluz,
+        2300
+      );
+  }
+
+
+  function stopConstantWandering(){
+
+    clearTimeout(
+      marieWalkTimer
+    );
+
+    clearTimeout(
+      tuluzWalkTimer
+    );
+
+
+    grayBtn?.classList.remove(
+      'family-walking-marie'
+    );
+
+    orangeBtn?.classList.remove(
+      'family-walking-tuluz'
+    );
+  }
+
+
+  /*
+    Cuando termina una escena especial, reanudamos
+    el paseo en pocos segundos.
+  */
+  const originalEndScene=
+    endScene;
+
+
+  endScene=
+    function(){
+
+      originalEndScene();
+
+
+      if(isGardenOpen()){
+
+        setTimeout(
+          startConstantWandering,
+          900
+        );
+      }
+    };
+
+
+  /* =====================================================
      CICLO DE VIDA DEL JARDÍN
   ===================================================== */
 
@@ -1854,6 +2347,12 @@
 
     previousWeather=null;
     syncWeather();
+
+    /*
+      Marie y Tuluz empiezan a recorrer el Claro
+      aunque no haya ninguna escena especial.
+    */
+    startConstantWandering();
   }
 
 
@@ -1875,6 +2374,8 @@
       sceneTimer
     );
 
+
+    stopConstantWandering();
 
     endScene();
 
