@@ -227,6 +227,9 @@
         'act1-planting'
       ) ||
       document.body.classList.contains(
+        'act1-cinematic-open'
+      ) ||
+      document.body.classList.contains(
         'act1-growth-open'
       ) ||
       document.getElementById(
@@ -2393,8 +2396,8 @@
           scheduleNext();
         }
       },
-      18000+
-      Math.random()*16000
+      7000+
+      Math.random()*5000
     );
   }
 
@@ -2584,8 +2587,8 @@
             chooseGardenAdventure();
           }
         },
-        11000+
-        Math.random()*7000
+        4000+
+        Math.random()*3000
       );
     }
 

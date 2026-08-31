@@ -1,5 +1,5 @@
 /* ACTO I · ETAPA 3 — EL MUNDO CRECE */
-#act1GrowthLayer{position:fixed;inset:0;z-index:54;pointer-events:none;font-family:monospace}#act1GrowthGarden,#act1GrowthField{position:fixed;inset:0;pointer-events:none}#act1GrowthGarden{z-index:116}#act1GrowthField{z-index:47}
+#act1GrowthLayer{position:fixed;inset:0;z-index:127;pointer-events:none;font-family:monospace}#act1GrowthGarden,#act1GrowthField{position:fixed;inset:0;pointer-events:none}#act1GrowthGarden{z-index:116}#act1GrowthField{z-index:47}
 #act1GrowthWhisper{position:fixed;left:50%;top:max(52px,calc(env(safe-area-inset-top) + 44px));z-index:184;max-width:min(82vw,440px);padding:8px 11px;border:1px solid rgba(255,217,236,.2);border-radius:8px;background:rgba(5,8,15,.8);color:#fff0f8;box-shadow:0 8px 22px rgba(0,0,0,.3);backdrop-filter:blur(4px);font:700 10px/1.45 monospace;text-align:center;opacity:0;transform:translate(-50%,-7px);transition:.28s;pointer-events:none}#act1GrowthWhisper.show{opacity:1;transform:translate(-50%,0)}
 #act1GrowthPermanent{position:absolute;inset:0;z-index:6;pointer-events:none}.growthNook{position:absolute;right:1.5%;bottom:5%;width:24%;height:43%;border-radius:52% 0 0 18%;background:radial-gradient(ellipse at 58% 70%,rgba(50,95,66,.18),transparent 58%),linear-gradient(90deg,transparent,rgba(7,28,20,.17));border-left:1px solid rgba(185,226,194,.09);overflow:hidden}.growthNook>i{position:absolute;bottom:3%;width:4px;height:18%;border-radius:100%;background:rgba(31,80,46,.5);transform-origin:bottom}.growthNook>i:nth-of-type(1){left:35%;rotate:-10deg}.growthNook>i:nth-of-type(2){left:58%;height:24%;rotate:8deg}.growthNook>i:nth-of-type(3){left:76%;height:15%;rotate:-4deg}.growthNookStar{position:absolute;right:19%;top:25%;color:rgba(255,226,163,.55);text-shadow:0 0 10px rgba(255,220,150,.35);animation:growthStar 3.8s ease-in-out infinite}@keyframes growthStar{50%{opacity:.35;scale:.85}}
 .growthPillow2{position:absolute;right:14%;bottom:8%;width:min(8.5vw,82px)}.growthPillow2 img{width:100%;filter:drop-shadow(0 5px 5px rgba(0,0,0,.27))}.growthToyBox{position:absolute;right:4.5%;bottom:8%;width:min(10vw,95px);height:min(7vw,62px);display:flex;align-items:flex-start;justify-content:center;gap:0}.growthToyBox b{position:absolute;left:7%;right:7%;bottom:0;height:68%;border:1px solid rgba(171,116,76,.35);border-radius:3px 3px 7px 7px;background:linear-gradient(#7a4f39,#4f352c);box-shadow:0 5px 8px rgba(0,0,0,.28)}.growthToyBox img{position:relative;width:31%;height:52%;object-fit:contain;z-index:1;filter:drop-shadow(0 2px 2px rgba(0,0,0,.25))}.growthWater{position:absolute;right:26%;bottom:7%;width:min(5.6vw,53px)}.growthWater img{width:100%;filter:drop-shadow(0 4px 5px rgba(0,0,0,.25))}.growthWater span{position:absolute;left:22%;right:22%;top:42%;height:18%;border-radius:50%;background:rgba(154,213,247,.45);box-shadow:0 0 8px rgba(146,214,255,.22)}
@@ -16,3 +16,61 @@
 #act1GrowthCinema{position:fixed;inset:0;z-index:194;display:grid;place-items:center;overflow:hidden;background:radial-gradient(circle at 50% 68%,rgba(53,53,78,.44),transparent 34%),linear-gradient(#02050c,#081224 58%,#07110e);opacity:0;visibility:hidden;pointer-events:none;transition:.65s}#act1GrowthCinema.show{opacity:1;visibility:visible;pointer-events:auto}.growthCinemaGlow{position:absolute;left:50%;bottom:12%;width:72%;height:42%;border-radius:50%;background:radial-gradient(ellipse,rgba(249,186,143,.1),transparent 65%);transform:translateX(-50%)}.growthCinemaHome{position:relative;width:min(84vw,560px);text-align:center}.growthCinemaCats{height:100px;display:flex;align-items:flex-end;justify-content:center;gap:10px;margin-bottom:8px}.growthCinemaCats img{width:min(12vw,80px);max-height:85px;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(0 5px 8px rgba(0,0,0,.35))}.growthCinemaHome>span{display:block;margin:5px;color:#ffdcec;font-size:31px;text-shadow:0 0 16px rgba(255,190,222,.28)}#growthCinemaText{min-height:74px;margin:0;color:#fff0f7;font:800 13px/1.65 monospace;opacity:0;translate:0 8px;transition:.5s}#growthCinemaText.visible{opacity:1;translate:0 0}#growthCinemaClose{position:absolute;left:50%;bottom:max(28px,calc(env(safe-area-inset-bottom) + 18px));padding:9px 14px;border:1px solid rgba(255,204,231,.28);border-radius:8px;background:rgba(24,14,28,.82);color:#ffeaf5;font:800 10px monospace;opacity:0;visibility:hidden;transform:translateX(-50%);pointer-events:none;transition:.3s}#growthCinemaClose.ready{opacity:1;visibility:visible;pointer-events:auto}
 @media(max-width:600px){#act1GrowthWhisper{top:max(40px,calc(env(safe-area-inset-top) + 34px));font-size:9px}.growthNook{width:31%;height:39%}.growthPillow2{right:16%;width:min(14vw,68px)}.growthToyBox{right:1%;width:min(18vw,83px);height:min(12vw,58px)}.growthWater{right:30%;width:min(10vw,47px)}.growthBuildPanel{width:90vw}.growthToySort{gap:5px}.growthToyCrate{width:75px}.growthToySort button{width:48px;height:48px}.growthCinemaCats img{width:min(18vw,74px)}#growthCinemaText{font-size:11px}}
 @media(prefers-reduced-motion:reduce){#act1GrowthLayer *,#act1GrowthPermanent *{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+
+
+/* =========================================================
+   CRECIMIENTO MÁS VISIBLE
+========================================================= */
+
+.growthNookDoor,
+.growthWaterQuest,
+.growthNotice,
+.growthFlowerQuest,
+.growthLanternQuest{
+  filter:
+    drop-shadow(0 0 12px rgba(255,210,230,.38))
+    drop-shadow(0 7px 9px rgba(0,0,0,.36));
+}
+
+.growthNookDoor{
+  width:88px;
+  background:
+    radial-gradient(ellipse at right,rgba(123,188,137,.32),transparent 68%);
+  border-left:2px solid rgba(212,244,219,.3);
+}
+
+.growthNookDoor span{
+  font-size:28px;
+  color:#ffe8af;
+  animation:growthBigHint 1.25s ease-in-out infinite;
+}
+
+.growthNotice{
+  width:62px;
+  height:62px;
+  font-size:25px;
+  opacity:.92;
+  border:1px solid rgba(255,222,239,.36);
+  background:rgba(21,15,24,.58);
+  box-shadow:0 0 21px rgba(255,183,218,.2);
+}
+
+.growthWaterQuest{
+  min-width:78px;
+}
+
+.growthLanternQuest{
+  width:76px;
+  height:112px;
+}
+
+#act1GrowthWhisper{
+  border-color:rgba(255,217,236,.42);
+  box-shadow:0 8px 22px rgba(0,0,0,.35),0 0 18px rgba(255,177,216,.14);
+  font-size:11px;
+}
+
+@keyframes growthBigHint{
+  0%,100%{opacity:.4;scale:.86}
+  50%{opacity:1;scale:1.15}
+}

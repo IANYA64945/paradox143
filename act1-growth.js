@@ -46,7 +46,7 @@
   function life(){return readJSON(LIFE_KEY,{});}
   function world(){try{return Number(worldX)||0;}catch(_){return 0;}}
   function isGardenOpen(){garden=garden||document.getElementById('catGarden'); return !!(garden&&garden.classList.contains('show'));}
-  function busy(){return !!(active||document.body.classList.contains('intro-active')||document.body.classList.contains('basket2-open')||document.body.classList.contains('refuge-arrival-event-open')||document.body.classList.contains('act1-adventure-open')||document.getElementById('letterReader')?.classList.contains('show')||document.getElementById('basket2Reader')?.classList.contains('show')||document.getElementById('gameOverlay')?.classList.contains('show')||document.getElementById('catCraftOverlay')?.classList.contains('show'));}
+  function busy(){return !!(active||document.body.classList.contains('intro-active')||document.body.classList.contains('basket2-open')||document.body.classList.contains('refuge-arrival-event-open')||document.body.classList.contains('act1-adventure-open')||document.body.classList.contains('act1-cinematic-open')||document.getElementById('letterReader')?.classList.contains('show')||document.getElementById('basket2Reader')?.classList.contains('show')||document.getElementById('gameOverlay')?.classList.contains('show')||document.getElementById('catCraftOverlay')?.classList.contains('show'));}
   function safeGarden(){return unlocked()&&isGardenOpen()&&catsReady()&&!busy();}
   function safeField(){return unlocked()&&!isGardenOpen()&&!busy();}
 
@@ -206,7 +206,7 @@
     if(!options.length) return false; return options[Math.floor(Math.random()*options.length)]?.();
   }
 
-  function schedule(){clearTimeout(scheduler);scheduler=setTimeout(()=>{if(!unlocked()||busy()){schedule();return;} if(isGardenOpen()) chooseGarden(); if(!active)schedule();},17000+Math.random()*15000);}
+  function schedule(){clearTimeout(scheduler);scheduler=setTimeout(()=>{if(!unlocked()||busy()){schedule();return;} if(isGardenOpen()) chooseGarden(); if(!active)schedule();},6500+Math.random()*5000);}
 
   function tickField(){
     const s=state(), wx=world(); if(!isGardenOpen()&&unlocked()){
@@ -216,7 +216,7 @@
     }else save({lastWorldX:wx});
   }
 
-  function onGardenOpen(){const s=state();save({visits:Number(s.visits||0)+1});renderPermanent(); if(unlocked())visitTimer=setTimeout(()=>{if(!active&&safeGarden())chooseGarden();},9000+Math.random()*6500); if(!state().finale&&count(IDS.slice(0,11))>=8)setTimeout(finale,4200);}
+  function onGardenOpen(){const s=state();save({visits:Number(s.visits||0)+1});renderPermanent(); if(unlocked())visitTimer=setTimeout(()=>{if(!active&&safeGarden())chooseGarden();},3500+Math.random()*2800); if(!state().finale&&count(IDS.slice(0,11))>=8)setTimeout(finale,4200);}
   function onGardenClose(){clearTimeout(visitTimer); if(active&&!document.getElementById('act1GrowthCinema')?.classList.contains('show'))end();}
 
   function init(){ensureDOM();garden=document.getElementById('catGarden');renderPermanent();window.addEventListener('paradox-cat-garden-open',onGardenOpen);window.addEventListener('paradox-cat-garden-close',onGardenClose);window.addEventListener('paradox-letter-collected',()=>setTimeout(()=>{if(!state().finale&&count(IDS.slice(0,11))>=8&&!busy())finale();},650));fieldTimer=setInterval(tickField,520);schedule();if(isGardenOpen())setTimeout(onGardenOpen,900);}

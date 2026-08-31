@@ -91,6 +91,7 @@
   let napObserver=null;
   let fiveMinuteTimer=0;
   let momentHeartbeatTimer=0;
+  let directLetterTimer=0;
 
   let previousWeather='';
   let weatherHold=0;
@@ -201,6 +202,7 @@
       document.body.classList.contains('refuge-arrival-event-open') ||
       document.body.classList.contains('act1-adventure-open') ||
       document.body.classList.contains('act1-growth-open') ||
+      document.body.classList.contains('act1-cinematic-open') ||
       document.getElementById('gameOverlay')?.classList.contains('show') ||
       document.getElementById('letterReader')?.classList.contains('show') ||
       document.getElementById('basket2Reader')?.classList.contains('show') ||
@@ -271,21 +273,39 @@
 
     save({earned});
 
+    /*
+      Las cartas nuevas YA NO aparecen en un botón flotante
+      junto a la patita/canasta.
+
+      Primero avisamos al sistema cinematográfico. Si esta
+      carta tiene una escena especial, la escena se reproduce
+      y la carta se presenta al terminar. Si no la tiene, la
+      carta se presenta directamente como las cartas de evento.
+    */
+    try{
+      window.dispatchEvent(
+        new CustomEvent(
+          'paradox-act1-earned',
+          {detail:{id}}
+        )
+      );
+    }catch(_){}
+
     if(!quiet){
       showWhisper(
         'algo de este momento quiso quedarse contigo ♡',
-        2900
+        2200
       );
     }
 
-    setTimeout(
-      refreshMemoryDrop,
-      250
+    scheduleDirectLetter(
+      850
     );
   }
 
   function pendingEarned(){
     const have=collected();
+
     return state().earned.filter(
       id=>!have.has(id)
     );
@@ -294,48 +314,102 @@
   function refreshMemoryDrop(){
     ensureDOM();
 
-    if(!memoryDrop) return;
-
-    const pending=pendingEarned();
-
-    memoryDrop.classList.toggle(
-      'show',
-      pending.length>0 &&
-      !document.body.classList.contains('intro-active')
-    );
-
-    const count=
-      memoryDrop.querySelector(
-        '.act1MemoryCount'
-      );
-
-    if(count){
-      count.textContent=
-        pending.length>1
-          ? String(pending.length)
-          : '';
+    /* El antiguo sobre flotante queda desactivado. */
+    if(memoryDrop){
+      memoryDrop.classList.remove('show');
+      memoryDrop.style.display='none';
     }
+
+    scheduleDirectLetter(
+      700
+    );
   }
 
-  function offerNextMemory(){
-    if(overlayBusy()) return;
+  function scheduleDirectLetter(
+    delay=700
+  ){
+    clearTimeout(
+      directLetterTimer
+    );
 
-    const pending=pendingEarned();
-    if(!pending.length) return;
+    directLetterTimer=setTimeout(
+      presentNextMemory,
+      delay
+    );
+  }
 
-    const id=pending[0];
+  function presentNextMemory(){
+    const pending=
+      pendingEarned();
+
+    if(!pending.length){
+      return false;
+    }
+
+    /*
+      Nunca interrumpe una aventura, crecimiento, llegada,
+      cinematográfica ni otra carta. Espera y vuelve a intentar.
+    */
+    if(
+      activeActivity ||
+      overlayBusy()
+    ){
+      scheduleDirectLetter(
+        900
+      );
+
+      return false;
+    }
 
     const st=state();
+    const now=Date.now();
+
+    /*
+      Si la persona cerró una carta sin guardarla, no vuelve a
+      saltar inmediatamente. Se le da un pequeño descanso.
+    */
+    const id=pending.find(
+      cardId=>
+        now-
+        Number(
+          st.offered?.[cardId]||0
+        )>=28000
+    );
+
+    if(!id){
+      scheduleDirectLetter(
+        4500
+      );
+
+      return false;
+    }
+
     const offered={
       ...(st.offered||{}),
-      [id]:Date.now()
+      [id]:now
     };
 
-    save({offered});
+    /*
+      Escribimos sin pasar por save() para no generar otra
+      programación recursiva del lector.
+    */
+    writeJSON(
+      KEY,
+      {
+        ...st,
+        offered
+      }
+    );
 
     window.ParadoxLetters
       ?.open
       ?.(id,true);
+
+    return true;
+  }
+
+  function offerNextMemory(){
+    return presentNextMemory();
   }
 
   function ensureDOM(){
@@ -1858,8 +1932,8 @@
       ()=>{
         chooseGardenActivity();
       },
-      5500+
-      Math.random()*4500
+      2800+
+      Math.random()*2200
     );
   }
 
@@ -1909,7 +1983,7 @@
       Mantiene el Claro tranquilo, pero elimina esperas
       absurdas de 20–30 minutos.
     */
-    if(elapsed>=42000){
+    if(elapsed>=15000){
       chooseGardenActivity();
     }
   }
@@ -2192,6 +2266,15 @@
       }
     );
 
+    window.addEventListener(
+      'paradox-act1-cinematic-finished',
+      ()=>{
+        scheduleDirectLetter(
+          450
+        );
+      }
+    );
+
     /*
       Tiempo en el Claro.
     */
@@ -2233,7 +2316,7 @@
     */
     momentHeartbeatTimer=setInterval(
       momentHeartbeat,
-      7000
+      5000
     );
 
     /*

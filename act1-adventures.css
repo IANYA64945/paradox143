@@ -7,7 +7,7 @@
   position:fixed;
   inset:0;
 
-  z-index:52;
+  z-index:126;
 
   pointer-events:none;
 
@@ -1742,4 +1742,69 @@ span:nth-child(4){
     animation-duration:.01ms !important;
     animation-iteration-count:1 !important;
   }
+}
+
+
+/* =========================================================
+   ACTIVIDADES MÁS VISIBLES
+========================================================= */
+
+.act1AdvTreasure,
+.act1AdvStarStep,
+.act1AdvReturnStar,
+.act1AdvYarnPoint,
+.act1AdvRainItem,
+.act1AdvTallTulip,
+.act1AdvMidnightFlower{
+  filter:
+    drop-shadow(0 0 11px rgba(255,204,229,.38))
+    drop-shadow(0 6px 9px rgba(0,0,0,.38));
+}
+
+.act1AdvTreasure::before,
+.act1AdvStarStep::before,
+.act1AdvYarnPoint::before,
+.act1AdvRainItem::before,
+.act1AdvMidnightFlower::before{
+  content:"";
+  position:absolute;
+  inset:-9px;
+  border:1px solid rgba(255,225,240,.4);
+  border-radius:999px;
+  box-shadow:0 0 20px rgba(255,176,217,.2);
+  animation:act1AdvVisiblePulse 1.2s ease-in-out infinite;
+  pointer-events:none;
+}
+
+.act1AdvTreasure,
+.act1AdvRainItem{
+  min-width:67px;
+}
+
+.act1AdvYarnPoint{
+  width:48px;
+  height:48px;
+  background:rgba(48,22,41,.72);
+  border-color:rgba(255,215,236,.48);
+  font-size:18px;
+}
+
+.act1AdvStarStep{
+  width:58px;
+  height:58px;
+  margin:-29px 0 0 -29px;
+  font-size:25px;
+}
+
+#act1AdventureWhisper{
+  border-color:rgba(255,218,238,.42);
+  box-shadow:
+    0 8px 22px rgba(0,0,0,.36),
+    0 0 18px rgba(255,172,214,.14);
+  font-size:11px;
+}
+
+@keyframes act1AdvVisiblePulse{
+  0%,100%{opacity:.3;scale:.88}
+  50%{opacity:.95;scale:1.08}
 }
