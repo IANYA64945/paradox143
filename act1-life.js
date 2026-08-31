@@ -192,6 +192,7 @@
       document.body.classList.contains('intro-active') ||
       document.body.classList.contains('basket2-open') ||
       document.body.classList.contains('refuge-arrival-event-open') ||
+      document.body.classList.contains('act1-adventure-open') ||
       document.getElementById('gameOverlay')?.classList.contains('show') ||
       document.getElementById('letterReader')?.classList.contains('show') ||
       document.getElementById('basket2Reader')?.classList.contains('show') ||
@@ -244,7 +245,7 @@
   }
 
   function earn(id,{quiet=false}={}){
-    if(!NEW_IDS.includes(id)) return;
+    if(!id || typeof id!=='string') return;
 
     const st=state();
 

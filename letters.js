@@ -315,7 +315,83 @@
       title: 'Nuestro pequeño mundo ♡',
       mark: '⌂',
       text: 'empezo con tulipanes y una cartita.. y sin darnos cuenta aparecieron una lunita, tormentas, juguetes, un refugio y tres pequeñas vidas. mira todo lo que nuestro pequeño mundo ya tiene ♡'
+    },
 
+    /* =====================================================
+       ACTO I · ETAPA 2 — PEQUEÑAS AVENTURAS
+       Cartas 56–67
+    ===================================================== */
+
+    'act1-tuluz-treasure': {
+      title: 'El tesorito de Tuluz',
+      mark: '◇',
+      text: 'resulto que su gran tesoro era una cosita diminuta que podria haber pasado desapercibida para cualquiera.. pero si algo le importa a uno de nuestros gatitos entonces tambien merece que lo busquemos ♡'
+    },
+
+    'act1-marie-guide': {
+      title: 'Marie sabía el camino',
+      mark: '🐾',
+      text: 'marie camino despacito como si supiera exactamente donde queria llevarme.. la segui sin preguntar y termine encontrando otro rinconcito bonito. contigo tambien seguiria caminos que todavia no conozco ♡'
+    },
+
+    'act1-mewo-awake': {
+      title: 'Mewo no quería mimir',
+      mark: '☾',
+      text: 'comida, mimitos, compañia.. quizas mewo no necesitaba una respuesta perfecta. tal vez solo queria saber que alguien se quedaria despierto con ella un ratito mas ♡'
+    },
+
+    'act1-star-home': {
+      title: 'De vuelta al cielo ✦',
+      mark: '✦',
+      text: 'la estrellita encontro el camino de regreso al cielo.. y aunque ya no podamos tocarla sigue brillando desde arriba. algunas cosas pueden alejarse sin dejar de acompañarnos ♡'
+    },
+
+    'act1-yarn-trail': {
+      title: 'El ovillo imposible',
+      mark: '∞',
+      text: 'el hilo cruzo medio jardin antes de volver al ovillo.. tuluz parecia orgullosisimo del desastre. supongo que algunas pequeñas aventuras empiezan solamente porque alguien dejo todo patas arriba >w<'
+    },
+
+    'act1-rain-rescue': {
+      title: 'Antes de que se moje',
+      mark: '☂',
+      text: 'corrimos a guardar cada cosita antes de que la lluvia llegara mas fuerte.. no hacia falta salvar el mundo, solo cuidar nuestro pequeño mundo por un momento ♡'
+    },
+
+    'act1-tall-tulips': {
+      title: 'Donde los tulipanes crecen altos',
+      mark: '✿',
+      text: 'caminando un poquito mas lejos encontramos tulipanes que parecian querer alcanzar las estrellas.. incluso en un campo infinito todavia quedan rincones que no habiamos visto juntos ♡'
+    },
+
+    'act1-midnight-flower': {
+      title: 'Flor de medianoche',
+      mark: '❀',
+      text: 'solo abrio cuando el cielo estuvo lleno de estrellas y por un momento parecio guardar un pedacito de su luz.. me gusta que este mundo todavia pueda sorprendernos ♡'
+    },
+
+    'act1-two-paths': {
+      title: 'Dos caminos',
+      mark: '↗',
+      text: 'marie fue por un lado y tuluz por el otro.. elegimos uno, pero el otro seguira esperando para otra noche. no necesito conocer todos los caminos mientras pueda seguir recorriendo alguno contigo ♡'
+    },
+
+    'act1-cat-picnic': {
+      title: 'Picnic para tres',
+      mark: '♡',
+      text: 'un poquito de comida, juguetes tirados por todos lados y tres gatitos convencidos de que aquello era una celebracion enorme.. creo que los momentos pequeños tambien saben sentirse especiales ♡'
+    },
+
+    'act1-our-charm': {
+      title: 'Nuestro detallito',
+      mark: '✧',
+      text: 'elegiste una pequeña señal para dejarla colgada en el refugio.. ahora seguira ahi cada vez que volvamos. una cosita sencilla que dice que este lugar tambien tiene un pedacito elegido por ti ♡'
+    },
+
+    'act1-little-adventures': {
+      title: 'Pequeñas aventuras ♡',
+      mark: '✦',
+      text: 'ninguna fue una gran hazaña.. solo seguimos huellitas, recogimos juguetes, perseguimos luces y encontramos rincones nuevos. pero contigo hasta las cosas pequeñas terminan sintiendose como una aventura ♡'
     }
   };
 
@@ -602,7 +678,20 @@
       'act1-our-tulip',
       'act1-choice-place',
       'act1-three-sleep',
-      'act1-little-world'
+      'act1-little-world',
+
+      'act1-tuluz-treasure',
+      'act1-marie-guide',
+      'act1-mewo-awake',
+      'act1-star-home',
+      'act1-yarn-trail',
+      'act1-rain-rescue',
+      'act1-tall-tulips',
+      'act1-midnight-flower',
+      'act1-two-paths',
+      'act1-cat-picnic',
+      'act1-our-charm',
+      'act1-little-adventures'
     ];
     const html = order
       .filter(id => collected.has(id))

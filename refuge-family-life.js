@@ -303,7 +303,10 @@
       bothNewCatsHere() &&
       !sceneRunning &&
       !arrivalEventRunning() &&
-      !workshopOpen()
+      !workshopOpen() &&
+      !document.body.classList.contains(
+        'act1-adventure-open'
+      )
     );
   }
 
