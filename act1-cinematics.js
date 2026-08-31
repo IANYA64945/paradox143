@@ -230,6 +230,72 @@
       theme:'stay-finale',mark:'♡',
       cats:['cat_gray_idle.png','mewo_idle.png','cat_orange_idle.png'],prop:null,
       frames:['al principio pensé que quedarse significaba simplemente no irse.','después entendí que también es volver y encontrar algo un poquito diferente.','reconocer lo que sigue aquí.','y aun así querer descubrir qué viene después contigo ♡']
+    },
+
+    'act1-again-from-start':{
+      theme:'warm-restart',mark:'↺',
+      cats:['mewo_idle.png'],prop:null,
+      frames:['por un momento intenté recordar cómo se veía todo al principio.','solo había tulipanes, una luna y un montón de espacio esperando algo.','si tuviera que empezar otra vez, volvería a querer descubrirlo contigo ♡']
+    },
+
+    'act1-what-changed':{
+      theme:'warm-changed',mark:'✦',
+      cats:['cat_gray_idle.png','mewo_idle.png','cat_orange_idle.png'],prop:null,
+      frames:['el campo sigue siendo enorme.','pero ahora conozco lugares a los que quiero volver.','supongo que un mundo cambia mucho cuando empiezas a tener recuerdos dentro de él ♡']
+    },
+
+    'act1-what-remains':{
+      theme:'warm-remains',mark:'⌂',
+      cats:[],prop:'aplique_huella.png',
+      frames:['algunas cosas duraron segundos. otras se quedaron durante muchas noches.','una luz, una huella, una flor, una almohadita.','me gusta que tantas cositas sigan esperándonos cuando volvemos ♡']
+    },
+
+    'act1-whole-night':{
+      theme:'warm-night',mark:'☾',
+      cats:['cat_gray_sleep.png','mewo_sleep.png','cat_orange_sleep.png'],prop:null,
+      frames:['caminamos bastante esta noche.','hubo juegos, cielo, lluvia de estrellas y un regreso a casa.','esta vez el recuerdo no fue un momento... fue toda la noche ♡']
+    },
+
+    'act1-sky-we-made':{
+      theme:'warm-stars',mark:'✦',
+      cats:[],prop:'aplique_estrella.png',
+      frames:['había miles de estrellas antes de que llegáramos.','pero ahora hay una pequeña forma que no estaba allí.','me gusta que hasta el cielo tenga algo elegido por ti ♡']
+    },
+
+    'act1-where-began':{
+      theme:'warm-tulip',mark:'✿',
+      cats:[],prop:null,
+      frames:['volví al lugar donde todo empezó.','cuesta imaginar este mundo sin refugio, huellitas ni gatos corriendo por todas partes.','todo esto empezó con un solo tulipán ♡']
+    },
+
+    'act1-they-grew-too':{
+      theme:'warm-cats',mark:'🐾',
+      cats:['cat_gray_happy.png','mewo_happy.png','cat_orange_happy.png'],prop:'toy_ball.png',
+      frames:['Mewo ya no está sola.','Marie tiene un rincón. Tuluz tiene demasiados juguetes >w<','creo que ellos también fueron construyendo este lugar mientras nosotros mirábamos ♡']
+    },
+
+    'act1-this-little-world':{
+      theme:'warm-world',mark:'◇',
+      cats:['cat_gray_idle.png','mewo_idle.png','cat_orange_idle.png'],prop:null,
+      frames:['el campo. la luna. la lluvia. el Claro.','las flores, los juguetes y tres pequeñas vidas corriendo por aquí.','ya no parecen cosas separadas... ahora todo esto se siente como un mismo pequeño mundo ♡']
+    },
+
+    'act1-tomorrow-too':{
+      theme:'warm-tomorrow',mark:'☀',
+      cats:['mewo_idle.png'],prop:null,
+      frames:['me gusta todo lo que ya ocurrió aquí.','pero también me gusta que todavía podamos volver mañana.','quizá el próximo recuerdo todavía ni siquiera sabe que va a existir ♡']
+    },
+
+    'act1-everything-kept':{
+      theme:'warm-final',mark:'♡',
+      cats:['cat_gray_idle.png','mewo_happy.png','cat_orange_idle.png'],prop:null,
+      frames:[
+        'quise llenar este lugar de cosas que pudieran recordarme cuánto te quiero.',
+        'y terminó lleno de noches, huellitas, flores, juegos, pequeñas decisiones y lugares a los que aprendimos a volver.',
+        'no porque todo tuviera que ser importante...',
+        'sino porque lo vivimos contigo aquí.',
+        'todo lo que guardamos ♡'
+      ]
     }
   };
 

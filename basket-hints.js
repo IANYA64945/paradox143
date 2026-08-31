@@ -78,6 +78,29 @@
       if(missing(h,'act1-meaning-stay')&&h.size>=85) p.push('Quizá quedarse no signifique estar quieto. Tal vez ya tienes suficientes recuerdos para entenderlo.');
     }
 
+    // Etapa 5 — Todo lo que guardamos
+    const stayIds=[
+      'act1-place-return','act1-same-moon','act1-nothing-happens',
+      'act1-things-stayed','act1-return-tulip','act1-rain-stay',
+      'act1-still-knowing-cats','act1-your-choices','act1-one-more-while',
+      'act1-meaning-stay'
+    ];
+
+    const stayCount=stayIds.filter(id=>h.has(id)).length;
+
+    if(stayCount>=6 || h.has('act1-meaning-stay')){
+      if(missing(h,'act1-again-from-start')) p.push('Cuando un lugar ya está lleno de recuerdos, a veces dan ganas de imaginar cómo se veía antes de tenerlos.');
+      if(missing(h,'act1-what-changed')&&h.has('act1-again-from-start')) p.push('Camina otra vez por el campo. Quizá siga siendo el mismo y, al mismo tiempo, ya no lo sea.');
+      if(missing(h,'act1-what-remains')&&h.has('act1-again-from-start')) p.push('La cajita no es la única cosa que guarda rastros. Mira también todo lo que quedó repartido por el Claro.');
+      if(missing(h,'act1-whole-night')&&h.size>=92) p.push('No todos los recuerdos tienen que caber en unos segundos. Quédate hasta sentir que viviste una noche entera.');
+      if(missing(h,'act1-sky-we-made')&&h.size>=92) p.push('El cielo tuvo estrellas desde el principio, pero quizá ahora haya una parte que se sienta un poquito más tuya.');
+      if(missing(h,'act1-where-began')&&h.size>=93) p.push('Vuelve al campo y busca aquello que hizo que todo empezara a crecer.');
+      if(missing(h,'act1-they-grew-too')&&h.size>=93) p.push('El refugio cambió mucho, pero no fue lo único. Mira a quienes viven dentro.');
+      if(missing(h,'act1-this-little-world')&&h.size>=94) p.push('Prueba mirar el campo y el refugio como si no fueran dos lugares diferentes.');
+      if(missing(h,'act1-tomorrow-too')&&h.size>=95) p.push('Recordar lo de ayer es bonito. Pensar que todavía puede existir mañana también.');
+      if(missing(h,'act1-everything-kept')&&h.size>=97) p.push('Tal vez ya no falte encontrar nada. Quizá solo falta mirar todo junto una última vez por esta noche.');
+    }
+
     // Cositas opcionales del mundo vivo (no dan cartas)
     if(h.size>=50){
       p.push('Hay un punto del Claro desde el que el cielo se ve especialmente bien. Con lluvia de estrellas quizá valga la pena quedarse allí un rato.');
@@ -89,7 +112,7 @@
 
     // Si no hay nada disponible o todo está completo
     if(!p.length){
-      if(h.size>=89) p.push('Por ahora el pequeño mundo no parece pedir nada. Tal vez solo quiera que vuelvas de vez en cuando ♡');
+      if(h.size>=99) p.push('Por ahora el pequeño mundo está tranquilo. Parece feliz de tener todo esto guardado aquí ♡');
       else p.push('No todo aparece por hacer algo específico. Cambia de clima, visita el Claro, camina por el campo y vuelve otro día.');
     }
     return p;

@@ -529,6 +529,71 @@
       title: 'Lo que significa quedarse ♡',
       mark: '♡',
       text: 'al principio pensaba que quedarse era no irse.. ahora creo que es algo diferente. es volver, encontrar algo cambiado, reconocer lo que sigue aqui y aun asi querer ver que viene despues contigo ♡'
+    },
+
+    /* =====================================================
+       ACTO I · ETAPA 5 — TODO LO QUE GUARDAMOS
+       Cartas 90–99
+    ===================================================== */
+
+    'act1-again-from-start': {
+      title: 'Si volviera a empezar',
+      mark: '↺',
+      text: 'si tuviera que empezar este pequeño mundo otra vez, volveria a plantar el primer tulipan, volveria a encontrar a mewo y volveria a esperar cada cosita que fue llegando.. pero creo que lo que mas querria repetir seria descubrirlo todo contigo ♡'
+    },
+
+    'act1-what-changed': {
+      title: 'Todo lo que cambió',
+      mark: '✦',
+      text: 'el campo sigue pareciendo infinito, pero ya no se siente vacio. ahora hay caminos que reconocemos, una casa a la que volver y pequeñas cosas que solo existen porque estuvimos aqui ♡'
+    },
+
+    'act1-what-remains': {
+      title: 'Todo lo que sigue aquí',
+      mark: '⌂',
+      text: 'algunas noches fueron ruidosas, otras tranquilas y muchas apenas duraron unos minutos.. pero cuando volvemos, encuentro pedacitos de todas ellas esperandonos en el mismo lugar ♡'
+    },
+
+    'act1-whole-night': {
+      title: 'Una noche completa',
+      mark: '☾',
+      text: 'jugamos, caminamos, miramos el cielo, volvimos al refugio y terminamos viendo a los tres mimir.. no hubo un gran momento. fue toda la noche la que termino sintiendose especial ♡'
+    },
+
+    'act1-sky-we-made': {
+      title: 'El cielo que hicimos',
+      mark: '✦',
+      text: 'antes las estrellas solamente estaban ahi arriba. ahora cada vez que las miro recuerdo que incluso el cielo de este lugar termino teniendo una pequeña forma elegida por ti ♡'
+    },
+
+    'act1-where-began': {
+      title: 'Donde comenzó todo',
+      mark: '✿',
+      text: 'volvi al campo y por un momento intente imaginarlo como era al principio.. sin refugio, sin huellitas, sin juguetes ni recuerdos. cuesta creer que todo esto haya empezado con un solo tulipan ♡'
+    },
+
+    'act1-they-grew-too': {
+      title: 'Ellos también crecieron',
+      mark: '🐾',
+      text: 'mewo ya no esta sola, marie encontro su rincón y tuluz consiguio llenar medio refugio de problemas >w< supongo que este mundo no fue el unico que cambio mientras estabamos aqui ♡'
+    },
+
+    'act1-this-little-world': {
+      title: 'Todo este pequeño mundo',
+      mark: '◇',
+      text: 'el campo, la luna, la lluvia, el refugio, las flores, los tres gatitos y todas esas cositas que parecian separadas.. ahora cuando las miro juntas siento que forman un mismo lugar ♡'
+    },
+
+    'act1-tomorrow-too': {
+      title: 'Mañana también',
+      mark: '☀',
+      text: 'me gusta todo lo que ya vivimos aqui, pero tambien me gusta pensar que mañana podemos volver sin saber exactamente que pequeña cosa terminaremos recordando de ese dia ♡'
+    },
+
+    'act1-everything-kept': {
+      title: 'Todo lo que guardamos ♡',
+      mark: '♡',
+      text: 'quise llenar este lugar de cosas que pudieran recordarme cuanto te quiero.. y al final termino lleno de algo mejor: momentos que solo significan algo porque los vivimos contigo aqui. si alguna vez volvemos a recorrerlo desde el principio, espero que sigamos encontrando razones para quedarnos un ratito mas ♡'
     }
   };
 
@@ -851,7 +916,17 @@
       'act1-still-knowing-cats',
       'act1-your-choices',
       'act1-one-more-while',
-      'act1-meaning-stay'
+      'act1-meaning-stay',
+      'act1-again-from-start',
+      'act1-what-changed',
+      'act1-what-remains',
+      'act1-whole-night',
+      'act1-sky-we-made',
+      'act1-where-began',
+      'act1-they-grew-too',
+      'act1-this-little-world',
+      'act1-tomorrow-too',
+      'act1-everything-kept'
     ];
     const html = order
       .filter(id => collected.has(id))
