@@ -255,32 +255,39 @@
   }
 
   function earn(id,{quiet=false}={}){
-    if(!id || typeof id!=='string') return;
+    if(!id || typeof id!=='string') return false;
 
     const st=state();
 
-    if(
-      st.earned.includes(id) ||
-      collected().has(id)
-    ){
-      return;
+    /*
+      Si ya está realmente guardada, no hacemos nada.
+    */
+    if(collected().has(id)){
+      return false;
     }
 
-    const earned=[
-      ...st.earned,
-      id
-    ];
+    /*
+      CORRECCIÓN:
+      antes, si una actividad quedaba marcada como "earned"
+      pero la carta no alcanzaba a guardarse, esta función
+      salía para siempre y ya no volvía a mostrar ni carta
+      ni cinematográfica.
 
-    save({earned});
+      Ahora "earned" NO bloquea el reintento.
+    */
+    if(!st.earned.includes(id)){
+      const earned=[
+        ...st.earned,
+        id
+      ];
+
+      save({earned});
+    }
 
     /*
-      Las cartas nuevas YA NO aparecen en un botón flotante
-      junto a la patita/canasta.
-
-      Primero avisamos al sistema cinematográfico. Si esta
-      carta tiene una escena especial, la escena se reproduce
-      y la carta se presenta al terminar. Si no la tiene, la
-      carta se presenta directamente como las cartas de evento.
+      Avisamos SIEMPRE al sistema cinematográfico.
+      Si no existe cinematográfica para este id, el lector
+      directo se encargará después.
     */
     try{
       window.dispatchEvent(
@@ -299,8 +306,10 @@
     }
 
     scheduleDirectLetter(
-      850
+      650
     );
+
+    return true;
   }
 
   function pendingEarned(){
@@ -400,6 +409,32 @@
         offered
       }
     );
+
+    /*
+      Si esta carta tiene cinematográfica, no abrimos el
+      lector encima de ella. Reintentamos la cinematográfica
+      y esperamos a que esa escena la guarde.
+    */
+    const cineScenes=
+      new Set(
+        window
+          .ParadoxAct1Cinematics
+          ?.scenes ||
+        []
+      );
+
+    if(cineScenes.has(id)){
+      window
+        .ParadoxAct1Cinematics
+        ?.play
+        ?.(id);
+
+      scheduleDirectLetter(
+        2200
+      );
+
+      return true;
+    }
 
     window.ParadoxLetters
       ?.open

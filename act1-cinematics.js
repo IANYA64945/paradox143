@@ -208,6 +208,84 @@
     return current===id || QUEUE.includes(id);
   }
 
+  /*
+    Guardado robusto:
+    usa la API normal y después VERIFICA localStorage.
+    Si por cualquier motivo la API no guardó, lo hace
+    directamente y refresca la Canasta.
+  */
+  function forceCollect(id){
+    if(!id) return false;
+
+    try{
+      window
+        .ParadoxLetters
+        ?.collect
+        ?.(id,false);
+    }catch(_){}
+
+    let list=[];
+
+    try{
+      const raw=
+        localStorage.getItem(
+          'paradox143_letters_v1'
+        );
+
+      const parsed=
+        raw
+          ? JSON.parse(raw)
+          : [];
+
+      list=
+        Array.isArray(parsed)
+          ? parsed
+          : [];
+    }catch(_){
+      list=[];
+    }
+
+    if(!list.includes(id)){
+      list.push(id);
+
+      try{
+        localStorage.setItem(
+          'paradox143_letters_v1',
+          JSON.stringify(list)
+        );
+      }catch(_){}
+
+      try{
+        window.dispatchEvent(
+          new CustomEvent(
+            'paradox-letter-collected',
+            {
+              detail:{
+                id,
+                wasNew:true,
+                repaired:true
+              }
+            }
+          )
+        );
+      }catch(_){}
+    }
+
+    try{
+      window
+        .ParadoxLetters
+        ?.refresh
+        ?.();
+
+      window
+        .ParadoxBasket2
+        ?.refresh
+        ?.();
+    }catch(_){}
+
+    return true;
+  }
+
   function enqueue(id){
     if(!SCENES[id] || queued(id)) return false;
     QUEUE.push(id);
@@ -307,10 +385,9 @@
       MISMO a paradox143_letters_v1 mediante la API oficial
       de letters.js. Por eso el contador 53/79 sí aumenta.
     */
-    try{
-      window.ParadoxLetters?.collect?.(finished,false);
-      window.ParadoxBasket2?.refresh?.();
-    }catch(_){}
+    forceCollect(
+      finished
+    );
 
     try{
       window.dispatchEvent(
@@ -390,6 +467,8 @@
   window.ParadoxAct1Cinematics={
     play:enqueue,
     scenes:Object.keys(SCENES),
-    recover:recoverPendingCinematics
+    recover:recoverPendingCinematics,
+    isRunning:()=>Boolean(current),
+    forceCollect
   };
 })();

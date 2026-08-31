@@ -54,6 +54,90 @@
     if(!IDS.includes(id)||collected().has(id)) return;
     if(window.ParadoxAct1Life?.earn){window.ParadoxAct1Life.earn(id,{quiet});}
   }
+
+  function forceCollectGrowth(id){
+    if(!id) return false;
+
+    try{
+      window
+        .ParadoxAct1Cinematics
+        ?.forceCollect
+        ?.(id);
+
+      if(
+        window
+          .ParadoxLetters
+          ?.has
+          ?.(id)
+      ){
+        return true;
+      }
+    }catch(_){}
+
+    try{
+      window
+        .ParadoxLetters
+        ?.collect
+        ?.(id,false);
+    }catch(_){}
+
+    let arr=[];
+
+    try{
+      arr=
+        JSON.parse(
+          localStorage.getItem(
+            LETTER_KEY
+          ) || '[]'
+        );
+
+      if(!Array.isArray(arr)){
+        arr=[];
+      }
+    }catch(_){
+      arr=[];
+    }
+
+    if(!arr.includes(id)){
+      arr.push(id);
+
+      try{
+        localStorage.setItem(
+          LETTER_KEY,
+          JSON.stringify(arr)
+        );
+      }catch(_){}
+
+      try{
+        window.dispatchEvent(
+          new CustomEvent(
+            'paradox-letter-collected',
+            {
+              detail:{
+                id,
+                wasNew:true,
+                repaired:true
+              }
+            }
+          )
+        );
+      }catch(_){}
+    }
+
+    try{
+      window
+        .ParadoxLetters
+        ?.refresh
+        ?.();
+
+      window
+        .ParadoxBasket2
+        ?.refresh
+        ?.();
+    }catch(_){}
+
+    return true;
+  }
   function whisper(text,duration=3000){
     ensureDOM(); const el=document.getElementById('act1GrowthWhisper'); if(!el) return;
     el.textContent=text; el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
@@ -92,10 +176,9 @@
         de otro botón flotante ni de un segundo guardado.
       */
       if(letterId){
-        try{
-          window.ParadoxLetters?.collect?.(letterId,false);
-          window.ParadoxBasket2?.refresh?.();
-        }catch(_){}
+        forceCollectGrowth(
+          letterId
+        );
 
         setTimeout(()=>{
           try{
