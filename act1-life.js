@@ -69,7 +69,13 @@
     specialTulip:null,
     choicePlace:null,
 
-    ambientMoments:0
+    ambientMoments:0,
+
+    /*
+      Corrección de ritmo:
+      evita que el Claro entregue solo un Momento por visita.
+    */
+    lastGardenMomentAt:0
   };
 
   let garden=null;
@@ -84,6 +90,7 @@
   let weatherTimer=0;
   let napObserver=null;
   let fiveMinuteTimer=0;
+  let momentHeartbeatTimer=0;
 
   let previousWeather='';
   let weatherHold=0;
@@ -1760,7 +1767,12 @@
 
   /* =====================================================
      ELECCIÓN NATURAL DE ACTIVIDADES DEL CLARO
-     Una por visita como máximo para no saturar.
+
+     CORRECCIÓN DE RITMO:
+     antes solo podía aparecer UN Momento por visita.
+     Eso hacía posible quedarse muchísimo tiempo sin ver
+     nada nuevo. Ahora el Claro puede volver a ofrecer otro
+     Momento, pero deja bastante espacio entre uno y otro.
   ===================================================== */
 
   function chooseGardenActivity(){
@@ -1770,7 +1782,7 @@
       !safeGarden() ||
       activeActivity
     ){
-      return;
+      return false;
     }
 
     const st=state();
@@ -1805,11 +1817,11 @@
     }
 
     if(!options.length){
-      return;
+      return false;
     }
 
     /*
-      El orden cambia entre visitas para que nunca parezca
+      El orden cambia para que nunca parezca
       una lista de tareas.
     */
     const action=
@@ -1820,19 +1832,86 @@
         )
       ];
 
-    action?.();
+    const started=
+      Boolean(
+        action?.()
+      );
+
+    if(started){
+      save({
+        lastGardenMomentAt:
+          Date.now()
+      });
+    }
+
+    return started;
   }
 
   function scheduleGardenActivity(){
     clearTimeout(gardenVisitTimer);
 
+    /*
+      Al entrar al Claro, un Momento pendiente puede
+      aparecer relativamente pronto.
+    */
     gardenVisitTimer=setTimeout(
       ()=>{
         chooseGardenActivity();
       },
-      9000+
-      Math.random()*8000
+      5500+
+      Math.random()*4500
     );
+  }
+
+
+  /*
+    Anti-estancamiento suave.
+
+    No fuerza cartas ni completa nada automáticamente.
+    Solo permite que, si el jugador sigue en el Claro y
+    todavía quedan Momentos 45/46/47/53 pendientes,
+    aparezca otra oportunidad después de un descanso.
+
+    Así no hace falta salir y volver al Claro una y otra vez.
+  */
+  function momentHeartbeat(){
+
+    if(
+      !safeGarden() ||
+      activeActivity
+    ){
+      return;
+    }
+
+    const st=state();
+
+    const pending=
+      !st.ballDone ||
+      !st.marieTrailDone ||
+      !st.firefliesDone ||
+      (
+        !st.choiceDone &&
+        st.gardenVisits>=2
+      );
+
+    if(!pending){
+      return;
+    }
+
+    const elapsed=
+      Date.now()-
+      Number(
+        st.lastGardenMomentAt||0
+      );
+
+    /*
+      Aproximadamente 42 s entre oportunidades.
+      Mantiene el Claro tranquilo, pero elimina esperas
+      absurdas de 20–30 minutos.
+    */
+    if(elapsed>=42000){
+      chooseGardenActivity();
+    }
   }
 
   /* =====================================================
@@ -2144,6 +2223,17 @@
       ambientMoment,
       26000+
       Math.random()*18000
+    );
+
+    /*
+      Revisión suave de progreso de MOMENTOS.
+      No entrega cartas: solo vuelve a permitir que
+      aparezca una actividad pendiente dentro de la
+      misma visita al Claro.
+    */
+    momentHeartbeatTimer=setInterval(
+      momentHeartbeat,
+      7000
     );
 
     /*
