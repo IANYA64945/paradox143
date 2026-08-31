@@ -1820,74 +1820,84 @@
 
   const GARDEN2_ZONES={
 
+    /*
+      DISTRIBUCIÓN 2.0
+      El Claro se divide visualmente en tres zonas:
+      - izquierda: descanso / Marie
+      - centro: convivencia / Mewo
+      - derecha: juego / Tuluz
+
+      Así los gatos dejan de amontonarse alrededor del centro.
+    */
+
     bed:{
-      left:15,
+      left:13,
       bottom:10
     },
 
     food:{
-      left:72,
+      left:70,
       bottom:9
     },
 
     flowers:{
-      left:24,
-      bottom:15
+      left:25,
+      bottom:18
     },
 
     tree:{
-      left:39,
-      bottom:22
+      left:36,
+      bottom:23
     },
 
     center:{
-      left:49,
-      bottom:15
+      left:50,
+      bottom:16
     },
 
     warm:{
-      left:30,
+      left:29,
       bottom:11
     },
 
     lookout:{
-      left:51,
-      bottom:23
+      left:52,
+      bottom:25
     },
 
     scratcher:{
-      left:79,
+      left:86,
       bottom:14
     },
 
     toys:{
       left:62,
-      bottom:14
+      bottom:12
     },
 
     right:{
-      left:71,
+      left:74,
       bottom:18
     },
 
     left:{
-      left:24,
-      bottom:20
+      left:20,
+      bottom:21
     },
 
     mewo:{
-      left:48,
+      left:50,
       bottom:16
     },
 
     marie:{
-      left:45,
-      bottom:15
+      left:32,
+      bottom:16
     },
 
     tuluz:{
-      left:56,
-      bottom:15
+      left:68,
+      bottom:16
     }
   };
 
@@ -1903,9 +1913,9 @@
     'warm',
     'flowers',
     'flowers',
-    'tree',
-    'center',
     'left',
+    'tree',
+    'marie',
     'lookout',
     'mewo',
     'tuluz'
@@ -1917,11 +1927,11 @@
     'toys',
     'toys',
     'scratcher',
+    'scratcher',
     'food',
     'food',
-    'tree',
-    'center',
     'right',
+    'tuluz',
     'lookout',
     'marie',
     'mewo'
