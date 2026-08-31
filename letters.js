@@ -392,6 +392,83 @@
       title: 'Pequeñas aventuras ♡',
       mark: '✦',
       text: 'ninguna fue una gran hazaña.. solo seguimos huellitas, recogimos juguetes, perseguimos luces y encontramos rincones nuevos. pero contigo hasta las cosas pequeñas terminan sintiendose como una aventura ♡'
+    },
+
+    /* =====================================================
+       ACTO I · ETAPA 3 — EL MUNDO CRECE
+       Cartas 68–79
+    ===================================================== */
+
+    'act1-new-nook': {
+      title: 'Un rinconcito nuevo',
+      mark: '⌂',
+      text: 'juraria que antes aqui terminaba el refugio.. pero entre las hojas apareció un espacio mas. parece que este pequeño lugar todavia tiene ganas de crecer con nosotros ♡'
+    },
+
+    'act1-second-pillow': {
+      title: 'Segunda almohadita',
+      mark: 'zZ',
+      text: 'una sola almohada era tierna hasta que intentaron dormir tres gatitos encima >w< ahora hay un poquito mas de espacio para descansar.. aunque seguramente igual terminaran todos juntos ♡'
+    },
+
+    'act1-toy-box': {
+      title: 'La cajita de juguetes',
+      mark: '□',
+      text: 'por fin encontramos un lugar para la pelota, el pececito y el ovillo.. no prometo que tuluz vaya a dejarlos ahi mucho tiempo, pero al menos podemos intentarlo >w<'
+    },
+
+    'act1-water-bowl': {
+      title: 'Agüita para todos',
+      mark: '◇',
+      text: 'entre tantas aventuras tambien habia que acordarse de algo sencillo.. dejarles agüita fresca. cuidar un hogar casi siempre esta hecho de detalles pequeñitos ♡'
+    },
+
+    'act1-marie-place': {
+      title: 'El lugar de Marie',
+      mark: '☾',
+      text: 'marie eligio este rinconcito sin pedir permiso y creo que desde ese momento dejo de ser solo un lugar del jardin.. ahora es su lugar ♡'
+    },
+
+    'act1-tuluz-place': {
+      title: 'El lugar de Tuluz',
+      mark: '✦',
+      text: 'tuluz encontro un sitio desde donde puede llegar rapido a sus juguetes, al rascador y probablemente a cualquier problema que decida causar >w< definitivamente lo eligio bien ♡'
+    },
+
+    'act1-mewo-place': {
+      title: 'El rinconcito de Mewo',
+      mark: '🐾',
+      text: 'mewo puede ir y venir cuando quiera.. pero incluso ella termino encontrando un lugar al que le gusta volver. supongo que tener libertad tambien significa poder elegir donde descansar ♡'
+    },
+
+    'act1-flowers-grew': {
+      title: 'Crecieron solas',
+      mark: '❀',
+      text: 'yo solo recuerdo haber plantado un tulipan.. pero ahora hay florecitas creciendo a su alrededor. quizas algunas cosas bonitas empiezan con algo pequeño y despues encuentran solas la forma de crecer ♡'
+    },
+
+    'act1-home-light': {
+      title: 'Una lucecita para volver',
+      mark: '✧',
+      text: 'dejamos una pequeña luz encendida en el refugio.. no porque estuviera oscuro, sino porque me gusta imaginar que cada vez que volvamos algo aqui ya nos estaba esperando ♡'
+    },
+
+    'act1-night-home': {
+      title: 'Una noche en casa',
+      mark: '☾',
+      text: 'comieron, jugaron, hicieron un pequeño desastre y al final todos encontraron donde mimir.. no paso nada extraordinario. creo que por eso se sintio tanto como estar en casa ♡'
+    },
+
+    'act1-look-grown': {
+      title: 'Mira cuánto creció',
+      mark: '↺',
+      text: 'a veces cuesta notar cuanto cambio algo cuando lo vemos todos los dias.. hasta que miramos hacia atras y descubrimos que aquel pequeño claro ya esta lleno de pedacitos de nosotros ♡'
+    },
+
+    'act1-here-we-live': {
+      title: 'Aquí vivimos ♡',
+      mark: '⌂',
+      text: 'al principio solo encontramos un pequeño claro entre los arboles.. despues fuimos dejando cositas, ellos tambien, y un dia deje de sentir que veniamos a visitar este lugar. senti que estabamos volviendo a casa ♡'
     }
   };
 
@@ -691,7 +768,20 @@
       'act1-two-paths',
       'act1-cat-picnic',
       'act1-our-charm',
-      'act1-little-adventures'
+      'act1-little-adventures',
+
+      'act1-new-nook',
+      'act1-second-pillow',
+      'act1-toy-box',
+      'act1-water-bowl',
+      'act1-marie-place',
+      'act1-tuluz-place',
+      'act1-mewo-place',
+      'act1-flowers-grew',
+      'act1-home-light',
+      'act1-night-home',
+      'act1-look-grown',
+      'act1-here-we-live'
     ];
     const html = order
       .filter(id => collected.has(id))

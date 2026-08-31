@@ -306,6 +306,9 @@
       !workshopOpen() &&
       !document.body.classList.contains(
         'act1-adventure-open'
+      ) &&
+      !document.body.classList.contains(
+        'act1-growth-open'
       )
     );
   }

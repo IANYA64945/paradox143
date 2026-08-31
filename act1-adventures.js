@@ -226,6 +226,9 @@
       document.body.classList.contains(
         'act1-planting'
       ) ||
+      document.body.classList.contains(
+        'act1-growth-open'
+      ) ||
       document.getElementById(
         'gameOverlay'
       )?.classList.contains(

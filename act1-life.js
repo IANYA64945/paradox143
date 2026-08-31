@@ -193,6 +193,7 @@
       document.body.classList.contains('basket2-open') ||
       document.body.classList.contains('refuge-arrival-event-open') ||
       document.body.classList.contains('act1-adventure-open') ||
+      document.body.classList.contains('act1-growth-open') ||
       document.getElementById('gameOverlay')?.classList.contains('show') ||
       document.getElementById('letterReader')?.classList.contains('show') ||
       document.getElementById('basket2Reader')?.classList.contains('show') ||
