@@ -469,6 +469,66 @@
       title: 'Aquí vivimos ♡',
       mark: '⌂',
       text: 'al principio solo encontramos un pequeño claro entre los arboles.. despues fuimos dejando cositas, ellos tambien, y un dia deje de sentir que veniamos a visitar este lugar. senti que estabamos volviendo a casa ♡'
+    },
+
+    'act1-place-return': {
+      title: 'Un lugar al que volver',
+      mark: '⌂',
+      text: 'hay lugares bonitos porque existen.. y otros porque alguien decide volver a ellos una y otra vez. creo que este pequeño Claro ya aprendio a esperarnos ♡'
+    },
+
+    'act1-same-moon': {
+      title: 'La misma luna ♡',
+      mark: '☾',
+      text: 'la luna es la misma que vimos desde el campo, pero desde aqui se siente diferente.. tal vez los lugares cambian cuando sabes con quien quieres mirarlos ♡'
+    },
+
+    'act1-nothing-happens': {
+      title: 'Cuando no pasa nada',
+      mark: '·',
+      text: 'no corrio nadie, no aparecio ninguna carta y no tuvimos que encontrar nada.. solo estuvimos aqui. creo que tambien quiero guardar los momentos que parecen no tener nada especial ♡'
+    },
+
+    'act1-things-stayed': {
+      title: 'Cositas que se quedaron',
+      mark: '◇',
+      text: 'una estrellita, una huellita, un hilo, una flor.. cosas pequeñas que no parecian importantes cuando ocurrieron y ahora juntas cuentan una parte de este lugar ♡'
+    },
+
+    'act1-return-tulip': {
+      title: 'Volver a nuestro tulipán',
+      mark: '✿',
+      text: 'lo plantaste en medio de miles y aun asi sigo sabiendo cual es.. me gusta pensar que entre tantas cosas en el mundo siempre habra algunas que podamos reconocer como nuestras ♡'
+    },
+
+    'act1-rain-stay': {
+      title: 'Quedarnos bajo la lluvia',
+      mark: '◇',
+      text: 'afuera seguia lloviendo y no habia nada que arreglar ni rescatar.. esta vez simplemente podiamos escucharla caer mientras nos quedabamos aqui juntos ♡'
+    },
+
+    'act1-still-knowing-cats': {
+      title: 'Todavía los estamos conociendo',
+      mark: '🐾',
+      text: 'creia que ya sabia donde dormiria marie, que haria tuluz y donde apareceria mewo.. pero cada noche hacen algo pequeño que no esperaba. me gusta que este lugar todavia pueda sorprenderme ♡'
+    },
+
+    'act1-your-choices': {
+      title: 'Las cosas que elegiste',
+      mark: '✧',
+      text: 'un tulipan aqui, un detallito alla, una forma entre las estrellas.. este mundo ya no se ve exactamente como lo imagine al principio. ahora tambien tiene decisiones tuyas dentro ♡'
+    },
+
+    'act1-one-more-while': {
+      title: 'Un ratito más',
+      mark: '☾',
+      text: 'podriamos volver al campo ahora.. pero no hay prisa. si estas aqui conmigo, cinco minutitos mas siempre pueden convertirse en otro pequeño recuerdo ♡'
+    },
+
+    'act1-meaning-stay': {
+      title: 'Lo que significa quedarse ♡',
+      mark: '♡',
+      text: 'al principio pensaba que quedarse era no irse.. ahora creo que es algo diferente. es volver, encontrar algo cambiado, reconocer lo que sigue aqui y aun asi querer ver que viene despues contigo ♡'
     }
   };
 
@@ -781,7 +841,17 @@
       'act1-home-light',
       'act1-night-home',
       'act1-look-grown',
-      'act1-here-we-live'
+      'act1-here-we-live',
+      'act1-place-return',
+      'act1-same-moon',
+      'act1-nothing-happens',
+      'act1-things-stayed',
+      'act1-return-tulip',
+      'act1-rain-stay',
+      'act1-still-knowing-cats',
+      'act1-your-choices',
+      'act1-one-more-while',
+      'act1-meaning-stay'
     ];
     const html = order
       .filter(id => collected.has(id))

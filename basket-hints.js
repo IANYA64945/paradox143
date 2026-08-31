@@ -56,6 +56,28 @@
     if(missing(h,'act1-look-grown')&&g.night) p.push('Cuando ves un lugar todos los días es difícil notar cuánto cambió. A veces hay que mirarlo como si fuera la primera vez.');
     if(missing(h,'act1-here-we-live')&&h.size>=70) p.push('El Claro ya tiene muchas cosas. Quizá lo que falta no sea construir algo más, sino darte cuenta de qué se convirtió.');
 
+    // Etapa 4 — Lo que significa quedarse
+    const homeIds=[
+      'act1-new-nook','act1-second-pillow','act1-toy-box','act1-water-bowl',
+      'act1-marie-place','act1-tuluz-place','act1-mewo-place','act1-flowers-grew',
+      'act1-home-light','act1-night-home','act1-look-grown','act1-here-we-live'
+    ];
+
+    const homeCount=homeIds.filter(id=>h.has(id)).length;
+
+    if(homeCount>=5 || h.has('act1-here-we-live')){
+      if(missing(h,'act1-place-return')) p.push('Quizá el siguiente recuerdo no esté escondido en algo nuevo. Prueba volver al Claro cuando ya sientas que conoces casi cada rincón.');
+      if(missing(h,'act1-same-moon')&&h.has('act1-place-return')) p.push('El mirador no sirve solamente para dibujar estrellas. Algunas noches vale la pena mirar algo que siempre estuvo ahí.');
+      if(missing(h,'act1-nothing-happens')&&h.has('act1-place-return')) p.push('Hay noches en las que el Claro no necesita una misión. Quédate sin buscar nada durante un poquito.');
+      if(missing(h,'act1-things-stayed')&&h.has('act1-place-return')) p.push('La caja de madera guarda rastros de cosas que ya pasaron. Quizá abrirla ahora se sienta diferente.');
+      if(missing(h,'act1-return-tulip')&&h.has('act1-place-return')) p.push('Entre miles de flores hay una cuyo lugar no decidió el mundo. Vuelve a buscarla.');
+      if(missing(h,'act1-rain-stay')&&h.has('act1-place-return')) p.push('La próxima vez que llueva no corras a salvar nada. El mirador también sirve para escuchar.');
+      if(missing(h,'act1-still-knowing-cats')&&h.has('act1-place-return')) p.push('Aunque creas conocer a los tres, observa lo que hacen cuando no les estás pidiendo nada.');
+      if(missing(h,'act1-your-choices')&&h.has('act1-place-return')) p.push('Mira cuántas cosas de este mundo están exactamente donde están porque tú elegiste que estuvieran allí.');
+      if(missing(h,'act1-one-more-while')&&h.has('act1-place-return')) p.push('Hay un lugar donde cinco minutitos más nunca parecen demasiado.');
+      if(missing(h,'act1-meaning-stay')&&h.size>=85) p.push('Quizá quedarse no signifique estar quieto. Tal vez ya tienes suficientes recuerdos para entenderlo.');
+    }
+
     // Cositas opcionales del mundo vivo (no dan cartas)
     if(h.size>=50){
       p.push('Hay un punto del Claro desde el que el cielo se ve especialmente bien. Con lluvia de estrellas quizá valga la pena quedarse allí un rato.');
@@ -67,7 +89,7 @@
 
     // Si no hay nada disponible o todo está completo
     if(!p.length){
-      if(h.size>=79) p.push('Por ahora el pequeño mundo no parece pedir nada. Tal vez solo quiera que vuelvas de vez en cuando ♡');
+      if(h.size>=89) p.push('Por ahora el pequeño mundo no parece pedir nada. Tal vez solo quiera que vuelvas de vez en cuando ♡');
       else p.push('No todo aparece por hacer algo específico. Cambia de clima, visita el Claro, camina por el campo y vuelve otro día.');
     }
     return p;

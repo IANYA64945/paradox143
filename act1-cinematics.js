@@ -170,6 +170,66 @@
         'Marie encontró dónde mimir. Mewo se quedó cerquita.',
         'y sin que ocurriera nada extraordinario... el refugio se sintió completamente lleno ♡'
       ]
+    },
+
+    'act1-place-return':{
+      theme:'stay-home',mark:'⌂',
+      cats:['cat_gray_idle.png','mewo_idle.png','cat_orange_idle.png'],prop:null,
+      frames:['volvimos otra vez.','el árbol seguía aquí. las lucecitas también. ellos encontraron sus lugares antes que nosotros.','creo que este pequeño Claro ya aprendió a esperarnos ♡']
+    },
+
+    'act1-same-moon':{
+      theme:'stay-moon',mark:'☾',
+      cats:['cat_gray_idle.png','mewo_idle.png','cat_orange_idle.png'],prop:null,
+      frames:['desde el campo la luna parecía enorme.','desde este rinconcito sigue siendo la misma...','pero algunas cosas se sienten diferentes cuando sabes con quién quieres mirarlas ♡']
+    },
+
+    'act1-nothing-happens':{
+      theme:'stay-quiet',mark:'·',
+      cats:['mewo_idle.png','cat_gray_sleep.png','cat_orange_idle.png'],prop:null,
+      frames:['esta vez no apareció nada que perseguir.','nadie necesitaba ayuda. ninguna lucecita estaba escondiendo un secreto.','solo estuvimos aquí... y creo que eso también merece quedarse ♡']
+    },
+
+    'act1-things-stayed':{
+      theme:'stay-box',mark:'◇',
+      cats:[],prop:'aplique_huella.png',
+      frames:['abrimos la cajita y había cosas demasiado pequeñas para parecer importantes.','una huellita. un hilo. una estrellita. una flor.','juntas se parecían muchísimo a una historia que nunca intentamos escribir ♡']
+    },
+
+    'act1-return-tulip':{
+      theme:'stay-tulip',mark:'✿',
+      cats:[],prop:null,
+      frames:['entre miles de tulipanes todavía pude encontrar este.','no porque sea el más grande ni el que más brilla.','sino porque tú elegiste dónde debía crecer ♡']
+    },
+
+    'act1-rain-stay':{
+      theme:'stay-rain',mark:'◇',
+      cats:['mewo_idle.png','cat_gray_sleep.png','cat_orange_idle.png'],prop:null,
+      frames:['afuera seguía lloviendo.','pero esta vez no había nada que rescatar ni ninguna carrera contra la tormenta.','podíamos simplemente escucharla caer mientras nos quedábamos aquí juntos ♡']
+    },
+
+    'act1-still-knowing-cats':{
+      theme:'stay-cats',mark:'🐾',
+      cats:['cat_gray_happy.png','mewo_idle.png','cat_orange_happy.png'],prop:'toy_ball.png',
+      frames:['creía que ya sabía exactamente cómo eran sus noches.','Marie encontró otra forma de acomodarse. Tuluz inventó otro desastre. Mewo decidió mirar algo que nadie más vio.','me gusta que todavía podamos seguir conociéndolos ♡']
+    },
+
+    'act1-your-choices':{
+      theme:'stay-choices',mark:'✧',
+      cats:['mewo_idle.png','cat_gray_idle.png','cat_orange_idle.png'],prop:'aplique_estrella.png',
+      frames:['este lugar ya no se ve exactamente como lo imaginé al principio.','hay un tulipán donde tú decidiste plantarlo, un detallito que tú escogiste y hasta una forma nueva en el cielo.','ahora este pequeño mundo también tiene decisiones tuyas dentro ♡']
+    },
+
+    'act1-one-more-while':{
+      theme:'stay-more',mark:'☾',
+      cats:['cat_gray_sleep.png','mewo_sleep.png','cat_orange_sleep.png'],prop:null,
+      frames:['podríamos volver al campo ahora.','pero nadie tiene prisa.','cinco minutitos más siempre pueden convertirse en otro pequeño recuerdo ♡']
+    },
+
+    'act1-meaning-stay':{
+      theme:'stay-finale',mark:'♡',
+      cats:['cat_gray_idle.png','mewo_idle.png','cat_orange_idle.png'],prop:null,
+      frames:['al principio pensé que quedarse significaba simplemente no irse.','después entendí que también es volver y encontrar algo un poquito diferente.','reconocer lo que sigue aquí.','y aun así querer descubrir qué viene después contigo ♡']
     }
   };
 
