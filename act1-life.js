@@ -1932,8 +1932,8 @@
       ()=>{
         chooseGardenActivity();
       },
-      2800+
-      Math.random()*2200
+      5600+
+      Math.random()*4400
     );
   }
 
@@ -1979,11 +1979,11 @@
       );
 
     /*
-      Aproximadamente 42 s entre oportunidades.
+      Aproximadamente 30 s entre oportunidades.
       Mantiene el Claro tranquilo, pero elimina esperas
       absurdas de 20–30 minutos.
     */
-    if(elapsed>=15000){
+    if(elapsed>=30000){
       chooseGardenActivity();
     }
   }
@@ -2009,7 +2009,7 @@
     if(
       safeGarden() &&
       !activeActivity &&
-      Math.random()<.72
+      Math.random()<.36
     ){
       const text=
         AMBIENT_LINES[

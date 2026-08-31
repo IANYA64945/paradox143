@@ -80,7 +80,34 @@
         <button id="growthCinemaClose" type="button">volver ♡</button>
       </div>`;
     document.body.appendChild(layer);
-    document.getElementById('growthCinemaClose')?.addEventListener('click',()=>{document.getElementById('act1GrowthCinema')?.classList.remove('show'); end();});
+    document.getElementById('growthCinemaClose')?.addEventListener('click',()=>{
+      const cinema=document.getElementById('act1GrowthCinema');
+      const letterId=cinema?.dataset?.letterId||'';
+
+      cinema?.classList.remove('show');
+
+      /*
+        Las cinematográficas 78/79 ahora se guardan aquí mismo.
+        Así el contador aumenta de inmediato y no dependen
+        de otro botón flotante ni de un segundo guardado.
+      */
+      if(letterId){
+        try{
+          window.ParadoxLetters?.collect?.(letterId,false);
+          window.ParadoxBasket2?.refresh?.();
+        }catch(_){}
+
+        setTimeout(()=>{
+          try{
+            window.ParadoxLetters?.open?.(letterId,false);
+          }catch(_){}
+        },220);
+
+        delete cinema.dataset.letterId;
+      }
+
+      end();
+    });
   }
 
   function renderPermanent(){
@@ -176,7 +203,7 @@
   // 78 — mirar atrás
   function lookBack(){
     const s=state(); if(!s.night||s.look||!safeGarden()||!begin('look')) return false;
-    const c=document.getElementById('act1GrowthCinema'), text=document.getElementById('growthCinemaText'), mark=document.getElementById('growthCinemaMark'), close=document.getElementById('growthCinemaClose'); c.classList.add('show'); close.classList.remove('ready');
+    const c=document.getElementById('act1GrowthCinema'), text=document.getElementById('growthCinemaText'), mark=document.getElementById('growthCinemaMark'), close=document.getElementById('growthCinemaClose'); c.dataset.letterId='act1-look-grown'; c.classList.add('show'); close.textContent='guardar carta ♡'; close.classList.remove('ready');
     const frames=[['·','al principio este lugar estaba casi vacío...'],['zZ','después apareció una almohada.'],['✦','juguetes, luces y pequeños rincones.'],['🐾','Mewo, Marie y Tuluz encontraron lugares propios.'],['⌂','a veces solo notas cuánto creció algo cuando vuelves a mirar desde el principio ♡']]; let i=0;
     const show=()=>{mark.textContent=frames[i][0];text.classList.remove('visible');void text.offsetWidth;text.textContent=frames[i][1];text.classList.add('visible');i++;if(i<frames.length)setTimeout(show,2800);else setTimeout(()=>close.classList.add('ready'),2000);};
     save({look:true}); earn('act1-look-grown',{quiet:true}); show(); return true;
@@ -185,7 +212,7 @@
   // 79 — cierre de la etapa
   function finale(){
     const s=state(); if(s.finale||count(IDS.slice(0,11))<8||busy()||!begin('finale')) return false;
-    const c=document.getElementById('act1GrowthCinema'), text=document.getElementById('growthCinemaText'), mark=document.getElementById('growthCinemaMark'), close=document.getElementById('growthCinemaClose'); c.classList.add('show','finale'); close.classList.remove('ready');
+    const c=document.getElementById('act1GrowthCinema'), text=document.getElementById('growthCinemaText'), mark=document.getElementById('growthCinemaMark'), close=document.getElementById('growthCinemaClose'); c.dataset.letterId='act1-here-we-live'; c.classList.add('show','finale'); close.textContent='guardar carta ♡'; close.classList.remove('ready');
     const frames=[['⌂','al principio solo encontramos un pequeño claro entre los árboles...'],['♡','después fuimos dejando cositas.'],['🐾','ellos también.'],['☾','y un día dejé de pensar que veníamos a visitar este lugar.'],['⌂','sentí que estábamos volviendo a casa ♡']]; let i=0;
     const show=()=>{mark.textContent=frames[i][0];text.classList.remove('visible');void text.offsetWidth;text.textContent=frames[i][1];text.classList.add('visible');i++;if(i<frames.length)setTimeout(show,3200);else setTimeout(()=>close.classList.add('ready'),2400);};
     save({finale:true}); earn('act1-here-we-live',{quiet:true}); show(); return true;
@@ -206,17 +233,17 @@
     if(!options.length) return false; return options[Math.floor(Math.random()*options.length)]?.();
   }
 
-  function schedule(){clearTimeout(scheduler);scheduler=setTimeout(()=>{if(!unlocked()||busy()){schedule();return;} if(isGardenOpen()) chooseGarden(); if(!active)schedule();},6500+Math.random()*5000);}
+  function schedule(){clearTimeout(scheduler);scheduler=setTimeout(()=>{if(!unlocked()||busy()){schedule();return;} if(isGardenOpen()) chooseGarden(); if(!active)schedule();},13000+Math.random()*10000);}
 
   function tickField(){
     const s=state(), wx=world(); if(!isGardenOpen()&&unlocked()){
       let travel=Number(s.fieldTravel||0); if(s.lastWorldX!==null) travel+=Math.min(220,Math.abs(wx-Number(s.lastWorldX||0))); save({fieldTravel:travel,lastWorldX:wx});
-      const t=life().specialTulip; if(t&&!s.flowers&&travel>=2400&&!active&&safeField()&&Math.random()<.006) flowersGrow(); renderFieldFlowers();
+      const t=life().specialTulip; if(t&&!s.flowers&&travel>=2400&&!active&&safeField()&&Math.random()<.003) flowersGrow(); renderFieldFlowers();
       if(!state().finale&&count(IDS.slice(0,11))>=8&&!busy()) setTimeout(finale,700);
     }else save({lastWorldX:wx});
   }
 
-  function onGardenOpen(){const s=state();save({visits:Number(s.visits||0)+1});renderPermanent(); if(unlocked())visitTimer=setTimeout(()=>{if(!active&&safeGarden())chooseGarden();},3500+Math.random()*2800); if(!state().finale&&count(IDS.slice(0,11))>=8)setTimeout(finale,4200);}
+  function onGardenOpen(){const s=state();save({visits:Number(s.visits||0)+1});renderPermanent(); if(unlocked())visitTimer=setTimeout(()=>{if(!active&&safeGarden())chooseGarden();},7000+Math.random()*5600); if(!state().finale&&count(IDS.slice(0,11))>=8)setTimeout(finale,4200);}
   function onGardenClose(){clearTimeout(visitTimer); if(active&&!document.getElementById('act1GrowthCinema')?.classList.contains('show'))end();}
 
   function init(){ensureDOM();garden=document.getElementById('catGarden');renderPermanent();window.addEventListener('paradox-cat-garden-open',onGardenOpen);window.addEventListener('paradox-cat-garden-close',onGardenClose);window.addEventListener('paradox-letter-collected',()=>setTimeout(()=>{if(!state().finale&&count(IDS.slice(0,11))>=8&&!busy())finale();},650));fieldTimer=setInterval(tickField,520);schedule();if(isGardenOpen())setTimeout(onGardenOpen,900);}

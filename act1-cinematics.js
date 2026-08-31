@@ -196,7 +196,7 @@
         <p id="act1CineText"></p>
       </div>
 
-      <button id="act1CineContinue" type="button">continuar ♡</button>
+      <button id="act1CineContinue" type="button">guardar carta ♡</button>
     `;
 
     document.body.appendChild(layer);
@@ -217,6 +217,19 @@
 
   function playNext(){
     if(current || !QUEUE.length) return;
+
+    /*
+      No ponemos una cinematográfica detrás de una carta
+      que todavía se está leyendo.
+    */
+    if(
+      document.getElementById('letterReader')
+        ?.classList.contains('show')
+    ){
+      setTimeout(playNext,700);
+      return;
+    }
+
     start(QUEUE.shift());
   }
 
@@ -288,6 +301,17 @@
     layer?.setAttribute('aria-hidden','true');
     document.body.classList.remove('act1-cinematic-open');
 
+    /*
+      CORRECCIÓN IMPORTANTE:
+      al pulsar "guardar carta ♡" la carta se añade AHORA
+      MISMO a paradox143_letters_v1 mediante la API oficial
+      de letters.js. Por eso el contador 53/79 sí aumenta.
+    */
+    try{
+      window.ParadoxLetters?.collect?.(finished,false);
+      window.ParadoxBasket2?.refresh?.();
+    }catch(_){}
+
     try{
       window.dispatchEvent(
         new CustomEvent(
@@ -297,7 +321,17 @@
       );
     }catch(_){}
 
-    setTimeout(playNext,500);
+    /*
+      Después de guardarla la abrimos para que pueda leerse.
+      Ya aparece como guardada, sin segundo botón ni patita.
+    */
+    setTimeout(()=>{
+      try{
+        window.ParadoxLetters?.open?.(finished,false);
+      }catch(_){}
+    },240);
+
+    setTimeout(playNext,900);
   }
 
   window.addEventListener(
@@ -308,8 +342,54 @@
     }
   );
 
+  /*
+    RECUPERACIÓN:
+    Si con el parche anterior una cinematográfica ya ocurrió
+    pero su carta quedó en "earned" sin entrar al contador,
+    la detectamos y la volvemos a presentar una sola vez.
+  */
+  function recoverPendingCinematics(){
+    try{
+      const life=
+        JSON.parse(
+          localStorage.getItem(
+            'paradox143_act1_life_v1'
+          ) || '{}'
+        );
+
+      const letters=
+        new Set(
+          JSON.parse(
+            localStorage.getItem(
+              'paradox143_letters_v1'
+            ) || '[]'
+          )
+        );
+
+      const earned=
+        Array.isArray(life.earned)
+          ? life.earned
+          : [];
+
+      earned.forEach(id=>{
+        if(
+          SCENES[id] &&
+          !letters.has(id)
+        ){
+          enqueue(id);
+        }
+      });
+    }catch(_){}
+  }
+
+  setTimeout(
+    recoverPendingCinematics,
+    2600
+  );
+
   window.ParadoxAct1Cinematics={
     play:enqueue,
-    scenes:Object.keys(SCENES)
+    scenes:Object.keys(SCENES),
+    recover:recoverPendingCinematics
   };
 })();

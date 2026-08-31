@@ -2237,7 +2237,7 @@
     if(
       !st.charmDone &&
       stage2DoneCount()>=6 &&
-      Math.random()<.38
+      Math.random()<.19
     ){
       return charm();
     }
@@ -2396,8 +2396,8 @@
           scheduleNext();
         }
       },
-      7000+
-      Math.random()*5000
+      14000+
+      Math.random()*10000
     );
   }
 
@@ -2445,7 +2445,7 @@
       if(
         !active &&
         !busy() &&
-        Math.random()<.004
+        Math.random()<.002
       ){
         chooseFieldAdventure();
       }
@@ -2499,7 +2499,7 @@
             if(
               !active &&
               safeGarden() &&
-              Math.random()<.58
+              Math.random()<.29
             ){
               rainRescue();
             }
@@ -2531,7 +2531,7 @@
     if(
       safeGarden() &&
       !active &&
-      Math.random()<.68
+      Math.random()<.34
     ){
       whisper(
         AMBIENT[
@@ -2582,13 +2582,13 @@
           if(
             !active &&
             safeGarden() &&
-            Math.random()<.72
+            Math.random()<.36
           ){
             chooseGardenAdventure();
           }
         },
-        4000+
-        Math.random()*3000
+        8000+
+        Math.random()*6000
       );
     }
 
