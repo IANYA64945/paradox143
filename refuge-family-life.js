@@ -309,6 +309,15 @@
       ) &&
       !document.body.classList.contains(
         'act1-growth-open'
+      ) &&
+      !document.body.classList.contains(
+        'act1-habits-open'
+      ) &&
+      !document.body.classList.contains(
+        'act1-constellation-open'
+      ) &&
+      !document.body.classList.contains(
+        'act1-cinematic-open'
       )
     );
   }
@@ -2048,7 +2057,22 @@
       !sceneRunning &&
       !microSceneRunning &&
       !arrivalEventRunning() &&
-      !workshopOpen()
+      !workshopOpen() &&
+      !document.body.classList.contains(
+        'act1-adventure-open'
+      ) &&
+      !document.body.classList.contains(
+        'act1-growth-open'
+      ) &&
+      !document.body.classList.contains(
+        'act1-cinematic-open'
+      ) &&
+      !document.body.classList.contains(
+        'act1-habits-open'
+      ) &&
+      !document.body.classList.contains(
+        'act1-constellation-open'
+      )
     );
   }
 

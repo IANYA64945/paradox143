@@ -56,6 +56,15 @@
     if(missing(h,'act1-look-grown')&&g.night) p.push('Cuando ves un lugar todos los días es difícil notar cuánto cambió. A veces hay que mirarlo como si fuera la primera vez.');
     if(missing(h,'act1-here-we-live')&&h.size>=70) p.push('El Claro ya tiene muchas cosas. Quizá lo que falta no sea construir algo más, sino darte cuenta de qué se convirtió.');
 
+    // Cositas opcionales del mundo vivo (no dan cartas)
+    if(h.size>=50){
+      p.push('Hay un punto del Claro desde el que el cielo se ve especialmente bien. Con lluvia de estrellas quizá valga la pena quedarse allí un rato.');
+    }
+
+    if(h.size>=45){
+      p.push('La pequeña caja de madera no parece esconder algo nuevo. Más bien parece guardar rastros de cosas que ya ocurrieron.');
+    }
+
     // Si no hay nada disponible o todo está completo
     if(!p.length){
       if(h.size>=79) p.push('Por ahora el pequeño mundo no parece pedir nada. Tal vez solo quiera que vuelvas de vez en cuando ♡');
